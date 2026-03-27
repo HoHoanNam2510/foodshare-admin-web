@@ -161,8 +161,8 @@ export default function Sidebar() {
       </nav>
 
       {/* ── 4. Bottom Logout / Profile ── */}
-      <div className="p-4 shrink-0 border-t border-outline-variant/50">
-        <button className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-error/10 hover:text-error transition-all duration-200">
+      <div className="px-4 py-2.5 shrink-0 border-t border-outline-variant/50">
+        <button className="flex items-center justify-center gap-2 w-full py-2 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-error/10 hover:text-error transition-all duration-200">
           <LogOut size={18} />
           Đăng xuất
         </button>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Epilogue, Be_Vietnam_Pro } from 'next/font/google';
-import './global.css';
+import './globals.css';
 
 // 1. Cấu hình font Epilogue (dùng cho Heading/Display)
 const epilogue = Epilogue({
@@ -28,6 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // Thêm suppressHydrationWarning vào html
     <html
       lang="vi"
       className={`${epilogue.variable} ${beVietnamPro.variable}`}
