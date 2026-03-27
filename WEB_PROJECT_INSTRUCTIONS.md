@@ -11,32 +11,49 @@
 
 ---
 
-## 2. UI/UX Design System (The Editorial Harvest)
+## 2. UI/UX Design System (Enterprise Corporate Trust - FoodShare Edition)
 
 ### 2.1. Overview & Creative North Star
 
-_(Follows the same "Living Magazine" philosophy as mobile: asymmetric layouts, overlapping elements, no rigid borders)._
+**Creative North Star: "Corporate Trust meets Editorial Harvest"**
+This design system embodies the modern enterprise SaaS aesthetic tailored for FoodShare's administrative platform. It rejects cold, sterile corporate formality in favor of a warm, confident, and inviting presence. We maintain our core "Harvest" color identity (Greens and Warm Neutrals) but elevate it with enterprise-grade polish: colored shadows, refined micro-interactions, and isometric depth.
 
-### 2.2. Colors & Tonal Layering
+**Keywords**: Trustworthy, Polished, Dimensional, Modern, Enterprise-Ready, Vibrant.
 
-Utilizes the exact same 13-step tonal scale (T0 to T100) across Primary, Secondary, Tertiary, and Neutral palettes to ensure brand consistency.
+### 2.2. Colors & Surface Philosophy
 
-**Web-Specific Surface Adaptations:**
+We strictly adhere to the established FoodShare color tokens, leveraging them to create professional tonal layering.
 
-- **Hover/Active States:** Because the web utilizes mouse interactions, actively leverage the Tonal scale. (e.g., A button is `bg-primary-T40`, on hover it becomes `bg-primary-T30`).
-- **Backgrounds:** `bg-neutral-DEFAULT` for main wrapper, `bg-neutral-T100` for elevated cards.
-
-**The "No-Line" Rule:**
-Rely on generous padding (`gap-8`, `p-10`) and background shifts. Use `<hr/>` only if absolutely necessary for data tables, tinted with `neutral-T90`.
+- **Primary (The Stem)**: `primary` (#296c24) for authoritative action and primary gradients. `primary-container` (#72b866) for accents.
+- **Secondary (The Zest)**: `secondary` (#944a00) and `secondary-container` (#fd933f) for striking highlights and notifications.
+- **Backgrounds (The Soil)**: `surface` (#f9f9f8) for the main wrapper, `surface-lowest` (#ffffff) for elevated cards.
+- **Dark Mode**: `dark-bg` (#080c1f) for depth, `dark-card` (rgba(255,255,255,0.03)) for surfaces.
 
 ### 2.3. Typography
 
-- Utilize `next/font/google` with CSS variables (`--font-epilogue`, `--font-be-vietnam-pro`).
-- Keep font scaling responsive (`text-base md:text-lg`).
+- **Fonts**: `Epilogue` for Display/Headlines (authoritative, modern) and `Be Vietnam Pro` for Body/UI (highly readable).
+- **Weights & Hierarchy**:
+  - **ExtraBold (800) / Bold (700)** for Hero headlines and section titles.
+  - **SemiBold (600)** for card titles and important labels.
+  - **Medium (500)** for navigation and standard buttons.
+- **Letter Spacing**: Tight tracking (`tracking-tight` or `-0.02em`) on large headlines for modern polish.
 
-### 2.4. Elevation & Depth (Web specific)
+### 2.4. Elevation, Shadows & Effects (Enterprise Polish)
 
-- Use Tailwind's soft shadow utilities (`shadow-sm`, `shadow-md`) but customize the shadow color in `tailwind.config.ts` to use a low-opacity `neutral-T10` instead of pure black.
+We replace flat, neutral gray shadows with **Colored Shadows** tinted with our Primary Green to reinforce the brand palette:
+
+- **Default Card Shadow**: Soft green-tinted base elevation (`shadow-soft`).
+- **Hover State**: Cards lift on hover (`-translate-y-1`) with multi-layer depth (`shadow-hover`).
+- **Glow Effects**: Badges or active states use an ethereal green glow (`shadow-glow`).
+- **Gradients**: Strategic use of `from-primary to-primary-container` for active buttons and `bg-clip-text text-transparent` for emphasizing metrics or headlines.
+- **Atmospheric Blobs**: Use large, softly blurred orbs (`blur-3xl`) with very low opacity (5-10%) in the background to create depth without distraction.
+
+### 2.5. Micro-Interactions & Styling Rules
+
+- **Buttons**: Primary buttons use gradients. Apply a subtle lift (`hover:-translate-y-0.5`) and increased shadow on hover.
+- **Cards**: Base cards use `rounded-xl`, `bg-surface-lowest`, and a very subtle border.
+- **Inputs**: `rounded-lg`, `bg-transparent` or white. Focus states must use `focus-within:ring-2 focus-within:ring-primary/50`.
+- **The "No-Line" Rule (Refined)**: Rely primarily on generous padding and background tonal shifts. Use borders (`border-outline-variant` or `dark:border-dark-hover`) only to strictly separate distinct architectural panels (e.g., Sidebar vs. Main Content) or table rows.
 
 ---
 

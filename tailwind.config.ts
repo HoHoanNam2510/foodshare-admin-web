@@ -12,7 +12,8 @@ const config: Config = {
       colors: {
         // ─── HỆ MÀU 13 SẮC ĐỘ (THE EDITORIAL HARVEST) ───
         primary: {
-          DEFAULT: '#72B866',
+          DEFAULT: '#296C24', // Ánh xạ từ T40: Đảm bảo nền đặc có độ tương phản cao
+          container: '#72B866', // Ánh xạ từ T70: Sử dụng cho các hover state nhạt
           T0: '#000000',
           T10: '#002201',
           T20: '#003A03',
@@ -20,14 +21,15 @@ const config: Config = {
           T40: '#296C24',
           T50: '#42863A',
           T60: '#5CA051',
-          T70: '#76BC69',
+          T70: '#72B866', // Đã tinh chỉnh khớp với mã #72B866 của bạn
           T80: '#90D882',
           T90: '#ABF59C',
           T95: '#CAFFBB',
           T100: '#FFFFFF',
         },
         secondary: {
-          DEFAULT: '#EC8632',
+          DEFAULT: '#944A00', // Ánh xạ từ T40
+          container: '#FA913C', // Ánh xạ từ T70
           T0: '#000000',
           T10: '#301400',
           T20: '#4F2500',
@@ -42,7 +44,7 @@ const config: Config = {
           T100: '#FFFFFF',
         },
         tertiary: {
-          DEFAULT: '#EF86B5',
+          DEFAULT: '#983F6A', // Ánh xạ từ T40
           T0: '#000000',
           T10: '#3D0024',
           T20: '#5E0D3B',
@@ -71,13 +73,21 @@ const config: Config = {
           T95: '#F0F1F0',
           T100: '#FFFFFF',
         },
-        // ─── CÁC MÀU PHỤ TRỢ & ĐẶC THÙ WEB ───
+
+        // ─── MAP CÁC BIẾN UI RIÊNG BIỆT ───
+        surface: {
+          DEFAULT: '#F8F9F8', // Lấy từ neutral-DEFAULT
+          container: '#E1E3E2', // Lấy từ neutral-T90 (Tạo sự tách biệt khối)
+          lowest: '#FFFFFF', // Lấy từ neutral-T100 (Dành cho nền Card)
+        },
         outline: {
           variant: '#c0c9b9',
         },
         error: {
           DEFAULT: '#ba1a1a',
         },
+
+        // ─── CHẾ ĐỘ TỐI (DARK MODE) ───
         dark: {
           bg: '#080c1f', // Nền chính của dashboard
           card: 'rgba(255,255,255,0.03)', // Nền của các thẻ (search, profile)
@@ -112,9 +122,12 @@ const config: Config = {
         '10': '3.5rem', // 56px
       },
       boxShadow: {
-        // Ambient Shadows cho Web (thay thế drop shadow gắt)
-        soft: '0 12px 24px -8px rgba(25, 28, 28, 0.04)',
-        floating: '0 24px 48px -12px rgba(25, 28, 28, 0.06)',
+        // ─── COLORED SHADOWS (Dựa trên RGB của Primary: 41, 108, 36) ───
+        soft: '0 4px 20px -2px rgba(41, 108, 36, 0.08)',
+        hover:
+          '0 10px 25px -5px rgba(41, 108, 36, 0.15), 0 8px 10px -6px rgba(41, 108, 36, 0.1)',
+        floating: '0 24px 48px -12px rgba(41, 108, 36, 0.12)',
+        glow: '0 0 20px rgba(41, 108, 36, 0.4)',
       },
     },
   },
