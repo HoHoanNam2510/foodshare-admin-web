@@ -70,6 +70,21 @@ export const adminMenus: MenuItem[] = [
     ],
   },
   {
+    // Checked
+    id: 'transactions',
+    label: 'Quản Lý Giao Dịch',
+    path: '/transactions',
+    icon: CreditCard,
+    sub: [
+      { label: 'Xem danh sách', path: '/transactions', icon: List },
+      {
+        label: 'Lịch sử cập nhật',
+        path: '/transactions/history',
+        icon: History,
+      },
+    ],
+  },
+  {
     id: 'disputes',
     label: 'Quản Lý Tranh Chấp',
     path: '/disputes',
@@ -101,13 +116,6 @@ export const adminMenus: MenuItem[] = [
       { label: 'Tạo & Gửi', path: '/notifications/create', icon: Send },
       { label: 'Xem lịch sử', path: '/notifications/history', icon: History },
     ],
-  },
-  {
-    id: 'transactions',
-    label: 'Quản Lý Giao Dịch',
-    path: '/transactions',
-    icon: CreditCard,
-    sub: [{ label: 'Xem danh sách', path: '/transactions', icon: List }],
   },
   {
     id: 'conversations',
