@@ -8,7 +8,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex bg-[#F0F1F0]">
+    <div className="min-h-screen flex bg-neutral-T95">
       {/* Cột trái: Sidebar cố định (280px) */}
       <Sidebar />
 

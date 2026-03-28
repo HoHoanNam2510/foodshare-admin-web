@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -23,6 +24,11 @@ interface GrowthChartProps {
 }
 
 export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   // Màu primary từ hệ thống: #296C24
   const primaryColor = '#296C24';
 
@@ -40,9 +46,13 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
     return null;
   };
 
+  if (!isMounted) {
+    return <div className="w-full h-75" />;
+  }
+
   return (
-    <div className="w-full h-75">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-full">
+      <ResponsiveContainer width="100%" height={300}>
         {type === 'bar' ? (
           <BarChart
             data={data}
@@ -101,7 +111,12 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
               dataKey="total"
               stroke={primaryColor}
               strokeWidth={3}
-              dot={{ r: 4, fill: primaryColor, strokeWidth: 2, stroke: '#fff' }}
+              dot={{
+                r: 4,
+                fill: primaryColor,
+                strokeWidth: 2,
+                stroke: '#fff',
+              }}
               activeDot={{ r: 6 }}
             />
           </LineChart>

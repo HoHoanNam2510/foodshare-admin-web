@@ -43,7 +43,7 @@ export default function Header() {
       {/* ── Bên Phải: Actions & Profile ── */}
       <div className="flex items-center gap-4">
         {/* Global Search Box (Enterprise style) */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-surface rounded-lg border border-outline-variant/30 w-64 focus-within:ring-1 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all duration-200">
+        <div className="flex items-center gap-2 px-3 py-2.5 bg-surface rounded-lg border border-outline-variant/30 w-64 focus-within:ring-1 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all duration-200">
           <Search size={16} className="text-gray-400" />
           <input
             type="text"
