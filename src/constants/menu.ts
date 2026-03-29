@@ -85,16 +85,12 @@ export const adminMenus: MenuItem[] = [
     ],
   },
   {
-    id: 'disputes',
-    label: 'Quản Lý Tranh Chấp',
-    path: '/disputes',
+    // Checked
+    id: 'reports',
+    label: 'Quản Lý Báo Cáo',
+    path: '/reports',
     icon: AlertTriangle,
-    sub: [
-      { label: 'Xem danh sách', path: '/disputes', icon: List },
-      { label: 'Cập nhật', path: '/disputes/edit', icon: Edit },
-      { label: 'Phân xử', path: '/disputes/resolve', icon: Gavel },
-      { label: 'Xử phạt', path: '/disputes/penalty', icon: Ban },
-    ],
+    sub: [{ label: 'Xem danh sách', path: '/reports', icon: List }],
   },
   {
     id: 'vouchers',

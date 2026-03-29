@@ -40,7 +40,7 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-70 z-40 flex flex-col bg-surface border-r border-outline-variant/50 transition-all duration-300">
+    <aside className="fixed top-0 left-0 h-screen w-70 z-40 flex flex-col bg-[#E3E8E3] border-r border-outline-variant/50 transition-all duration-300">
       {/* ── 1. Logo & Brand ── */}
       <div className="flex items-center gap-3 px-6 py-6 shrink-0">
         <div className="w-10 h-10 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 flex items-center justify-center overflow-hidden shrink-0">
