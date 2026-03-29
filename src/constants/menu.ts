@@ -93,6 +93,14 @@ export const adminMenus: MenuItem[] = [
     sub: [{ label: 'Xem danh sách', path: '/reports', icon: List }],
   },
   {
+    // Checked
+    id: 'chats',
+    label: 'Quản Lý Hội Thoại',
+    path: '/chats',
+    icon: MessageCircle,
+    sub: [{ label: 'Xem danh sách', path: '/chats', icon: List }],
+  },
+  {
     id: 'vouchers',
     label: 'Quản Lý Voucher',
     path: '/vouchers',
@@ -111,20 +119,6 @@ export const adminMenus: MenuItem[] = [
     sub: [
       { label: 'Tạo & Gửi', path: '/notifications/create', icon: Send },
       { label: 'Xem lịch sử', path: '/notifications/history', icon: History },
-    ],
-  },
-  {
-    id: 'conversations',
-    label: 'Quản Lý Hội Thoại',
-    path: '/conversations',
-    icon: MessageCircle,
-    sub: [
-      { label: 'Xem lịch sử', path: '/conversations', icon: History },
-      {
-        label: 'Xóa/Gỡ tin nhắn',
-        path: '/conversations/manage',
-        icon: MessageSquare,
-      },
     ],
   },
   {
