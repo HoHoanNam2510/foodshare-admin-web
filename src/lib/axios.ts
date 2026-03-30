@@ -7,7 +7,15 @@ const axiosInstance = axios.create({
   },
 });
 
-// Bạn có thể thêm Interceptors ở đây sau này để tự động đính kèm Token đăng nhập vào header
-// axiosInstance.interceptors.request.use(...)
+// Tự động đính kèm Admin Token vào mỗi request
+axiosInstance.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
 
 export default axiosInstance;

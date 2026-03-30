@@ -11,17 +11,12 @@ import {
   List,
   UserPlus,
   Edit,
-  Lock,
   ShieldCheck,
   EyeOff,
-  Gavel,
-  Ban,
-  Plus,
   Send,
   History,
-  MessageSquare,
-  RotateCcw,
-  Trash,
+  Leaf,
+  ToggleLeft,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -106,9 +101,17 @@ export const adminMenus: MenuItem[] = [
     path: '/vouchers',
     icon: Ticket,
     sub: [
-      { label: 'Xem danh sách', path: '/vouchers', icon: List },
-      { label: 'Thêm mới', path: '/vouchers/create', icon: Plus },
-      { label: 'Vô hiệu hóa', path: '/vouchers/status', icon: Ban },
+      { label: 'Danh sách voucher', path: '/vouchers', icon: List },
+      { label: 'Khóa/Mở voucher', path: '/vouchers', icon: ToggleLeft },
+    ],
+  },
+  {
+    id: 'greenpoints',
+    label: 'Quản Lý Green Points',
+    path: '/greenpoints',
+    icon: Leaf,
+    sub: [
+      { label: 'Lịch sử giao dịch điểm', path: '/greenpoints', icon: History },
     ],
   },
   {
@@ -126,10 +129,6 @@ export const adminMenus: MenuItem[] = [
     label: 'Quản Lý Thùng Rác',
     path: '/trash',
     icon: Trash2,
-    sub: [
-      { label: 'Xem danh sách', path: '/trash', icon: List },
-      { label: 'Khôi phục', path: '/trash/restore', icon: RotateCcw },
-      { label: 'Xóa vĩnh viễn', path: '/trash/delete', icon: Trash },
-    ],
+    sub: [{ label: 'Xem danh sách', path: '/trash', icon: List }],
   },
 ];

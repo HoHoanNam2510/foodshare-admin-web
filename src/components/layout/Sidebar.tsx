@@ -132,9 +132,12 @@ export default function Sidebar() {
               {/* Sub-menu */}
               {hasSub && isOpen && (
                 <div className="ml-5 mt-1 mb-2 flex flex-col gap-0.5 pl-3 border-l-2 border-outline-variant/30">
-                  {item.sub.map((sub) => {
+                  {item.sub.map((sub, subIdx) => {
                     const SubIcon = sub.icon;
-                    const isSubActive = pathname === sub.path;
+                    // Chỉ active sub đầu tiên nếu nhiều sub cùng path
+                    const isSubActive =
+                      pathname === sub.path &&
+                      subIdx === item.sub.findIndex((s) => s.path === sub.path);
 
                     return (
                       <Link
