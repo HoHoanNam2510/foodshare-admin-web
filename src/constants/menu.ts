@@ -17,6 +17,7 @@ import {
   History,
   Leaf,
   ToggleLeft,
+  Star,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -96,14 +97,18 @@ export const adminMenus: MenuItem[] = [
     sub: [{ label: 'Xem danh sách', path: '/chats', icon: List }],
   },
   {
+    id: 'reviews',
+    label: 'Quản Lý Đánh Giá',
+    path: '/reviews',
+    icon: Star,
+    sub: [{ label: 'Xem danh sách', path: '/reviews', icon: List }],
+  },
+  {
     id: 'vouchers',
     label: 'Quản Lý Voucher',
     path: '/vouchers',
     icon: Ticket,
-    sub: [
-      { label: 'Danh sách voucher', path: '/vouchers', icon: List },
-      { label: 'Khóa/Mở voucher', path: '/vouchers', icon: ToggleLeft },
-    ],
+    sub: [{ label: 'Danh sách voucher', path: '/vouchers', icon: List }],
   },
   {
     id: 'greenpoints',
