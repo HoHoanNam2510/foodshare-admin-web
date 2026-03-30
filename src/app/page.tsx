@@ -1,6 +1,19 @@
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function RootPage() {
-  // Tự động chuyển hướng người dùng vào trang dashboard
-  redirect('/dashboard');
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+      router.replace('/dashboard');
+    } else {
+      router.replace('/login');
+    }
+  }, [router]);
+
+  return null;
 }
