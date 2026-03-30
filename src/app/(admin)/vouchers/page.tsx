@@ -66,7 +66,7 @@ const getStatusBadge = (
     );
   }
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-green-50 text-primary border-primary/20">
+    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-green-50 text-primary border-primary/20 text-center">
       Hoạt động
     </span>
   );

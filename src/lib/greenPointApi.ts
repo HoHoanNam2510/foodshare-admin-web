@@ -38,7 +38,7 @@ export async function fetchAdminPointLogs(params: {
   if (params.limit) query.set('limit', String(params.limit));
 
   const res = await axiosInstance.get<AdminPointLogsResponse>(
-    `/api/greenpoints/admin/logs?${query.toString()}`
+    `/greenpoints/admin/logs?${query.toString()}`
   );
   return res.data;
 }

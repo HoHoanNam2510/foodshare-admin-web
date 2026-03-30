@@ -48,7 +48,7 @@ export async function fetchAdminVouchers(params: {
   if (params.limit) query.set('limit', String(params.limit));
 
   const res = await axiosInstance.get<AdminVouchersResponse>(
-    `/api/vouchers/admin?${query.toString()}`
+    `/vouchers/admin?${query.toString()}`
   );
   return res.data;
 }
@@ -56,6 +56,6 @@ export async function fetchAdminVouchers(params: {
 export async function toggleAdminVoucher(
   id: string
 ): Promise<{ success: boolean; message: string; data: IVoucher }> {
-  const res = await axiosInstance.patch(`/api/vouchers/admin/${id}/toggle`);
+  const res = await axiosInstance.patch(`/vouchers/admin/${id}/toggle`);
   return res.data;
 }
