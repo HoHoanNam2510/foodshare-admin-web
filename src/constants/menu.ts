@@ -50,8 +50,8 @@ export const adminMenus: MenuItem[] = [
     icon: Users,
     sub: [
       { label: 'Danh sách tài khoản', path: '/users', icon: List },
-      { label: 'Tạo mới', path: '/users/create', icon: UserPlus },
       { label: 'Xét duyệt KYC', path: '/users/kyc', icon: ShieldCheck },
+      { label: 'Tạo mới tài khoản', path: '/users/create', icon: UserPlus },
     ],
   },
   {

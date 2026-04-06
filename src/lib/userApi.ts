@@ -44,6 +44,7 @@ export async function fetchUsers(params: {
   search?: string;
   role?: string;
   status?: string;
+  kycStatus?: string;
   page?: number;
   limit?: number;
   sortBy?: string;
@@ -53,12 +54,25 @@ export async function fetchUsers(params: {
   if (params.search?.trim()) query.set('search', params.search.trim());
   if (params.role && params.role !== 'ALL') query.set('role', params.role);
   if (params.status && params.status !== 'ALL') query.set('status', params.status);
+  if (params.kycStatus && params.kycStatus !== 'ALL') query.set('kycStatus', params.kycStatus);
   if (params.page) query.set('page', String(params.page));
   if (params.limit) query.set('limit', String(params.limit));
   if (params.sortBy) query.set('sortBy', params.sortBy);
   if (params.sortOrder) query.set('sortOrder', params.sortOrder);
 
   const res = await axiosInstance.get<UsersResponse>(`/users?${query.toString()}`);
+  return res.data;
+}
+
+export async function reviewKyc(
+  id: string,
+  action: 'APPROVE' | 'REJECT',
+  rejectionReason?: string
+): Promise<{ success: boolean; message: string; data: IUser }> {
+  const res = await axiosInstance.patch(`/users/${id}/kyc-review`, {
+    action,
+    rejectionReason,
+  });
   return res.data;
 }
 

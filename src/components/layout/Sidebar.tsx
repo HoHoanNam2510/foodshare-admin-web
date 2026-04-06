@@ -28,8 +28,7 @@ export default function Sidebar() {
     setExpanded((prev) => ({ ...prev, ...initialExpanded }));
   }, [pathname]);
 
-  const toggleExpand = (id: string, e: React.MouseEvent) => {
-    e.preventDefault();
+  const toggleExpand = (id: string) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -99,33 +98,41 @@ export default function Sidebar() {
                     : 'hover:bg-primary/5 text-gray-600 hover:text-primary'
                 }`}
               >
-                <Link
-                  href={hasSub ? '#' : item.path}
-                  onClick={(e) => hasSub && toggleExpand(item.id, e)}
-                  className="flex items-center gap-3 flex-1 px-3 py-2.5 min-w-0"
-                >
-                  <Icon
-                    size={18}
-                    className={`shrink-0 transition-colors ${isActive ? 'text-white' : ''}`}
-                  />
-                  <span
-                    className={`flex-1 font-body text-sm whitespace-nowrap transition-colors ${isActive ? 'font-bold' : 'font-medium'}`}
-                  >
-                    {item.label}
-                  </span>
-                </Link>
-
-                {hasSub && (
+                {hasSub ? (
                   <button
-                    onClick={(e) => toggleExpand(item.id, e)}
-                    className="pr-3 py-2.5 shrink-0"
+                    onClick={() => toggleExpand(item.id)}
+                    className="flex items-center gap-3 flex-1 px-3 py-2.5 min-w-0 text-left"
                   >
+                    <Icon
+                      size={18}
+                      className={`shrink-0 transition-colors ${isActive ? 'text-white' : ''}`}
+                    />
+                    <span
+                      className={`flex-1 font-body text-sm whitespace-nowrap transition-colors ${isActive ? 'font-bold' : 'font-medium'}`}
+                    >
+                      {item.label}
+                    </span>
                     {isOpen ? (
-                      <ChevronDown size={16} />
+                      <ChevronDown size={16} className="shrink-0" />
                     ) : (
-                      <ChevronRight size={16} />
+                      <ChevronRight size={16} className="shrink-0" />
                     )}
                   </button>
+                ) : (
+                  <Link
+                    href={item.path}
+                    className="flex items-center gap-3 flex-1 px-3 py-2.5 min-w-0"
+                  >
+                    <Icon
+                      size={18}
+                      className={`shrink-0 transition-colors ${isActive ? 'text-white' : ''}`}
+                    />
+                    <span
+                      className={`flex-1 font-body text-sm whitespace-nowrap transition-colors ${isActive ? 'font-bold' : 'font-medium'}`}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
                 )}
               </div>
 
