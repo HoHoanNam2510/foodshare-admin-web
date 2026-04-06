@@ -11,12 +11,16 @@ import {
   Store,
   Ban,
   Unlock,
+  Loader2,
 } from 'lucide-react';
+import { useState } from 'react';
+import type { IUser } from '@/lib/userApi';
 
 interface UserDetailModalProps {
-  user: any;
+  user: IUser | null;
   onClose: () => void;
-  formatDate: (date: Date) => string;
+  onBanToggle: (user: IUser) => Promise<void>;
+  formatDate: (date: string | Date) => string;
   getStatusBadge: (status: string) => React.ReactNode;
   getRoleBadge: (role: string) => React.ReactNode;
 }
@@ -24,14 +28,26 @@ interface UserDetailModalProps {
 export default function UserDetailModal({
   user,
   onClose,
+  onBanToggle,
   formatDate,
   getStatusBadge,
   getRoleBadge,
 }: UserDetailModalProps) {
+  const [toggling, setToggling] = useState(false);
+
   if (!user) return null;
 
-  // Lấy chữ cái đầu làm Avatar fallback
   const initial = user.fullName ? user.fullName.charAt(0).toUpperCase() : '?';
+
+  const handleBanToggle = async () => {
+    setToggling(true);
+    try {
+      await onBanToggle(user);
+      onClose();
+    } finally {
+      setToggling(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -147,7 +163,7 @@ export default function UserDetailModal({
                   </span>
                 </p>
                 <p className="text-gray-700 italic">
-                  "{user.storeInfo.description}"
+                  &quot;{user.storeInfo.description}&quot;
                 </p>
               </div>
             </div>
@@ -188,19 +204,36 @@ export default function UserDetailModal({
         <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors"
+            disabled={toggling}
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors disabled:opacity-50"
           >
             Đóng
           </button>
 
           {user.status === 'ACTIVE' ? (
-            <button className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-error/10 text-error hover:bg-error hover:text-white transition-colors">
-              <Ban size={16} />
+            <button
+              onClick={handleBanToggle}
+              disabled={toggling}
+              className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-error/10 text-error hover:bg-error hover:text-white transition-colors disabled:opacity-50"
+            >
+              {toggling ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Ban size={16} />
+              )}
               Khóa tài khoản
             </button>
           ) : (
-            <button className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-              <Unlock size={16} />
+            <button
+              onClick={handleBanToggle}
+              disabled={toggling}
+              className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors disabled:opacity-50"
+            >
+              {toggling ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Unlock size={16} />
+              )}
               Mở khóa tài khoản
             </button>
           )}

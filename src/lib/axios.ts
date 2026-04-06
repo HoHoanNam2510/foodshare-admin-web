@@ -18,4 +18,23 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+// Xử lý token hết hạn hoặc không hợp lệ → redirect về login
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      typeof window !== 'undefined' &&
+      (error?.response?.status === 401 || error?.response?.status === 403)
+    ) {
+      // Chỉ redirect nếu đang ở trang admin (không phải trang login)
+      if (!window.location.pathname.startsWith('/login')) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        window.location.replace('/login');
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;

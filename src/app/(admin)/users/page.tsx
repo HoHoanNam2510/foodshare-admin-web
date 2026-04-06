@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Search,
   Filter,
@@ -9,13 +9,19 @@ import {
   Ban,
   Unlock,
   ShieldAlert,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import UserDetailModal from '@/components/features/users/UserDetailModal';
-import { MOCK_USERS } from '@/constants/mockUsers';
+import { fetchUsers, updateUserStatus, type IUser } from '@/lib/userApi';
+
+const PAGE_SIZE = 10;
 
 // --- HELPER FORMATS ---
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('vi-VN', {
+const formatDate = (date: string | Date) => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('vi-VN', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -53,35 +59,83 @@ const getRoleBadge = (role: string) => {
 };
 
 export default function UsersManagementPage() {
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [roleFilter, setRoleFilter] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: PAGE_SIZE,
+    total: 0,
+    totalPages: 1,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  const filteredUsers = useMemo(() => {
-    let result = [...MOCK_USERS];
-    result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      result = result.filter(
-        (u) =>
-          u.fullName.toLowerCase().includes(lowerQuery) ||
-          u.email.toLowerCase().includes(lowerQuery) ||
-          (u.phoneNumber && u.phoneNumber.includes(lowerQuery))
-      );
-    }
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, roleFilter]);
 
-    if (statusFilter !== 'ALL') {
-      result = result.filter((u) => u.status === statusFilter);
+  const loadUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchUsers({
+        search: searchQuery,
+        role: roleFilter,
+        status: statusFilter,
+        page: currentPage,
+        limit: PAGE_SIZE,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      });
+      setUsers(res.data);
+      setPagination(res.pagination);
+    } catch {
+      setError('Không thể tải danh sách người dùng. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
     }
-    if (roleFilter !== 'ALL') {
-      result = result.filter((u) => u.role === roleFilter);
+  }, [searchQuery, roleFilter, statusFilter, currentPage]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  const handleBanToggle = async (user: IUser) => {
+    setTogglingId(user._id);
+    setOpenDropdownId(null);
+    try {
+      const newStatus = user.status === 'ACTIVE' ? 'BANNED' : 'ACTIVE';
+      await updateUserStatus(user._id, newStatus);
+      await loadUsers();
+      // Sync modal if open
+      if (selectedUser?._id === user._id) {
+        setSelectedUser((prev) => prev ? { ...prev, status: newStatus } : null);
+      }
+    } catch {
+      alert('Thao tác thất bại. Vui lòng thử lại.');
+    } finally {
+      setTogglingId(null);
     }
-    return result;
-  }, [searchQuery, statusFilter, roleFilter]);
+  };
 
   const closeDropdown = () => setOpenDropdownId(null);
 
@@ -107,8 +161,8 @@ export default function UsersManagementPage() {
           <input
             type="text"
             placeholder="Tìm theo tên, email, sđt..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="bg-transparent text-sm outline-none w-full font-body text-gray-900 placeholder:text-gray-400"
           />
         </div>
@@ -164,8 +218,23 @@ export default function UsersManagementPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20 text-sm">
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-5 py-16 text-center">
+                    <div className="flex flex-col items-center gap-3 text-gray-400">
+                      <Loader2 size={28} className="animate-spin" />
+                      <span className="text-sm font-body">Đang tải dữ liệu...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center text-error text-sm">
+                    {error}
+                  </td>
+                </tr>
+              ) : users.length > 0 ? (
+                users.map((user) => (
                   <tr
                     key={user._id}
                     className="hover:bg-primary/5 transition-colors"
@@ -224,9 +293,14 @@ export default function UsersManagementPage() {
                             openDropdownId === user._id ? null : user._id
                           );
                         }}
-                        className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+                        disabled={togglingId === user._id}
+                        className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors disabled:opacity-50"
                       >
-                        <MoreVertical size={18} />
+                        {togglingId === user._id ? (
+                          <Loader2 size={18} className="animate-spin" />
+                        ) : (
+                          <MoreVertical size={18} />
+                        )}
                       </button>
 
                       {openDropdownId === user._id && (
@@ -256,10 +330,7 @@ export default function UsersManagementPage() {
 
                           {user.status === 'ACTIVE' ? (
                             <button
-                              onClick={() => {
-                                alert(`Đã khóa user ${user._id}`);
-                                setOpenDropdownId(null);
-                              }}
+                              onClick={() => handleBanToggle(user)}
                               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
                             >
                               <Ban size={16} />
@@ -267,10 +338,7 @@ export default function UsersManagementPage() {
                             </button>
                           ) : (
                             <button
-                              onClick={() => {
-                                alert(`Đã mở khóa user ${user._id}`);
-                                setOpenDropdownId(null);
-                              }}
+                              onClick={() => handleBanToggle(user)}
                               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
                             >
                               <Unlock size={16} />
@@ -295,12 +363,84 @@ export default function UsersManagementPage() {
             </tbody>
           </table>
         </div>
+
+        {/* ── PAGINATION ── */}
+        {!loading && !error && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-3 border-t border-outline-variant/30">
+            <p className="text-xs font-body text-gray-500">
+              Hiển thị{' '}
+              <span className="font-semibold text-gray-700">
+                {(pagination.page - 1) * pagination.limit + 1}–
+                {Math.min(pagination.page * pagination.limit, pagination.total)}
+              </span>{' '}
+              trong tổng số{' '}
+              <span className="font-semibold text-gray-700">
+                {pagination.total}
+              </span>{' '}
+              người dùng
+            </p>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded-md text-gray-500 hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                .filter(
+                  (p) =>
+                    p === 1 ||
+                    p === pagination.totalPages ||
+                    Math.abs(p - currentPage) <= 1
+                )
+                .reduce<(number | '...')[]>((acc, p, idx, arr) => {
+                  if (idx > 0 && p - (arr[idx - 1] as number) > 1)
+                    acc.push('...');
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, idx) =>
+                  p === '...' ? (
+                    <span key={`ellipsis-${idx}`} className="px-2 text-gray-400 text-sm">
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p as number)}
+                      className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
+                        currentPage === p
+                          ? 'bg-primary text-white'
+                          : 'text-gray-600 hover:bg-surface-container'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))
+                }
+                disabled={currentPage === pagination.totalPages}
+                className="p-1.5 rounded-md text-gray-500 hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── HIỂN THỊ MODAL CHI TIẾT ── */}
       <UserDetailModal
         user={selectedUser}
         onClose={() => setSelectedUser(null)}
+        onBanToggle={handleBanToggle}
         formatDate={formatDate}
         getStatusBadge={getStatusBadge}
         getRoleBadge={getRoleBadge}
