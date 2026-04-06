@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   Filter,
@@ -12,9 +13,19 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Pencil,
+  Trash2,
+  UserPlus,
 } from 'lucide-react';
 import UserDetailModal from '@/components/features/users/UserDetailModal';
-import { fetchUsers, updateUserStatus, type IUser } from '@/lib/userApi';
+import UserEditModal from '@/components/features/users/UserEditModal';
+import {
+  fetchUsers,
+  updateUserStatus,
+  deleteUser,
+  type IUser,
+} from '@/lib/userApi';
+import { useAuthStore } from '@/stores/authStore';
 
 const PAGE_SIZE = 10;
 
@@ -29,16 +40,21 @@ const formatDate = (date: string | Date) => {
 };
 
 const getStatusBadge = (status: string) => {
-  const isBanned = status === 'BANNED';
+  if (status === 'BANNED')
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-red-50 text-error border-error/20">
+        Bị khóa
+      </span>
+    );
+  if (status === 'PENDING_KYC')
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-amber-50 text-amber-700 border-amber-200">
+        Chờ KYC
+      </span>
+    );
   return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${
-        isBanned
-          ? 'bg-red-50 text-error border-error/20'
-          : 'bg-green-50 text-primary border-primary/20'
-      }`}
-    >
-      {isBanned ? 'Bị khóa' : 'Hoạt động'}
+    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-green-50 text-primary border-primary/20">
+      Hoạt động
     </span>
   );
 };
@@ -59,6 +75,9 @@ const getRoleBadge = (role: string) => {
 };
 
 export default function UsersManagementPage() {
+  const router = useRouter();
+  const { user: adminUser } = useAuthStore();
+
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -77,7 +96,9 @@ export default function UsersManagementPage() {
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+  const [editingUser, setEditingUser] = useState<IUser | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -119,6 +140,7 @@ export default function UsersManagementPage() {
     loadUsers();
   }, [loadUsers]);
 
+  // ── Ban / Unban ──
   const handleBanToggle = async (user: IUser) => {
     setTogglingId(user._id);
     setOpenDropdownId(null);
@@ -126,9 +148,10 @@ export default function UsersManagementPage() {
       const newStatus = user.status === 'ACTIVE' ? 'BANNED' : 'ACTIVE';
       await updateUserStatus(user._id, newStatus);
       await loadUsers();
-      // Sync modal if open
       if (selectedUser?._id === user._id) {
-        setSelectedUser((prev) => prev ? { ...prev, status: newStatus } : null);
+        setSelectedUser((prev) =>
+          prev ? { ...prev, status: newStatus } : null
+        );
       }
     } catch {
       alert('Thao tác thất bại. Vui lòng thử lại.');
@@ -137,7 +160,59 @@ export default function UsersManagementPage() {
     }
   };
 
+  // ── Delete ──
+  const handleDelete = async (user: IUser) => {
+    setOpenDropdownId(null);
+
+    // Guard: cannot delete ACTIVE accounts (shown by UI logic, but double-check)
+    if (user.status === 'ACTIVE') {
+      alert(
+        'Không thể xóa tài khoản đang hoạt động. Vui lòng khóa tài khoản trước.'
+      );
+      return;
+    }
+
+    // Guard: cannot delete own account
+    if (adminUser && user._id === adminUser._id) {
+      alert('Bạn không thể xóa tài khoản của chính mình.');
+      return;
+    }
+
+    const confirmed = confirm(
+      `Xóa vĩnh viễn tài khoản "${user.fullName}" (${user.email})?\n\nHành động này không thể hoàn tác.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(user._id);
+    try {
+      await deleteUser(user._id);
+      await loadUsers();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Xóa tài khoản thất bại. Vui lòng thử lại.';
+      alert(msg);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  // ── After edit saved ──
+  const handleUserUpdated = async (updated: IUser) => {
+    await loadUsers();
+    if (selectedUser?._id === updated._id) {
+      setSelectedUser(updated);
+    }
+  };
+
   const closeDropdown = () => setOpenDropdownId(null);
+
+  // KYC button: only for accounts in PENDING_KYC status
+  const showKycAction = (user: IUser) => user.status === 'PENDING_KYC';
+
+  // Delete: only BANNED accounts, and not self
+  const showDeleteAction = (user: IUser) =>
+    user.status === 'BANNED' && adminUser?._id !== user._id;
 
   return (
     <div
@@ -145,13 +220,22 @@ export default function UsersManagementPage() {
       onClick={closeDropdown}
     >
       {/* ── HEADER ── */}
-      <div>
-        <h1 className="text-2xl font-sans font-bold text-gray-900 leading-tight">
-          Quản Lý Người Dùng
-        </h1>
-        <p className="text-sm font-body text-gray-500 mt-1">
-          Quản lý tài khoản, định danh (KYC) và trạng thái người dùng
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-sans font-bold text-gray-900 leading-tight">
+            Quản Lý Người Dùng
+          </h1>
+          <p className="text-sm font-body text-gray-500 mt-1">
+            Quản lý tài khoản, định danh (KYC) và trạng thái người dùng
+          </p>
+        </div>
+        <button
+          onClick={() => router.push('/users/create')}
+          className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity shrink-0"
+        >
+          <UserPlus size={16} />
+          Tạo tài khoản
+        </button>
       </div>
 
       {/* ── TOOLBAR (SEARCH & FILTERS) ── */}
@@ -191,6 +275,7 @@ export default function UsersManagementPage() {
             >
               <option value="ALL">Tất cả trạng thái</option>
               <option value="ACTIVE">Đang hoạt động</option>
+              <option value="PENDING_KYC">Chờ duyệt KYC</option>
               <option value="BANNED">Đã bị khóa</option>
             </select>
           </div>
@@ -206,12 +291,14 @@ export default function UsersManagementPage() {
                 <th className="px-5 py-4 font-semibold rounded-tl-md">
                   Người dùng
                 </th>
-                <th className="px-5 py-4 font-semibold">Vai trò</th>
+                <th className="px-5 py-4 font-semibold text-center">Vai trò</th>
                 <th className="px-5 py-4 font-semibold">Liên hệ & Địa chỉ</th>
                 <th className="px-5 py-4 font-semibold text-center">
                   Điểm xanh
                 </th>
-                <th className="px-5 py-4 font-semibold">Trạng thái</th>
+                <th className="px-5 py-4 font-semibold text-center">
+                  Trạng thái
+                </th>
                 <th className="px-3 py-4 font-semibold text-center rounded-tr-md">
                   Hành động
                 </th>
@@ -223,13 +310,18 @@ export default function UsersManagementPage() {
                   <td colSpan={6} className="px-5 py-16 text-center">
                     <div className="flex flex-col items-center gap-3 text-gray-400">
                       <Loader2 size={28} className="animate-spin" />
-                      <span className="text-sm font-body">Đang tải dữ liệu...</span>
+                      <span className="text-sm font-body">
+                        Đang tải dữ liệu...
+                      </span>
                     </div>
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-error text-sm">
+                  <td
+                    colSpan={6}
+                    className="px-5 py-10 text-center text-error text-sm"
+                  >
                     {error}
                   </td>
                 </tr>
@@ -239,7 +331,7 @@ export default function UsersManagementPage() {
                     key={user._id}
                     className="hover:bg-primary/5 transition-colors"
                   >
-                    {/* Người dùng: Gom Tên + Email */}
+                    {/* Người dùng */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold shrink-0">
@@ -256,8 +348,10 @@ export default function UsersManagementPage() {
                       </div>
                     </td>
 
-                    {/* Vai trò */}
-                    <td className="px-5 py-4">{getRoleBadge(user.role)}</td>
+                    {/* Vai trò — center */}
+                    <td className="px-5 py-4 text-center">
+                      {getRoleBadge(user.role)}
+                    </td>
 
                     {/* Liên hệ & Địa chỉ */}
                     <td className="px-5 py-4 max-w-50">
@@ -274,17 +368,19 @@ export default function UsersManagementPage() {
                       </div>
                     </td>
 
-                    {/* Green Points */}
+                    {/* Green Points — center */}
                     <td className="px-5 py-4 text-center">
                       <span className="font-bold text-primary">
                         {user.greenPoints}
                       </span>
                     </td>
 
-                    {/* Trạng thái */}
-                    <td className="px-5 py-4">{getStatusBadge(user.status)}</td>
+                    {/* Trạng thái — center */}
+                    <td className="px-5 py-4 text-center">
+                      {getStatusBadge(user.status)}
+                    </td>
 
-                    {/* Action 3 chấm */}
+                    {/* Hành động — center */}
                     <td className="px-3 py-4 text-center relative">
                       <button
                         onClick={(e) => {
@@ -293,10 +389,12 @@ export default function UsersManagementPage() {
                             openDropdownId === user._id ? null : user._id
                           );
                         }}
-                        disabled={togglingId === user._id}
+                        disabled={
+                          togglingId === user._id || deletingId === user._id
+                        }
                         className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors disabled:opacity-50"
                       >
-                        {togglingId === user._id ? (
+                        {togglingId === user._id || deletingId === user._id ? (
                           <Loader2 size={18} className="animate-spin" />
                         ) : (
                           <MoreVertical size={18} />
@@ -304,7 +402,8 @@ export default function UsersManagementPage() {
                       </button>
 
                       {openDropdownId === user._id && (
-                        <div className="absolute right-8 top-10 w-48 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
+                        <div className="absolute right-8 top-10 w-52 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
+                          {/* Xem hồ sơ */}
                           <button
                             onClick={() => {
                               setSelectedUser(user);
@@ -316,34 +415,69 @@ export default function UsersManagementPage() {
                             Xem hồ sơ
                           </button>
 
-                          {user.kycStatus === 'PENDING' && (
+                          {/* Chỉnh sửa */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingUser(user);
+                              setOpenDropdownId(null);
+                            }}
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                          >
+                            <Pencil size={16} />
+                            Chỉnh sửa
+                          </button>
+
+                          {/* Xét duyệt KYC — only when PENDING and not ADMIN */}
+                          {showKycAction(user) && (
                             <button
-                              onClick={() => setOpenDropdownId(null)}
+                              onClick={() => {
+                                setOpenDropdownId(null);
+                                router.push('/users/kyc');
+                              }}
                               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-secondary hover:bg-secondary/10 transition-colors"
                             >
                               <ShieldAlert size={16} />
-                              Duyệt KYC
+                              Xét duyệt KYC
                             </button>
                           )}
 
-                          <div className="h-px bg-outline-variant/20 my-1"></div>
+                          {/* Ban / Unban — hidden for PENDING_KYC (use KYC workflow first) */}
+                          {user.status !== 'PENDING_KYC' && (
+                            <>
+                              <div className="h-px bg-outline-variant/20 my-1" />
+                              {user.status === 'ACTIVE' ? (
+                                <button
+                                  onClick={() => handleBanToggle(user)}
+                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
+                                >
+                                  <Ban size={16} />
+                                  Khóa tài khoản
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleBanToggle(user)}
+                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
+                                >
+                                  <Unlock size={16} />
+                                  Mở khóa tài khoản
+                                </button>
+                              )}
+                            </>
+                          )}
 
-                          {user.status === 'ACTIVE' ? (
-                            <button
-                              onClick={() => handleBanToggle(user)}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
-                            >
-                              <Ban size={16} />
-                              Khóa tài khoản
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleBanToggle(user)}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
-                            >
-                              <Unlock size={16} />
-                              Mở khóa tài khoản
-                            </button>
+                          {/* Xóa tài khoản — only BANNED and not self */}
+                          {showDeleteAction(user) && (
+                            <>
+                              <div className="h-px bg-outline-variant/20 my-1" />
+                              <button
+                                onClick={() => handleDelete(user)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
+                              >
+                                <Trash2 size={16} />
+                                Xóa tài khoản
+                              </button>
+                            </>
                           )}
                         </div>
                       )}
@@ -404,7 +538,10 @@ export default function UsersManagementPage() {
                 }, [])
                 .map((p, idx) =>
                   p === '...' ? (
-                    <span key={`ellipsis-${idx}`} className="px-2 text-gray-400 text-sm">
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="px-2 text-gray-400 text-sm"
+                    >
                       …
                     </span>
                   ) : (
@@ -436,7 +573,7 @@ export default function UsersManagementPage() {
         )}
       </div>
 
-      {/* ── HIỂN THỊ MODAL CHI TIẾT ── */}
+      {/* ── DETAIL MODAL ── */}
       <UserDetailModal
         user={selectedUser}
         onClose={() => setSelectedUser(null)}
@@ -444,6 +581,13 @@ export default function UsersManagementPage() {
         formatDate={formatDate}
         getStatusBadge={getStatusBadge}
         getRoleBadge={getRoleBadge}
+      />
+
+      {/* ── EDIT MODAL ── */}
+      <UserEditModal
+        user={editingUser}
+        onClose={() => setEditingUser(null)}
+        onUpdated={handleUserUpdated}
       />
     </div>
   );

@@ -182,20 +182,24 @@ export default function UserDetailModal({
                 </span>
                 <span className="text-gray-500">Đánh giá</span>
               </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck
-                  size={16}
-                  className={
-                    user.kycStatus === 'VERIFIED'
-                      ? 'text-primary'
-                      : 'text-gray-400'
-                  }
-                />
-                <span className="font-semibold text-gray-900">
-                  {user.kycStatus}
-                </span>
-                <span className="text-gray-500">Trạng thái KYC</span>
-              </div>
+
+              {/* KYC Status — only shown for STORE or PENDING_KYC accounts */}
+              {(user.role === 'STORE' || user.status === 'PENDING_KYC') && (
+                <div className="flex items-center gap-2">
+                  <ShieldCheck
+                    size={16}
+                    className={
+                      user.kycStatus === 'VERIFIED'
+                        ? 'text-primary'
+                        : 'text-gray-400'
+                    }
+                  />
+                  <span className="font-semibold text-gray-900">
+                    {user.kycStatus}
+                  </span>
+                  <span className="text-gray-500">Trạng thái KYC</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

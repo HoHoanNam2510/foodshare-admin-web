@@ -111,14 +111,16 @@ export default function KycReviewPage() {
         sortOrder: 'desc',
       };
 
-      // Fetch users that have KYC docs — filter by kycStatus on backend
-      if (kycFilter !== 'ALL') {
-        // Use the query param for kycStatus filtering
+      if (kycFilter === 'PENDING') {
+        // PENDING_KYC is the new authoritative status for "awaiting review"
+        (params as Record<string, unknown>).status = 'PENDING_KYC';
+      } else if (kycFilter !== 'ALL') {
+        // VERIFIED / REJECTED — filter by kycStatus field
         (params as Record<string, unknown>).kycStatus = kycFilter;
       }
 
       const res = await fetchUsers(params);
-      // Only show users that actually have KYC documents or store info
+      // Always ensure we only show users that have submitted KYC documents
       const filtered = res.data.filter(
         (u) => u.kycDocuments && u.kycDocuments.length > 0
       );
