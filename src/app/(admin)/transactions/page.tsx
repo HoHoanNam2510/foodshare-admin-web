@@ -48,6 +48,8 @@ const getStatusBadge = (status: string) => {
     COMPLETED: 'bg-green-50 text-primary border-primary/20',
     CANCELLED: 'bg-gray-100 text-gray-600 border-gray-200',
     REJECTED: 'bg-red-50 text-error border-error/20',
+    REFUNDED: 'bg-orange-50 text-orange-700 border-orange-200',
+    DISPUTED: 'bg-rose-50 text-rose-700 border-rose-200',
   };
   return (
     <span
@@ -194,6 +196,8 @@ export default function TransactionsManagementPage() {
             <option value="COMPLETED">Hoàn thành</option>
             <option value="CANCELLED">Đã hủy</option>
             <option value="REJECTED">Đã từ chối</option>
+            <option value="REFUNDED">Đã hoàn tiền</option>
+            <option value="DISPUTED">Đang khiếu nại</option>
           </select>
         </div>
       </div>

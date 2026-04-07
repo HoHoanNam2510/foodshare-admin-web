@@ -18,6 +18,7 @@ import {
   Leaf,
   ToggleLeft,
   Star,
+  Wallet,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -78,6 +79,15 @@ export const adminMenus: MenuItem[] = [
         path: '/transactions/history',
         icon: History,
       },
+    ],
+  },
+  {
+    id: 'escrow',
+    label: 'Quản Lý Escrow',
+    path: '/escrow',
+    icon: Wallet,
+    sub: [
+      { label: 'Danh sách Escrow', path: '/escrow', icon: List },
     ],
   },
   {
