@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Search,
   Filter,
@@ -11,7 +11,13 @@ import {
   Layers,
 } from 'lucide-react';
 import TransactionDetailModal from '@/components/features/transactions/TransactionDetailModal';
-import { MOCK_TRANSACTIONS } from '@/constants/mockTransactions';
+import Pagination from '@/components/ui/Pagination';
+import {
+  fetchAdminTransactions,
+  adminForceUpdateTransactionStatus,
+  type ITransaction,
+  type PaginationMeta,
+} from '@/lib/transactionApi';
 
 // --- HELPER FORMATS ---
 const formatCurrency = (amount: number, method: string) => {
@@ -23,8 +29,9 @@ const formatCurrency = (amount: number, method: string) => {
   }).format(amount);
 };
 
-const formatDate = (date: Date) => {
-  return date.toLocaleString('vi-VN', {
+const formatDate = (date: string | Date) => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleString('vi-VN', {
     hour: '2-digit',
     minute: '2-digit',
     day: '2-digit',
@@ -44,52 +51,82 @@ const getStatusBadge = (status: string) => {
   };
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${styles[status] || styles.PENDING}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${styles[status] ?? styles.PENDING}`}
     >
       {status}
     </span>
   );
 };
 
+const PAGE_LIMIT = 15;
+
 export default function TransactionsManagementPage() {
-  // State quản lý Tab nội bộ: Thêm tùy chọn 'ALL'
-  const [activeTab, setActiveTab] = useState<'ALL' | 'REQUEST' | 'ORDER'>(
-    'ALL'
-  );
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [activeTab, setActiveTab] = useState<'ALL' | 'REQUEST' | 'ORDER'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [selectedTx, setSelectedTx] = useState<any | null>(null);
+  const [selectedTx, setSelectedTx] = useState<ITransaction | null>(null);
 
+  const loadTransactions = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetchAdminTransactions({
+        type: activeTab !== 'ALL' ? activeTab : undefined,
+        status: statusFilter !== 'ALL' ? statusFilter : undefined,
+        page: currentPage,
+        limit: PAGE_LIMIT,
+      });
+      setTransactions(res.data);
+      setPagination(res.pagination);
+    } catch (err) {
+      console.error('Failed to load transactions:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeTab, statusFilter, currentPage]);
+
+  useEffect(() => {
+    loadTransactions();
+  }, [loadTransactions]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, statusFilter]);
+
+  // Client-side search on the current page's data
   const filteredTransactions = useMemo(() => {
-    let result = [...MOCK_TRANSACTIONS];
+    if (!searchQuery) return transactions;
+    const q = searchQuery.toLowerCase();
+    return transactions.filter(
+      (tx) =>
+        tx._id.toLowerCase().includes(q) ||
+        tx.postId.title.toLowerCase().includes(q) ||
+        tx.requesterId.fullName.toLowerCase().includes(q) ||
+        tx.ownerId.fullName.toLowerCase().includes(q)
+    );
+  }, [transactions, searchQuery]);
 
-    // 1. Lọc theo Tab loại giao dịch
-    if (activeTab !== 'ALL') {
-      result = result.filter((tx) => tx.type === activeTab);
-    }
+  const handleTabChange = (tab: 'ALL' | 'REQUEST' | 'ORDER') => {
+    setActiveTab(tab);
+    setStatusFilter('ALL');
+    setSearchQuery('');
+  };
 
-    // Sắp xếp mới nhất lên đầu
-    result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-    // 2. Lọc theo Search (Mã GD, Tên bài, Người nhận)
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      result = result.filter(
-        (t) =>
-          t._id.toLowerCase().includes(lowerQuery) ||
-          t.post.title.toLowerCase().includes(lowerQuery) ||
-          t.requester.fullName.toLowerCase().includes(lowerQuery)
-      );
-    }
-
-    // 3. Lọc theo Trạng thái
-    if (statusFilter !== 'ALL') {
-      result = result.filter((t) => t.status === statusFilter);
-    }
-    return result;
-  }, [activeTab, searchQuery, statusFilter]);
+  const handleStatusUpdate = async (transactionId: string, newStatus: string) => {
+    await adminForceUpdateTransactionStatus(transactionId, newStatus);
+    // Refresh list and update selected modal item
+    await loadTransactions();
+    setSelectedTx((prev) =>
+      prev?._id === transactionId ? { ...prev, status: newStatus as ITransaction['status'] } : prev
+    );
+  };
 
   const closeDropdown = () => setOpenDropdownId(null);
 
@@ -108,66 +145,56 @@ export default function TransactionsManagementPage() {
         </p>
       </div>
 
-      {/* ── TABS CHUYỂN ĐỔI NỘI BỘ ── */}
+      {/* ── TABS ── */}
       <div className="flex items-center gap-2 border-b border-outline-variant/30 pb-px">
         <button
-          onClick={() => {
-            setActiveTab('ALL');
-            setStatusFilter('ALL');
-          }}
+          onClick={() => handleTabChange('ALL')}
           className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'ALL' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
         >
           <Layers size={18} /> Tất cả giao dịch
         </button>
         <button
-          onClick={() => {
-            setActiveTab('REQUEST');
-            setStatusFilter('ALL');
-          }}
+          onClick={() => handleTabChange('REQUEST')}
           className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'REQUEST' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
         >
           <HeartHandshake size={18} /> P2P - Xin đồ miễn phí
         </button>
         <button
-          onClick={() => {
-            setActiveTab('ORDER');
-            setStatusFilter('ALL');
-          }}
+          onClick={() => handleTabChange('ORDER')}
           className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'ORDER' ? 'border-secondary text-secondary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
         >
           <ShoppingBag size={18} /> B2C - Mua túi mù
         </button>
       </div>
 
-      {/* ── TOOLBAR (SEARCH & FILTERS) ── */}
+      {/* ── TOOLBAR ── */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-surface-lowest p-4 rounded-md shadow-sm border border-outline-variant/30">
         <div className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50 w-full sm:w-80 focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all">
           <Search size={16} className="text-gray-400" />
           <input
             type="text"
-            placeholder="Tìm theo Mã GD, Tên bài, Người nhận..."
+            placeholder="Tìm theo Mã GD, Tên bài, Tên người..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-transparent text-sm outline-none w-full font-body text-gray-900 placeholder:text-gray-400"
           />
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50">
-            <Filter size={16} className="text-gray-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-transparent text-sm outline-none font-body text-gray-700 cursor-pointer"
-            >
-              <option value="ALL">Tất cả trạng thái</option>
-              <option value="PENDING">Chờ xác nhận</option>
-              <option value="ACCEPTED">Đã chấp nhận</option>
-              <option value="ESCROWED">Đã thanh toán (Giữ tiền)</option>
-              <option value="COMPLETED">Hoàn thành</option>
-              <option value="CANCELLED">Đã hủy</option>
-            </select>
-          </div>
+        <div className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50">
+          <Filter size={16} className="text-gray-400" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-transparent text-sm outline-none font-body text-gray-700 cursor-pointer"
+          >
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="PENDING">Chờ xác nhận</option>
+            <option value="ACCEPTED">Đã chấp nhận</option>
+            <option value="ESCROWED">Đã thanh toán (Giữ tiền)</option>
+            <option value="COMPLETED">Hoàn thành</option>
+            <option value="CANCELLED">Đã hủy</option>
+            <option value="REJECTED">Đã từ chối</option>
+          </select>
         </div>
       </div>
 
@@ -177,32 +204,47 @@ export default function TransactionsManagementPage() {
           <table className="w-full text-left font-body">
             <thead className="bg-surface/50 border-b border-outline-variant/30 font-label text-xs uppercase text-gray-500">
               <tr>
-                <th className="px-5 py-4 font-semibold rounded-tl-md">
-                  Mã GD & Bài đăng
-                </th>
+                <th className="px-5 py-4 font-semibold rounded-tl-md">Mã GD & Bài đăng</th>
                 <th className="px-5 py-4 font-semibold">Giao dịch giữa</th>
-                <th className="px-5 py-4 font-semibold text-right">
-                  Tổng thanh toán
-                </th>
+                <th className="px-5 py-4 font-semibold text-right">Tổng thanh toán</th>
                 <th className="px-5 py-4 font-semibold">Trạng thái</th>
                 <th className="px-5 py-4 font-semibold">Ngày tạo</th>
-                <th className="px-3 py-4 font-semibold text-center rounded-tr-md">
-                  Hành động
-                </th>
+                <th className="px-3 py-4 font-semibold text-center rounded-tr-md">Hành động</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20 text-sm">
-              {filteredTransactions.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-5 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-32 mb-1" />
+                      <div className="h-3 bg-gray-100 rounded w-48" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-3 bg-gray-200 rounded w-28 mb-1" />
+                      <div className="h-3 bg-gray-100 rounded w-24" />
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="h-4 bg-gray-200 rounded w-20 ml-auto" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-5 bg-gray-200 rounded w-20" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-3 bg-gray-200 rounded w-28" />
+                    </td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-8 w-8 bg-gray-200 rounded-md mx-auto" />
+                    </td>
+                  </tr>
+                ))
+              ) : filteredTransactions.length > 0 ? (
                 filteredTransactions.map((tx) => (
-                  <tr
-                    key={tx._id}
-                    className="hover:bg-primary/5 transition-colors"
-                  >
+                  <tr key={tx._id} className="hover:bg-primary/5 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex flex-col min-w-50">
-                        <span className="font-semibold text-gray-900 flex items-center gap-2">
-                          {tx._id}
-                          {/* Indicator nhỏ để biết loại giao dịch khi ở tab ALL */}
+                        <span className="font-semibold text-gray-900 flex items-center gap-2 font-mono text-xs">
+                          {tx._id.slice(-8).toUpperCase()}
                           {activeTab === 'ALL' && (
                             <span
                               className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold ${tx.type === 'REQUEST' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}
@@ -212,7 +254,7 @@ export default function TransactionsManagementPage() {
                           )}
                         </span>
                         <span className="text-xs text-gray-500 mt-0.5 line-clamp-1">
-                          {tx.post.title}
+                          {tx.postId.title}
                         </span>
                       </div>
                     </td>
@@ -220,16 +262,12 @@ export default function TransactionsManagementPage() {
                     <td className="px-5 py-4">
                       <div className="flex flex-col text-xs gap-0.5">
                         <span className="text-gray-800">
-                          <strong className="text-gray-500 font-medium">
-                            Nhận:
-                          </strong>{' '}
-                          {tx.requester.fullName}
+                          <strong className="text-gray-500 font-medium">Nhận:</strong>{' '}
+                          {tx.requesterId.fullName}
                         </span>
                         <span className="text-gray-800">
-                          <strong className="text-gray-500 font-medium">
-                            Cấp:
-                          </strong>{' '}
-                          {tx.owner.fullName}
+                          <strong className="text-gray-500 font-medium">Cấp:</strong>{' '}
+                          {tx.ownerId.fullName}
                         </span>
                       </div>
                     </td>
@@ -237,10 +275,7 @@ export default function TransactionsManagementPage() {
                     <td className="px-5 py-4 text-right">
                       <div className="flex flex-col">
                         <span className="text-gray-900 font-semibold">
-                          {formatCurrency(
-                            tx.post.price * tx.quantity,
-                            tx.paymentMethod
-                          )}
+                          {formatCurrency(tx.postId.price * tx.quantity, tx.paymentMethod)}
                         </span>
                         <span className="text-xs text-gray-500 mt-0.5">
                           SL: {tx.quantity} • {tx.paymentMethod}
@@ -257,9 +292,7 @@ export default function TransactionsManagementPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setOpenDropdownId(
-                            openDropdownId === tx._id ? null : tx._id
-                          );
+                          setOpenDropdownId(openDropdownId === tx._id ? null : tx._id);
                         }}
                         className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
                       >
@@ -284,10 +317,7 @@ export default function TransactionsManagementPage() {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-5 py-10 text-center text-gray-500"
-                  >
+                  <td colSpan={6} className="px-5 py-10 text-center text-gray-500">
                     Không có giao dịch nào phù hợp.
                   </td>
                 </tr>
@@ -295,11 +325,21 @@ export default function TransactionsManagementPage() {
             </tbody>
           </table>
         </div>
+
+        {/* ── PAGINATION ── */}
+        {pagination && pagination.totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={pagination.totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       <TransactionDetailModal
         transaction={selectedTx}
         onClose={() => setSelectedTx(null)}
+        onStatusUpdate={handleStatusUpdate}
         formatDate={formatDate}
         formatCurrency={formatCurrency}
         getStatusBadge={getStatusBadge}
