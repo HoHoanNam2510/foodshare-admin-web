@@ -35,7 +35,7 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-surface-lowest border border-outline-variant/50 p-3 rounded-lg shadow-hover">
+        <div className="bg-surface-lowest border border-outline-variant/50 p-3 rounded-2xl shadow-hover">
           <p className="font-label text-xs text-gray-500 mb-1">{label}</p>
           <p className="font-body text-sm font-bold text-primary">
             Số lượng: {payload[0].value}
