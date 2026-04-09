@@ -3,8 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Search,
-  Filter,
   MoreVertical,
   Eye,
   Ban,
@@ -17,6 +15,8 @@ import {
   Trash2,
   UserPlus,
 } from 'lucide-react';
+import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
+import DataTable, { type Column } from '@/components/ui/DataTable';
 import UserDetailModal from '@/components/features/users/UserDetailModal';
 import UserEditModal from '@/components/features/users/UserEditModal';
 import {
@@ -78,7 +78,6 @@ export default function UsersManagementPage() {
   const router = useRouter();
   const { user: adminUser } = useAuthStore();
 
-  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [roleFilter, setRoleFilter] = useState('ALL');
@@ -99,15 +98,6 @@ export default function UsersManagementPage() {
   const [editingUser, setEditingUser] = useState<IUser | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchQuery(searchInput);
-      setCurrentPage(1);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -239,339 +229,222 @@ export default function UsersManagementPage() {
       </div>
 
       {/* ── TOOLBAR (SEARCH & FILTERS) ── */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-surface-lowest p-4 rounded-md shadow-sm border border-outline-variant/30">
-        <div className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50 w-full sm:w-80 focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all">
-          <Search size={16} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Tìm theo tên, email, sđt..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="bg-transparent text-sm outline-none w-full font-body text-gray-900 placeholder:text-gray-400"
-          />
-        </div>
-
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50">
-            <Filter size={16} className="text-gray-400" />
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="bg-transparent text-sm outline-none font-body text-gray-700 cursor-pointer"
-            >
-              <option value="ALL">Tất cả vai trò</option>
-              <option value="USER">Người dùng cá nhân</option>
-              <option value="STORE">Cửa hàng/Tổ chức</option>
-              <option value="ADMIN">Quản trị viên</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50">
-            <Filter size={16} className="text-gray-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-transparent text-sm outline-none font-body text-gray-700 cursor-pointer"
-            >
-              <option value="ALL">Tất cả trạng thái</option>
-              <option value="ACTIVE">Đang hoạt động</option>
-              <option value="PENDING_KYC">Chờ duyệt KYC</option>
-              <option value="BANNED">Đã bị khóa</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <Toolbar
+        onSearch={(v) => {
+          setSearchQuery(v);
+          setCurrentPage(1);
+        }}
+        placeholder="Tìm theo tên, email, sđt..."
+        filters={
+          [
+            {
+              type: 'select',
+              value: roleFilter,
+              onChange: setRoleFilter,
+              options: [
+                { value: 'ALL', label: 'Tất cả vai trò' },
+                { value: 'USER', label: 'Người dùng cá nhân' },
+                { value: 'STORE', label: 'Cửa hàng/Tổ chức' },
+                { value: 'ADMIN', label: 'Quản trị viên' },
+              ],
+            },
+            {
+              type: 'select',
+              value: statusFilter,
+              onChange: setStatusFilter,
+              options: [
+                { value: 'ALL', label: 'Tất cả trạng thái' },
+                { value: 'ACTIVE', label: 'Đang hoạt động' },
+                { value: 'PENDING_KYC', label: 'Chờ duyệt KYC' },
+                { value: 'BANNED', label: 'Đã bị khóa' },
+              ],
+            },
+          ] satisfies ToolbarFilter[]
+        }
+      />
 
       {/* ── DATA TABLE ── */}
-      <div className="bg-surface-lowest rounded-md shadow-soft border border-outline-variant/30 overflow-visible relative">
-        <div className="overflow-x-auto min-h-100">
-          <table className="w-full text-left font-body">
-            <thead className="bg-surface/50 border-b border-outline-variant/30 font-label text-xs uppercase text-gray-500">
-              <tr>
-                <th className="px-5 py-4 font-semibold rounded-tl-md">
-                  Người dùng
-                </th>
-                <th className="px-5 py-4 font-semibold text-center">Vai trò</th>
-                <th className="px-5 py-4 font-semibold">Liên hệ & Địa chỉ</th>
-                <th className="px-5 py-4 font-semibold text-center">
-                  Điểm xanh
-                </th>
-                <th className="px-5 py-4 font-semibold text-center">
-                  Trạng thái
-                </th>
-                <th className="px-3 py-4 font-semibold text-center rounded-tr-md">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant/20 text-sm">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="px-5 py-16 text-center">
-                    <div className="flex flex-col items-center gap-3 text-gray-400">
-                      <Loader2 size={28} className="animate-spin" />
-                      <span className="text-sm font-body">
-                        Đang tải dữ liệu...
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-5 py-10 text-center text-error text-sm"
+      <DataTable
+        columns={
+          [
+            {
+              key: 'user',
+              header: 'Người dùng',
+              render: (user: IUser) => (
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold shrink-0">
+                    {user.fullName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex flex-col min-w-37.5">
+                    <span className="font-semibold text-gray-900 line-clamp-1">
+                      {user.fullName}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-0.5">
+                      {user.email}
+                    </span>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              key: 'role',
+              header: 'Vai trò',
+              align: 'center',
+              render: (user: IUser) => getRoleBadge(user.role),
+            },
+            {
+              key: 'contact',
+              header: 'Liên hệ & Địa chỉ',
+              render: (user: IUser) => (
+                <div className="flex flex-col">
+                  <span className="text-gray-900 font-medium">
+                    {user.phoneNumber || 'N/A'}
+                  </span>
+                  <span
+                    className="text-xs text-gray-500 mt-0.5 truncate"
+                    title={user.defaultAddress}
                   >
-                    {error}
-                  </td>
-                </tr>
-              ) : users.length > 0 ? (
-                users.map((user) => (
-                  <tr
-                    key={user._id}
-                    className="hover:bg-primary/5 transition-colors"
+                    {user.defaultAddress || 'Chưa cập nhật'}
+                  </span>
+                </div>
+              ),
+            },
+            {
+              key: 'greenPoints',
+              header: 'Điểm xanh',
+              align: 'center',
+              render: (user: IUser) => (
+                <span className="font-bold text-primary">
+                  {user.greenPoints}
+                </span>
+              ),
+            },
+            {
+              key: 'status',
+              header: 'Trạng thái',
+              align: 'center',
+              render: (user: IUser) => getStatusBadge(user.status),
+            },
+            {
+              key: 'actions',
+              header: 'Hành động',
+              align: 'center',
+              render: (user: IUser) => (
+                <div className="text-center relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenDropdownId(
+                        openDropdownId === user._id ? null : user._id
+                      );
+                    }}
+                    disabled={
+                      togglingId === user._id || deletingId === user._id
+                    }
+                    className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors disabled:opacity-50"
                   >
-                    {/* Người dùng */}
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold shrink-0">
-                          {user.fullName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex flex-col min-w-37.5">
-                          <span className="font-semibold text-gray-900 line-clamp-1">
-                            {user.fullName}
-                          </span>
-                          <span className="text-xs text-gray-500 mt-0.5">
-                            {user.email}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
+                    {togglingId === user._id || deletingId === user._id ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <MoreVertical size={18} />
+                    )}
+                  </button>
 
-                    {/* Vai trò — center */}
-                    <td className="px-5 py-4 text-center">
-                      {getRoleBadge(user.role)}
-                    </td>
+                  {openDropdownId === user._id && (
+                    <div className="absolute right-8 top-10 w-52 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
+                      <button
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setOpenDropdownId(null);
+                        }}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                      >
+                        <Eye size={16} />
+                        Xem hồ sơ
+                      </button>
 
-                    {/* Liên hệ & Địa chỉ */}
-                    <td className="px-5 py-4 max-w-50">
-                      <div className="flex flex-col">
-                        <span className="text-gray-900 font-medium">
-                          {user.phoneNumber || 'N/A'}
-                        </span>
-                        <span
-                          className="text-xs text-gray-500 mt-0.5 truncate"
-                          title={user.defaultAddress}
-                        >
-                          {user.defaultAddress || 'Chưa cập nhật'}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Green Points — center */}
-                    <td className="px-5 py-4 text-center">
-                      <span className="font-bold text-primary">
-                        {user.greenPoints}
-                      </span>
-                    </td>
-
-                    {/* Trạng thái — center */}
-                    <td className="px-5 py-4 text-center">
-                      {getStatusBadge(user.status)}
-                    </td>
-
-                    {/* Hành động — center */}
-                    <td className="px-3 py-4 text-center relative">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setOpenDropdownId(
-                            openDropdownId === user._id ? null : user._id
-                          );
+                          setEditingUser(user);
+                          setOpenDropdownId(null);
                         }}
-                        disabled={
-                          togglingId === user._id || deletingId === user._id
-                        }
-                        className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors disabled:opacity-50"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
                       >
-                        {togglingId === user._id || deletingId === user._id ? (
-                          <Loader2 size={18} className="animate-spin" />
-                        ) : (
-                          <MoreVertical size={18} />
-                        )}
+                        <Pencil size={16} />
+                        Chỉnh sửa
                       </button>
 
-                      {openDropdownId === user._id && (
-                        <div className="absolute right-8 top-10 w-52 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
-                          {/* Xem hồ sơ */}
-                          <button
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setOpenDropdownId(null);
-                            }}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
-                          >
-                            <Eye size={16} />
-                            Xem hồ sơ
-                          </button>
+                      {showKycAction(user) && (
+                        <button
+                          onClick={() => {
+                            setOpenDropdownId(null);
+                            router.push('/users/kyc');
+                          }}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-secondary hover:bg-secondary/10 transition-colors"
+                        >
+                          <ShieldAlert size={16} />
+                          Xét duyệt KYC
+                        </button>
+                      )}
 
-                          {/* Chỉnh sửa */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingUser(user);
-                              setOpenDropdownId(null);
-                            }}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
-                          >
-                            <Pencil size={16} />
-                            Chỉnh sửa
-                          </button>
-
-                          {/* Xét duyệt KYC — only when PENDING and not ADMIN */}
-                          {showKycAction(user) && (
+                      {user.status !== 'PENDING_KYC' && (
+                        <>
+                          <div className="h-px bg-outline-variant/20 my-1" />
+                          {user.status === 'ACTIVE' ? (
                             <button
-                              onClick={() => {
-                                setOpenDropdownId(null);
-                                router.push('/users/kyc');
-                              }}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-secondary hover:bg-secondary/10 transition-colors"
+                              onClick={() => handleBanToggle(user)}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
                             >
-                              <ShieldAlert size={16} />
-                              Xét duyệt KYC
+                              <Ban size={16} />
+                              Khóa tài khoản
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleBanToggle(user)}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
+                            >
+                              <Unlock size={16} />
+                              Mở khóa tài khoản
                             </button>
                           )}
-
-                          {/* Ban / Unban — hidden for PENDING_KYC (use KYC workflow first) */}
-                          {user.status !== 'PENDING_KYC' && (
-                            <>
-                              <div className="h-px bg-outline-variant/20 my-1" />
-                              {user.status === 'ACTIVE' ? (
-                                <button
-                                  onClick={() => handleBanToggle(user)}
-                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
-                                >
-                                  <Ban size={16} />
-                                  Khóa tài khoản
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleBanToggle(user)}
-                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
-                                >
-                                  <Unlock size={16} />
-                                  Mở khóa tài khoản
-                                </button>
-                              )}
-                            </>
-                          )}
-
-                          {/* Xóa tài khoản — only BANNED and not self */}
-                          {showDeleteAction(user) && (
-                            <>
-                              <div className="h-px bg-outline-variant/20 my-1" />
-                              <button
-                                onClick={() => handleDelete(user)}
-                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
-                              >
-                                <Trash2 size={16} />
-                                Xóa tài khoản
-                              </button>
-                            </>
-                          )}
-                        </div>
+                        </>
                       )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-5 py-10 text-center text-gray-500"
-                  >
-                    Không tìm thấy người dùng nào phù hợp.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
 
-        {/* ── PAGINATION ── */}
-        {!loading && !error && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-outline-variant/30">
-            <p className="text-xs font-body text-gray-500">
-              Hiển thị{' '}
-              <span className="font-semibold text-gray-700">
-                {(pagination.page - 1) * pagination.limit + 1}–
-                {Math.min(pagination.page * pagination.limit, pagination.total)}
-              </span>{' '}
-              trong tổng số{' '}
-              <span className="font-semibold text-gray-700">
-                {pagination.total}
-              </span>{' '}
-              người dùng
-            </p>
-
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="p-1.5 rounded-md text-gray-500 hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft size={16} />
-              </button>
-
-              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                .filter(
-                  (p) =>
-                    p === 1 ||
-                    p === pagination.totalPages ||
-                    Math.abs(p - currentPage) <= 1
-                )
-                .reduce<(number | '...')[]>((acc, p, idx, arr) => {
-                  if (idx > 0 && p - (arr[idx - 1] as number) > 1)
-                    acc.push('...');
-                  acc.push(p);
-                  return acc;
-                }, [])
-                .map((p, idx) =>
-                  p === '...' ? (
-                    <span
-                      key={`ellipsis-${idx}`}
-                      className="px-2 text-gray-400 text-sm"
-                    >
-                      …
-                    </span>
-                  ) : (
-                    <button
-                      key={p}
-                      onClick={() => setCurrentPage(p as number)}
-                      className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                        currentPage === p
-                          ? 'bg-primary text-white'
-                          : 'text-gray-600 hover:bg-surface-container'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  )
-                )}
-
-              <button
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))
-                }
-                disabled={currentPage === pagination.totalPages}
-                className="p-1.5 rounded-md text-gray-500 hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+                      {showDeleteAction(user) && (
+                        <>
+                          <div className="h-px bg-outline-variant/20 my-1" />
+                          <button
+                            onClick={() => handleDelete(user)}
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                            Xóa tài khoản
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ),
+            },
+          ] satisfies Column<IUser>[]
+        }
+        data={users}
+        rowKey={(user) => user._id}
+        loading={loading}
+        error={error}
+        emptyMessage="Không tìm thấy người dùng nào phù hợp."
+        pagination={pagination}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        className="rounded-md overflow-visible relative"
+        tableClassName="min-h-100"
+        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        bodyClassName="divide-outline-variant/20 text-sm"
+        rowClassName="hover:bg-primary/5 transition-colors"
+        cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
+      />
 
       {/* ── DETAIL MODAL ── */}
       <UserDetailModal
