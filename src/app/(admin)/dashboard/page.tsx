@@ -17,7 +17,7 @@ import {
   getRowKey,
 } from '@/components/features/dashboard/tableColumns';
 import DataTable, { type SortOrder } from '@/components/ui/DataTable';
-import SearchInput from '@/components/ui/SearchInput';
+import Toolbar from '@/components/ui/Toolbar';
 import {
   fetchDashboardStats,
   fetchDashboardChart,
@@ -176,27 +176,24 @@ export default function DashboardPage() {
       ) : null}
 
       {/* ── TABS ── */}
-      <div className="flex overflow-x-auto scrollbar-none">
-        <div className="flex gap-1 p-1 bg-surface rounded-xl border border-outline-variant/30">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-body font-semibold rounded-lg transition-all whitespace-nowrap ${
-                  isActive
-                    ? 'bg-linear-to-br from-primary to-primary-container text-white shadow-soft'
-                    : 'text-neutral-T50 hover:text-primary hover:bg-primary/5'
-                }`}
-              >
-                <Icon size={16} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="flex items-center gap-1 bg-surface-lowest p-1.5 rounded-xl border border-outline-variant/30 shadow-sm overflow-x-auto">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all ${
+                isActive
+                  ? 'bg-primary text-white shadow-soft'
+                  : 'text-neutral-T60 hover:bg-primary/5 hover:text-primary'
+              }`}
+            >
+              <tab.icon size={16} />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── CHART ── */}
@@ -214,19 +211,10 @@ export default function DashboardPage() {
 
       {/* ── DATA TABLE ── */}
       <div className="flex flex-col gap-4">
-        {/* Table toolbar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <h2 className="font-sans font-bold text-lg text-neutral-T10 tracking-tight">
-            Danh sách {tabs.find((t) => t.id === activeTab)?.label}
-          </h2>
-          <div className="flex items-center gap-3">
-            <SearchInput
-              onSearch={setSearchQuery}
-              placeholder={`Tìm trong ${tabs.find((t) => t.id === activeTab)?.label?.toLowerCase()}...`}
-              className="w-64"
-            />
-          </div>
-        </div>
+        <Toolbar
+          onSearch={setSearchQuery}
+          placeholder={`Tìm trong ${tabs.find((t) => t.id === activeTab)?.label?.toLowerCase()}...`}
+        />
 
         <DataTable
           columns={columns}

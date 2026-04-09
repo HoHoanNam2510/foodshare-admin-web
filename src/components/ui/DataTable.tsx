@@ -57,6 +57,16 @@ interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   /** Extra class for the wrapper */
   className?: string;
+  /** Class for table element */
+  tableClassName?: string;
+  /** Class for thead element */
+  headerClassName?: string;
+  /** Class for tbody element */
+  bodyClassName?: string;
+  /** Class applied to each data row */
+  rowClassName?: string | ((row: T, index: number) => string);
+  /** Class applied to each cell */
+  cellClassName?: string | ((col: Column<T>, row: T, index: number) => string);
 }
 
 // ─── Component ───────────────────────────────────────────────
@@ -76,6 +86,11 @@ export default function DataTable<T>({
   sortOrder = null,
   onRowClick,
   className = '',
+  tableClassName = '',
+  headerClassName = '',
+  bodyClassName = '',
+  rowClassName = '',
+  cellClassName = '',
 }: DataTableProps<T>) {
   const colCount = columns.length;
 
@@ -120,9 +135,11 @@ export default function DataTable<T>({
       className={`bg-surface-lowest rounded-lg shadow-soft border border-outline-variant/30 overflow-hidden ${className}`}
     >
       <div className="overflow-x-auto">
-        <table className="w-full text-left font-body">
+        <table className={`w-full text-left font-body ${tableClassName}`}>
           {/* ── THEAD ── */}
-          <thead className="bg-linear-to-r from-primary/5 to-primary-container/5 border-b border-outline-variant/30">
+          <thead
+            className={`bg-linear-to-r from-primary/5 to-primary-container/5 border-b border-outline-variant/30 ${headerClassName}`}
+          >
             <tr>
               {columns.map((col) => (
                 <th
@@ -154,7 +171,9 @@ export default function DataTable<T>({
           </thead>
 
           {/* ── TBODY ── */}
-          <tbody className="divide-y divide-outline-variant/15 text-sm">
+          <tbody
+            className={`divide-y divide-outline-variant/15 text-sm ${bodyClassName}`}
+          >
             {loading ? (
               <tr>
                 <td colSpan={colCount} className="px-5 py-20 text-center">
@@ -190,28 +209,42 @@ export default function DataTable<T>({
                 </td>
               </tr>
             ) : (
-              data.map((row, idx) => (
-                <tr
-                  key={rowKey(row, idx)}
-                  className={`transition-colors hover:bg-primary/3 ${
-                    onRowClick ? 'cursor-pointer' : ''
-                  }`}
-                  onClick={() => onRowClick?.(row)}
-                >
-                  {columns.map((col) => (
-                    <td
-                      key={col.key}
-                      className={`px-5 py-4 ${alignClass(col.align)} ${col.maxWidth || ''} ${col.truncate ? 'truncate' : ''}`}
-                    >
-                      {col.render
-                        ? col.render(row, idx)
-                        : String(
-                            (row as Record<string, unknown>)[col.key] ?? '—'
-                          )}
-                    </td>
-                  ))}
-                </tr>
-              ))
+              data.map((row, idx) => {
+                const resolvedRowClass =
+                  typeof rowClassName === 'function'
+                    ? rowClassName(row, idx)
+                    : rowClassName;
+
+                return (
+                  <tr
+                    key={rowKey(row, idx)}
+                    className={`transition-colors hover:bg-primary/3 ${
+                      onRowClick ? 'cursor-pointer' : ''
+                    } ${resolvedRowClass}`}
+                    onClick={() => onRowClick?.(row)}
+                  >
+                    {columns.map((col) => {
+                      const resolvedCellClass =
+                        typeof cellClassName === 'function'
+                          ? cellClassName(col, row, idx)
+                          : cellClassName;
+
+                      return (
+                        <td
+                          key={col.key}
+                          className={`px-5 py-4 ${alignClass(col.align)} ${col.maxWidth || ''} ${col.truncate ? 'truncate' : ''} ${resolvedCellClass}`}
+                        >
+                          {col.render
+                            ? col.render(row, idx)
+                            : String(
+                                (row as Record<string, unknown>)[col.key] ?? '—'
+                              )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

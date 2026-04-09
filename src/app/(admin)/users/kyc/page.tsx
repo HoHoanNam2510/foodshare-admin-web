@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Search,
   ShieldCheck,
   ShieldX,
   ChevronLeft,
@@ -20,6 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import Image from 'next/image';
+import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import { fetchUsers, reviewKyc, type IUser } from '@/lib/userApi';
 
 const PAGE_SIZE = 10;
@@ -66,7 +66,6 @@ const getKycBadge = (status: string) => {
 type KycFilter = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'ALL';
 
 export default function KycReviewPage() {
-  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [kycFilter, setKycFilter] = useState<KycFilter>('PENDING');
   const [currentPage, setCurrentPage] = useState(1);
@@ -85,15 +84,6 @@ export default function KycReviewPage() {
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchQuery(searchInput);
-      setCurrentPage(1);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -171,49 +161,26 @@ export default function KycReviewPage() {
       </div>
 
       {/* ── TOOLBAR ── */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-surface-lowest p-4 rounded-md shadow-sm border border-outline-variant/30">
-        <div className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50 w-full sm:w-80 focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all">
-          <Search size={16} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Tìm theo tên, email..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="bg-transparent text-sm outline-none w-full font-body text-gray-900 placeholder:text-gray-400"
-          />
-        </div>
-
-        {/* KYC status tabs */}
-        <div className="flex items-center gap-1 bg-surface rounded-lg border border-outline-variant/50 p-1">
-          {(
-            [
-              { value: 'PENDING', label: 'Chờ duyệt', icon: Clock },
-              { value: 'VERIFIED', label: 'Đã duyệt', icon: CheckCircle2 },
-              { value: 'REJECTED', label: 'Từ chối', icon: XCircle },
-              { value: 'ALL', label: 'Tất cả', icon: FileText },
-            ] as const
-          ).map((tab) => {
-            const Icon = tab.icon;
-            const isActive = kycFilter === tab.value;
-            return (
-              <button
-                key={tab.value}
-                onClick={() => setKycFilter(tab.value)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  isActive
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-gray-500 hover:bg-primary/5 hover:text-primary'
-                }`}
-              >
-                <Icon size={14} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <Toolbar
+        onSearch={(v) => { setSearchQuery(v); setCurrentPage(1); }}
+        placeholder="Tìm theo tên, email..."
+        filters={[
+          {
+            type: 'tabs',
+            value: kycFilter,
+            onChange: (v) => setKycFilter(v as KycFilter),
+            options: [
+              { value: 'PENDING', label: 'Chờ duyệt', icon: <Clock size={14} /> },
+              { value: 'VERIFIED', label: 'Đã duyệt', icon: <CheckCircle2 size={14} /> },
+              { value: 'REJECTED', label: 'Từ chối', icon: <XCircle size={14} /> },
+              { value: 'ALL', label: 'Tất cả', icon: <FileText size={14} /> },
+            ],
+          },
+        ] satisfies ToolbarFilter[]}
+      />
 
       {/* ── KYC CARDS ── */}
+
       <div className="grid gap-4">
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-16 text-gray-400">
