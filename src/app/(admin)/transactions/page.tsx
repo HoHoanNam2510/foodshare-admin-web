@@ -9,12 +9,14 @@ import {
   HeartHandshake,
   ShoppingBag,
   Layers,
+  CheckCircle,
 } from 'lucide-react';
 import TransactionDetailModal from '@/components/features/transactions/TransactionDetailModal';
 import Pagination from '@/components/ui/Pagination';
 import {
   fetchAdminTransactions,
   adminForceUpdateTransactionStatus,
+  adminConfirmPayment,
   type ITransaction,
   type PaginationMeta,
 } from '@/lib/transactionApi';
@@ -123,11 +125,20 @@ export default function TransactionsManagementPage() {
 
   const handleStatusUpdate = async (transactionId: string, newStatus: string) => {
     await adminForceUpdateTransactionStatus(transactionId, newStatus);
-    // Refresh list and update selected modal item
     await loadTransactions();
     setSelectedTx((prev) =>
       prev?._id === transactionId ? { ...prev, status: newStatus as ITransaction['status'] } : prev
     );
+  };
+
+  const handleConfirmPayment = async (transactionId: string) => {
+    try {
+      await adminConfirmPayment(transactionId);
+      await loadTransactions();
+    } catch (err) {
+      console.error('Confirm payment failed:', err);
+    }
+    setOpenDropdownId(null);
   };
 
   const closeDropdown = () => setOpenDropdownId(null);
@@ -304,7 +315,7 @@ export default function TransactionsManagementPage() {
                       </button>
 
                       {openDropdownId === tx._id && (
-                        <div className="absolute right-8 top-10 w-44 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
+                        <div className="absolute right-8 top-10 w-52 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
                           <button
                             onClick={() => {
                               setSelectedTx(tx);
@@ -314,6 +325,17 @@ export default function TransactionsManagementPage() {
                           >
                             <Eye size={16} /> Xem & Cập nhật
                           </button>
+                          {tx.type === 'ORDER' && tx.status === 'PENDING' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleConfirmPayment(tx._id);
+                              }}
+                              className="w-full flex justify-center items-center gap-2 px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors"
+                            >
+                              <CheckCircle size={16} /> Xác nhận đã nhận tiền
+                            </button>
+                          )}
                         </div>
                       )}
                     </td>

@@ -33,7 +33,7 @@ export type TransactionStatus =
   | 'REFUNDED'
   | 'DISPUTED';
 
-export type PaymentMethod = 'FREE' | 'MOMO'; // TODO: Re-add | 'ZALOPAY' | 'VNPAY' when ready
+export type PaymentMethod = 'FREE' | 'BANK_TRANSFER';
 
 export interface ITransaction {
   _id: string;
@@ -91,6 +91,17 @@ export async function adminForceUpdateTransactionStatus(
   const res = await axiosInstance.patch(
     `/transactions/admin/${transactionId}/status`,
     { status }
+  );
+  return res.data;
+}
+
+// ── Admin Confirm Payment (chuyển khoản ngân hàng) ──
+
+export async function adminConfirmPayment(
+  transactionId: string
+): Promise<{ success: boolean; data: { verificationCode: string } }> {
+  const res = await axiosInstance.post(
+    `/transactions/admin/${transactionId}/confirm-payment`
   );
   return res.data;
 }

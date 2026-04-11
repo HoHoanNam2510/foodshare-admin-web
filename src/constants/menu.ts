@@ -19,6 +19,7 @@ import {
   ToggleLeft,
   Star,
   Wallet,
+  Settings,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -86,9 +87,7 @@ export const adminMenus: MenuItem[] = [
     label: 'Quản Lý Escrow',
     path: '/escrow',
     icon: Wallet,
-    sub: [
-      { label: 'Danh sách Escrow', path: '/escrow', icon: List },
-    ],
+    sub: [{ label: 'Danh sách Escrow', path: '/escrow', icon: List }],
   },
   {
     // Checked
@@ -122,7 +121,7 @@ export const adminMenus: MenuItem[] = [
   },
   {
     id: 'greenpoints',
-    label: 'Quản Lý Green Points',
+    label: 'Quản Lý Điểm Xanh',
     path: '/greenpoints',
     icon: Leaf,
     sub: [
@@ -145,5 +144,12 @@ export const adminMenus: MenuItem[] = [
     path: '/trash',
     icon: Trash2,
     sub: [{ label: 'Xem danh sách', path: '/trash', icon: List }],
+  },
+  {
+    id: 'settings',
+    label: 'Cài Đặt Hệ Thống',
+    path: '/settings',
+    icon: Settings,
+    sub: [],
   },
 ];
