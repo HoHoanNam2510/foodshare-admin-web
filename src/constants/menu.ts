@@ -16,10 +16,10 @@ import {
   Send,
   History,
   Leaf,
-  ToggleLeft,
   Star,
   Wallet,
   Settings,
+  Award,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -126,6 +126,15 @@ export const adminMenus: MenuItem[] = [
     icon: Leaf,
     sub: [
       { label: 'Lịch sử giao dịch điểm', path: '/greenpoints', icon: History },
+    ],
+  },
+  {
+    id: 'badges',
+    label: 'Quản Lý Huy Hiệu',
+    path: '/badges',
+    icon: Award,
+    sub: [
+      { label: 'Danh sách huy hiệu', path: '/badges', icon: List },
     ],
   },
   {
