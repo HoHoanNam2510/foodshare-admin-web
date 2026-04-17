@@ -272,8 +272,18 @@ export default function UsersManagementPage() {
               header: 'Người dùng',
               render: (user: IUser) => (
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold shrink-0">
-                    {user.fullName.charAt(0).toUpperCase()}
+                  <div className="relative w-9 h-9 shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold absolute inset-0">
+                      {user.fullName.charAt(0).toUpperCase()}
+                    </div>
+                    {user.avatar && (
+                      <img
+                        src={user.avatar}
+                        alt={user.fullName}
+                        className="w-9 h-9 rounded-full object-cover absolute inset-0"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    )}
                   </div>
                   <div className="flex flex-col min-w-37.5">
                     <span className="font-semibold text-gray-900 line-clamp-1">

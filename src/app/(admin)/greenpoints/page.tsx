@@ -227,9 +227,18 @@ export default function GreenPointsManagementPage() {
                       {/* Người dùng */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold shrink-0">
-                            {log.userId?.fullName?.charAt(0)?.toUpperCase() ??
-                              '?'}
+                          <div className="relative w-9 h-9 shrink-0">
+                            <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold absolute inset-0">
+                              {log.userId?.fullName?.charAt(0)?.toUpperCase() ?? '?'}
+                            </div>
+                            {log.userId?.avatar && (
+                              <img
+                                src={log.userId.avatar}
+                                alt={log.userId.fullName}
+                                className="w-9 h-9 rounded-full object-cover absolute inset-0"
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                              />
+                            )}
                           </div>
                           <div className="flex flex-col min-w-0">
                             <span className="font-semibold text-gray-900 line-clamp-1">

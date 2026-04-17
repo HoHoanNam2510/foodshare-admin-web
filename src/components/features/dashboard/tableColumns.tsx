@@ -26,8 +26,18 @@ const userColumns: Column<any>[] = [
     header: 'Họ tên',
     render: (row) => (
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-primary-container flex items-center justify-center text-white text-xs font-bold shrink-0">
-          {row.fullName?.charAt(0)?.toUpperCase() || '?'}
+        <div className="relative w-8 h-8 shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-primary-container flex items-center justify-center text-white text-xs font-bold absolute inset-0">
+            {row.fullName?.charAt(0)?.toUpperCase() || '?'}
+          </div>
+          {row.avatar && (
+            <img
+              src={row.avatar}
+              alt={row.fullName}
+              className="w-8 h-8 rounded-lg object-cover absolute inset-0"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          )}
         </div>
         <span className="font-semibold text-neutral-T10">{row.fullName}</span>
       </div>
