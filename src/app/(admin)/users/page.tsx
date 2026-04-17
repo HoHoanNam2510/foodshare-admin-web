@@ -3,22 +3,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  MoreVertical,
   Eye,
   Ban,
   Unlock,
   ShieldAlert,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
   Pencil,
   Trash2,
   UserPlus,
 } from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
+import PageHeader from '@/components/ui/PageHeader';
+import ActionDropdown, {
+  type DropdownAction,
+} from '@/components/ui/ActionDropdown';
+import StatusBadge from '@/components/ui/StatusBadge';
 import UserDetailModal from '@/components/features/users/UserDetailModal';
 import UserEditModal from '@/components/features/users/UserEditModal';
+import { formatDate } from '@/lib/formatters';
 import {
   fetchUsers,
   updateUserStatus,
@@ -29,50 +31,21 @@ import { useAuthStore } from '@/stores/authStore';
 
 const PAGE_SIZE = 10;
 
-// --- HELPER FORMATS ---
-const formatDate = (date: string | Date) => {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
+// ─── Badge helpers (dùng StatusBadge + label tiếng Việt) ─────
+
+const USER_STATUS_LABELS: Record<string, string> = {
+  ACTIVE: 'Hoạt động',
+  PENDING_KYC: 'Chờ KYC',
+  BANNED: 'Bị khóa',
 };
 
-const getStatusBadge = (status: string) => {
-  if (status === 'BANNED')
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-red-50 text-error border-error/20">
-        Bị khóa
-      </span>
-    );
-  if (status === 'PENDING_KYC')
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-amber-50 text-amber-700 border-amber-200">
-        Chờ KYC
-      </span>
-    );
-  return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider bg-green-50 text-primary border-primary/20">
-      Hoạt động
-    </span>
-  );
-};
+const getStatusBadge = (status: string) => (
+  <StatusBadge status={status} label={USER_STATUS_LABELS[status]} />
+);
 
-const getRoleBadge = (role: string) => {
-  const styles: Record<string, string> = {
-    USER: 'bg-gray-100 text-gray-600 border-gray-200',
-    STORE: 'bg-secondary/10 text-secondary border-secondary/20',
-    ADMIN: 'bg-purple-50 text-purple-700 border-purple-200',
-  };
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${styles[role] || styles.USER}`}
-    >
-      {role}
-    </span>
-  );
-};
+const getRoleBadge = (role: string) => <StatusBadge status={role} />;
+
+// ─────────────────────────────────────────────────────────────
 
 export default function UsersManagementPage() {
   const router = useRouter();
@@ -99,7 +72,6 @@ export default function UsersManagementPage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [statusFilter, roleFilter]);
@@ -130,7 +102,6 @@ export default function UsersManagementPage() {
     loadUsers();
   }, [loadUsers]);
 
-  // ── Ban / Unban ──
   const handleBanToggle = async (user: IUser) => {
     setTogglingId(user._id);
     setOpenDropdownId(null);
@@ -150,19 +121,15 @@ export default function UsersManagementPage() {
     }
   };
 
-  // ── Delete ──
   const handleDelete = async (user: IUser) => {
     setOpenDropdownId(null);
 
-    // Guard: cannot delete ACTIVE accounts (shown by UI logic, but double-check)
     if (user.status === 'ACTIVE') {
       alert(
         'Không thể xóa tài khoản đang hoạt động. Vui lòng khóa tài khoản trước.'
       );
       return;
     }
-
-    // Guard: cannot delete own account
     if (adminUser && user._id === adminUser._id) {
       alert('Bạn không thể xóa tài khoản của chính mình.');
       return;
@@ -187,48 +154,161 @@ export default function UsersManagementPage() {
     }
   };
 
-  // ── After edit saved ──
   const handleUserUpdated = async (updated: IUser) => {
     await loadUsers();
-    if (selectedUser?._id === updated._id) {
-      setSelectedUser(updated);
-    }
+    if (selectedUser?._id === updated._id) setSelectedUser(updated);
   };
 
-  const closeDropdown = () => setOpenDropdownId(null);
+  const buildActions = (user: IUser): DropdownAction[] => [
+    {
+      label: 'Xem hồ sơ',
+      icon: <Eye size={16} />,
+      onClick: () => {
+        setSelectedUser(user);
+        setOpenDropdownId(null);
+      },
+    },
+    {
+      label: 'Chỉnh sửa',
+      icon: <Pencil size={16} />,
+      onClick: () => {
+        setEditingUser(user);
+        setOpenDropdownId(null);
+      },
+    },
+    {
+      label: 'Xét duyệt KYC',
+      icon: <ShieldAlert size={16} />,
+      variant: 'secondary',
+      hidden: user.status !== 'PENDING_KYC',
+      onClick: () => {
+        setOpenDropdownId(null);
+        router.push('/users/kyc');
+      },
+    },
+    {
+      label: user.status === 'ACTIVE' ? 'Khóa tài khoản' : 'Mở khóa tài khoản',
+      icon: user.status === 'ACTIVE' ? <Ban size={16} /> : <Unlock size={16} />,
+      variant: user.status === 'ACTIVE' ? 'danger' : 'primary',
+      dividerBefore: true,
+      hidden: user.status === 'PENDING_KYC',
+      onClick: () => handleBanToggle(user),
+    },
+    {
+      label: 'Xóa tài khoản',
+      icon: <Trash2 size={16} />,
+      variant: 'danger',
+      dividerBefore: true,
+      hidden: user.status !== 'BANNED' || adminUser?._id === user._id,
+      onClick: () => handleDelete(user),
+    },
+  ];
 
-  // KYC button: only for accounts in PENDING_KYC status
-  const showKycAction = (user: IUser) => user.status === 'PENDING_KYC';
-
-  // Delete: only BANNED accounts, and not self
-  const showDeleteAction = (user: IUser) =>
-    user.status === 'BANNED' && adminUser?._id !== user._id;
+  const columns: Column<IUser>[] = [
+    {
+      key: 'user',
+      header: 'Người dùng',
+      render: (user) => (
+        <div className="flex items-center gap-3">
+          <div className="relative w-9 h-9 shrink-0">
+            <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold absolute inset-0">
+              {user.fullName.charAt(0).toUpperCase()}
+            </div>
+            {user.avatar && (
+              <img
+                src={user.avatar}
+                alt={user.fullName}
+                className="w-9 h-9 rounded-full object-cover absolute inset-0"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+          </div>
+          <div className="flex flex-col min-w-37.5">
+            <span className="font-semibold text-gray-900 line-clamp-1">
+              {user.fullName}
+            </span>
+            <span className="text-xs text-gray-500 mt-0.5">{user.email}</span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'role',
+      header: 'Vai trò',
+      align: 'center',
+      render: (user) => getRoleBadge(user.role),
+    },
+    {
+      key: 'contact',
+      header: 'Liên hệ & Địa chỉ',
+      render: (user) => (
+        <div className="flex flex-col">
+          <span className="text-gray-900 font-medium">
+            {user.phoneNumber || 'N/A'}
+          </span>
+          <span
+            className="text-xs text-gray-500 mt-0.5 truncate"
+            title={user.defaultAddress}
+          >
+            {user.defaultAddress || 'Chưa cập nhật'}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'greenPoints',
+      header: 'Điểm xanh',
+      align: 'center',
+      render: (user) => (
+        <span className="font-bold text-primary">{user.greenPoints}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Trạng thái',
+      align: 'center',
+      render: (user) => getStatusBadge(user.status),
+    },
+    {
+      key: 'actions',
+      header: 'Hành động',
+      align: 'center',
+      render: (user) => (
+        <ActionDropdown
+          id={user._id}
+          openId={openDropdownId}
+          onToggle={(id) =>
+            setOpenDropdownId((prev) => (prev === id ? null : id))
+          }
+          loading={togglingId === user._id || deletingId === user._id}
+          width="w-52"
+          actions={buildActions(user)}
+        />
+      ),
+    },
+  ];
 
   return (
     <div
       className="w-full max-w-7xl mx-auto flex flex-col gap-6"
-      onClick={closeDropdown}
+      onClick={() => setOpenDropdownId(null)}
     >
-      {/* ── HEADER ── */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-sans font-bold text-gray-900 leading-tight">
-            Quản Lý Người Dùng
-          </h1>
-          <p className="text-sm font-body text-gray-500 mt-1">
-            Quản lý tài khoản, định danh (KYC) và trạng thái người dùng
-          </p>
-        </div>
-        <button
-          onClick={() => router.push('/users/create')}
-          className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity shrink-0"
-        >
-          <UserPlus size={16} />
-          Tạo tài khoản
-        </button>
-      </div>
+      <PageHeader
+        title="Quản Lý Người Dùng"
+        subtitle="Quản lý tài khoản, định danh (KYC) và trạng thái người dùng"
+        action={
+          <button
+            onClick={() => router.push('/users/create')}
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            <UserPlus size={16} />
+            Tạo tài khoản
+          </button>
+        }
+      />
 
-      {/* ── TOOLBAR (SEARCH & FILTERS) ── */}
       <Toolbar
         onSearch={(v) => {
           setSearchQuery(v);
@@ -263,183 +343,8 @@ export default function UsersManagementPage() {
         }
       />
 
-      {/* ── DATA TABLE ── */}
       <DataTable
-        columns={
-          [
-            {
-              key: 'user',
-              header: 'Người dùng',
-              render: (user: IUser) => (
-                <div className="flex items-center gap-3">
-                  <div className="relative w-9 h-9 shrink-0">
-                    <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold absolute inset-0">
-                      {user.fullName.charAt(0).toUpperCase()}
-                    </div>
-                    {user.avatar && (
-                      <img
-                        src={user.avatar}
-                        alt={user.fullName}
-                        className="w-9 h-9 rounded-full object-cover absolute inset-0"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      />
-                    )}
-                  </div>
-                  <div className="flex flex-col min-w-37.5">
-                    <span className="font-semibold text-gray-900 line-clamp-1">
-                      {user.fullName}
-                    </span>
-                    <span className="text-xs text-gray-500 mt-0.5">
-                      {user.email}
-                    </span>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              key: 'role',
-              header: 'Vai trò',
-              align: 'center',
-              render: (user: IUser) => getRoleBadge(user.role),
-            },
-            {
-              key: 'contact',
-              header: 'Liên hệ & Địa chỉ',
-              render: (user: IUser) => (
-                <div className="flex flex-col">
-                  <span className="text-gray-900 font-medium">
-                    {user.phoneNumber || 'N/A'}
-                  </span>
-                  <span
-                    className="text-xs text-gray-500 mt-0.5 truncate"
-                    title={user.defaultAddress}
-                  >
-                    {user.defaultAddress || 'Chưa cập nhật'}
-                  </span>
-                </div>
-              ),
-            },
-            {
-              key: 'greenPoints',
-              header: 'Điểm xanh',
-              align: 'center',
-              render: (user: IUser) => (
-                <span className="font-bold text-primary">
-                  {user.greenPoints}
-                </span>
-              ),
-            },
-            {
-              key: 'status',
-              header: 'Trạng thái',
-              align: 'center',
-              render: (user: IUser) => getStatusBadge(user.status),
-            },
-            {
-              key: 'actions',
-              header: 'Hành động',
-              align: 'center',
-              render: (user: IUser) => (
-                <div className="text-center relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenDropdownId(
-                        openDropdownId === user._id ? null : user._id
-                      );
-                    }}
-                    disabled={
-                      togglingId === user._id || deletingId === user._id
-                    }
-                    className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors disabled:opacity-50"
-                  >
-                    {togglingId === user._id || deletingId === user._id ? (
-                      <Loader2 size={18} className="animate-spin" />
-                    ) : (
-                      <MoreVertical size={18} />
-                    )}
-                  </button>
-
-                  {openDropdownId === user._id && (
-                    <div className="absolute right-8 top-10 w-52 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
-                      <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setOpenDropdownId(null);
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
-                      >
-                        <Eye size={16} />
-                        Xem hồ sơ
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingUser(user);
-                          setOpenDropdownId(null);
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
-                      >
-                        <Pencil size={16} />
-                        Chỉnh sửa
-                      </button>
-
-                      {showKycAction(user) && (
-                        <button
-                          onClick={() => {
-                            setOpenDropdownId(null);
-                            router.push('/users/kyc');
-                          }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-secondary hover:bg-secondary/10 transition-colors"
-                        >
-                          <ShieldAlert size={16} />
-                          Xét duyệt KYC
-                        </button>
-                      )}
-
-                      {user.status !== 'PENDING_KYC' && (
-                        <>
-                          <div className="h-px bg-outline-variant/20 my-1" />
-                          {user.status === 'ACTIVE' ? (
-                            <button
-                              onClick={() => handleBanToggle(user)}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
-                            >
-                              <Ban size={16} />
-                              Khóa tài khoản
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleBanToggle(user)}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
-                            >
-                              <Unlock size={16} />
-                              Mở khóa tài khoản
-                            </button>
-                          )}
-                        </>
-                      )}
-
-                      {showDeleteAction(user) && (
-                        <>
-                          <div className="h-px bg-outline-variant/20 my-1" />
-                          <button
-                            onClick={() => handleDelete(user)}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
-                          >
-                            <Trash2 size={16} />
-                            Xóa tài khoản
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ),
-            },
-          ] satisfies Column<IUser>[]
-        }
+        columns={columns}
         data={users}
         rowKey={(user) => user._id}
         loading={loading}
@@ -456,7 +361,6 @@ export default function UsersManagementPage() {
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
       />
 
-      {/* ── DETAIL MODAL ── */}
       <UserDetailModal
         user={selectedUser}
         onClose={() => setSelectedUser(null)}
@@ -466,7 +370,6 @@ export default function UsersManagementPage() {
         getRoleBadge={getRoleBadge}
       />
 
-      {/* ── EDIT MODAL ── */}
       <UserEditModal
         user={editingUser}
         onClose={() => setEditingUser(null)}

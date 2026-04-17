@@ -20,20 +20,11 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
+import PageHeader from '@/components/ui/PageHeader';
 import { fetchUsers, reviewKyc, type IUser } from '@/lib/userApi';
+import { formatDateTime } from '@/lib/formatters';
 
 const PAGE_SIZE = 10;
-
-const formatDate = (date: string | Date) => {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
 
 const getKycBadge = (status: string) => {
   switch (status) {
@@ -149,16 +140,10 @@ export default function KycReviewPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
-      {/* ── HEADER ── */}
-      <div>
-        <h1 className="text-2xl font-sans font-bold text-gray-900 leading-tight flex items-center gap-3">
-          <ShieldCheck size={28} className="text-primary" />
-          Xét Duyệt KYC
-        </h1>
-        <p className="text-sm font-body text-gray-500 mt-1">
-          Duyệt hoặc từ chối đơn đăng ký cửa hàng từ người dùng
-        </p>
-      </div>
+      <PageHeader
+        title="Xét Duyệt KYC"
+        subtitle="Duyệt hoặc từ chối đơn đăng ký cửa hàng từ người dùng"
+      />
 
       {/* ── TOOLBAR ── */}
       <Toolbar
@@ -304,7 +289,7 @@ export default function KycReviewPage() {
                     )}
 
                     <p className="text-[11px] text-gray-400 font-body mt-2">
-                      Ngày gửi: {formatDate(user.updatedAt)}
+                      Ngày gửi: {formatDateTime(user.updatedAt)}
                     </p>
                   </div>
                 </div>

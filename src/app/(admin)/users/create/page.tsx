@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { sendRegistrationCode, verifyRegistrationCode } from '@/lib/authApi';
 import { adminCreateUser } from '@/lib/userApi';
+import PageHeader from '@/components/ui/PageHeader';
 
 type TabRole = 'USER' | 'STORE' | 'ADMIN';
 
@@ -338,14 +339,10 @@ export default function CreateUserPage() {
         >
           <ArrowLeft size={20} />
         </button>
-        <div>
-          <h1 className="text-2xl font-sans font-bold text-gray-900 leading-tight">
-            Tạo tài khoản mới
-          </h1>
-          <p className="text-sm font-body text-gray-500 mt-0.5">
-            Tạo tài khoản người dùng, cửa hàng hoặc quản trị viên
-          </p>
-        </div>
+        <PageHeader
+          title="Tạo tài khoản mới"
+          subtitle="Tạo tài khoản người dùng, cửa hàng hoặc quản trị viên"
+        />
       </div>
 
       {/* Step indicator */}

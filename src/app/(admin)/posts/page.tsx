@@ -1,8 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
+import PageHeader from '@/components/ui/PageHeader';
+import ActionDropdown, {
+  type DropdownAction,
+} from '@/components/ui/ActionDropdown';
 import PostDetailModal from '@/components/features/posts/PostDetailModal';
 import {
   fetchAdminPosts,
@@ -11,19 +16,8 @@ import {
   type IPost,
   type PaginationMeta,
 } from '@/lib/postApi';
-import {
-  formatDate,
-  formatCurrency,
-  getStatusBadge,
-} from '@/components/features/posts/postFormatters';
-import {
-  MoreVertical,
-  Eye,
-  EyeOff,
-  CheckCircle,
-  XCircle,
-  Loader2,
-} from 'lucide-react';
+import { formatDateTime, formatPostCurrency } from '@/lib/formatters';
+import { getStatusBadge } from '@/components/features/posts/postFormatters';
 
 const PAGE_LIMIT = 10;
 
@@ -64,12 +58,10 @@ export default function PostsManagementPage() {
     loadPosts();
   }, [loadPosts]);
 
-  // Reset page khi đổi filter trạng thái
   useEffect(() => {
     setCurrentPage(1);
   }, [statusFilter]);
 
-  // Client-side filter theo search và loại hình (API chưa hỗ trợ)
   const filteredPosts = posts.filter((p) => {
     let match = true;
     if (searchQuery) {
@@ -111,23 +103,121 @@ export default function PostsManagementPage() {
   const handleHide = (postId: string) =>
     withActionLoading(postId, () => adminToggleHidePost(postId));
 
-  const handleDropdownToggle = (id: string) =>
-    setOpenDropdownId((prev) => (prev === id ? null : id));
+  const buildActions = (post: IPost): DropdownAction[] => [
+    {
+      label: 'Xem chi tiết',
+      icon: <Eye size={16} />,
+      onClick: () => {
+        setSelectedPost(post);
+        setOpenDropdownId(null);
+      },
+    },
+    {
+      label: 'Duyệt bài đăng',
+      icon: <CheckCircle size={16} />,
+      variant: 'primary',
+      hidden: post.status !== 'PENDING_REVIEW',
+      onClick: () => handleApprove(post._id),
+    },
+    {
+      label: 'Từ chối',
+      icon: <XCircle size={16} />,
+      variant: 'danger',
+      hidden: post.status !== 'PENDING_REVIEW',
+      onClick: () => handleReject(post._id),
+    },
+    {
+      label: 'Ẩn bài đăng',
+      icon: <EyeOff size={16} />,
+      variant: 'danger',
+      hidden: post.status === 'HIDDEN',
+      onClick: () => handleHide(post._id),
+    },
+  ];
+
+  const columns: Column<IPost>[] = [
+    {
+      key: 'post',
+      header: 'Bài đăng',
+      render: (post) => (
+        <div className="flex flex-col min-w-50">
+          <span className="font-semibold text-gray-900 line-clamp-1">
+            {post.title}
+          </span>
+          <span className="text-xs text-gray-500 mt-0.5">
+            {post.category} &middot; {post.ownerId?.fullName || 'N/A'}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'typePrice',
+      header: 'Loại hình & Giá',
+      render: (post) => (
+        <div className="flex flex-col">
+          <span className="text-gray-900 font-medium">
+            {post.type === 'P2P_FREE' ? 'P2P – Tặng' : 'B2C – Túi mù'}
+          </span>
+          <span className="text-xs mt-0.5">
+            {formatPostCurrency(post.price, post.type)}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'quantity',
+      header: 'Số lượng',
+      align: 'center',
+      render: (post) => (
+        <>
+          <span className="font-semibold text-gray-900">
+            {post.remainingQuantity}
+          </span>
+          <span className="text-gray-500"> / {post.totalQuantity}</span>
+        </>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Trạng thái',
+      render: (post) => getStatusBadge(post.status),
+    },
+    {
+      key: 'createdAt',
+      header: 'Ngày tạo',
+      render: (post) => (
+        <span className="text-gray-500 text-xs">
+          {formatDateTime(post.createdAt)}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Hành động',
+      align: 'center',
+      render: (post) => (
+        <ActionDropdown
+          id={post._id}
+          openId={openDropdownId}
+          onToggle={(id) =>
+            setOpenDropdownId((prev) => (prev === id ? null : id))
+          }
+          loading={actionLoading === post._id}
+          actions={buildActions(post)}
+        />
+      ),
+    },
+  ];
 
   return (
     <div
       className="w-full max-w-7xl mx-auto flex flex-col gap-6"
       onClick={() => setOpenDropdownId(null)}
     >
-      {/* Tiêu đề trang */}
-      <div>
-        <h1 className="text-2xl font-sans font-bold text-gray-900 leading-tight">
-          Quản Lý Bài Đăng
-        </h1>
-        <p className="text-sm font-body text-gray-500 mt-1">
-          Quản lý các tin chia sẻ thực phẩm và bán túi mù trên hệ thống
-        </p>
-      </div>
+      <PageHeader
+        title="Quản Lý Bài Đăng"
+        subtitle="Quản lý các tin chia sẻ thực phẩm và bán túi mù trên hệ thống"
+      />
 
       <Toolbar
         searchQuery={searchQuery}
@@ -163,131 +253,7 @@ export default function PostsManagementPage() {
       />
 
       <DataTable
-        columns={
-          [
-            {
-              key: 'post',
-              header: 'Bài đăng',
-              render: (post: IPost) => (
-                <div className="flex flex-col min-w-50">
-                  <span className="font-semibold text-gray-900 line-clamp-1">
-                    {post.title}
-                  </span>
-                  <span className="text-xs text-gray-500 mt-0.5">
-                    {post.category} &middot; {post.ownerId?.fullName || 'N/A'}
-                  </span>
-                </div>
-              ),
-            },
-            {
-              key: 'typePrice',
-              header: 'Loại hình & Giá',
-              render: (post: IPost) => (
-                <div className="flex flex-col">
-                  <span className="text-gray-900 font-medium">
-                    {post.type === 'P2P_FREE' ? 'P2P – Tặng' : 'B2C – Túi mù'}
-                  </span>
-                  <span className="text-xs mt-0.5">
-                    {formatCurrency(post.price, post.type)}
-                  </span>
-                </div>
-              ),
-            },
-            {
-              key: 'quantity',
-              header: 'Số lượng',
-              align: 'center',
-              render: (post: IPost) => (
-                <>
-                  <span className="font-semibold text-gray-900">
-                    {post.remainingQuantity}
-                  </span>
-                  <span className="text-gray-500"> / {post.totalQuantity}</span>
-                </>
-              ),
-            },
-            {
-              key: 'status',
-              header: 'Trạng thái',
-              render: (post: IPost) => getStatusBadge(post.status),
-            },
-            {
-              key: 'createdAt',
-              header: 'Ngày tạo',
-              render: (post: IPost) => (
-                <span className="text-gray-500 text-xs">
-                  {formatDate(post.createdAt)}
-                </span>
-              ),
-            },
-            {
-              key: 'actions',
-              header: 'Hành động',
-              align: 'center',
-              render: (post: IPost) => (
-                <div className="text-center relative">
-                  {actionLoading === post._id ? (
-                    <Loader2
-                      size={18}
-                      className="animate-spin text-gray-400 mx-auto"
-                    />
-                  ) : (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDropdownToggle(post._id);
-                      }}
-                      className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
-                    >
-                      <MoreVertical size={18} />
-                    </button>
-                  )}
-
-                  {openDropdownId === post._id && (
-                    <div className="absolute right-8 top-10 w-44 bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95">
-                      <button
-                        onClick={() => setSelectedPost(post)}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors"
-                      >
-                        <Eye size={16} />
-                        Xem chi tiết
-                      </button>
-
-                      {post.status === 'PENDING_REVIEW' && (
-                        <>
-                          <button
-                            onClick={() => handleApprove(post._id)}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors"
-                          >
-                            <CheckCircle size={16} />
-                            Duyệt bài đăng
-                          </button>
-                          <button
-                            onClick={() => handleReject(post._id)}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                          >
-                            <XCircle size={16} />
-                            Từ chối
-                          </button>
-                        </>
-                      )}
-
-                      {post.status !== 'HIDDEN' && (
-                        <button
-                          onClick={() => handleHide(post._id)}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors"
-                        >
-                          <EyeOff size={16} />
-                          Ẩn bài đăng
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ),
-            },
-          ] satisfies Column<IPost>[]
-        }
+        columns={columns}
         data={filteredPosts}
         rowKey={(post) => post._id}
         loading={isLoading}
@@ -309,8 +275,8 @@ export default function PostsManagementPage() {
         onApprove={handleApprove}
         onReject={handleReject}
         onHide={handleHide}
-        formatDate={formatDate}
-        formatCurrency={formatCurrency}
+        formatDate={formatDateTime}
+        formatCurrency={formatPostCurrency}
         getStatusBadge={getStatusBadge}
       />
     </div>
