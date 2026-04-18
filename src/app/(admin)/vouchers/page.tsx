@@ -8,6 +8,7 @@ import Toolbar from '@/components/ui/Toolbar';
 import StatusBadge from '@/components/ui/StatusBadge';
 import ActionDropdown, { type DropdownAction } from '@/components/ui/ActionDropdown';
 import PageHeader from '@/components/ui/PageHeader';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDate, formatDiscount } from '@/lib/formatters';
 import {
   IVoucher,
@@ -117,9 +118,15 @@ export default function VouchersManagementPage() {
     {
       key: 'creatorId',
       header: 'Cửa hàng',
-      render: (voucher) => (
-        <span className="font-medium text-gray-900">{voucher.creatorId?.fullName || 'N/A'}</span>
-      ),
+      render: (voucher) =>
+        voucher.creatorId ? (
+          <div className="flex items-center gap-2">
+            <UserAvatar fullName={voucher.creatorId.fullName} avatar={voucher.creatorId.avatar} size="sm" />
+            <span className="font-medium text-gray-900">{voucher.creatorId.fullName}</span>
+          </div>
+        ) : (
+          <span className="text-gray-400">N/A</span>
+        ),
     },
     {
       key: 'discount',

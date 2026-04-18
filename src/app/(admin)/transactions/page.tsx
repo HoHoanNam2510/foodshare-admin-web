@@ -8,6 +8,7 @@ import Toolbar from '@/components/ui/Toolbar';
 import StatusBadge from '@/components/ui/StatusBadge';
 import ActionDropdown, { type DropdownAction } from '@/components/ui/ActionDropdown';
 import PageHeader from '@/components/ui/PageHeader';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime, formatTransactionCurrency } from '@/lib/formatters';
 import {
   fetchAdminTransactions,
@@ -126,15 +127,15 @@ export default function TransactionsManagementPage() {
       header: 'Mã GD & Bài đăng',
       render: (tx) => (
         <div className="flex flex-col min-w-50">
-          <span className="font-semibold text-gray-900 flex items-center gap-2 font-mono text-xs">
+          <span className="font-semibold text-gray-900 flex items-center gap-2 font-mono text-sm">
             {tx._id.slice(-8).toUpperCase()}
             {activeTab === 'ALL' && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold ${tx.type === 'REQUEST' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}>
+              <span className={`text-xs px-1.5 py-0.5 rounded uppercase font-bold ${tx.type === 'REQUEST' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}>
                 {tx.type === 'REQUEST' ? 'P2P' : 'B2C'}
               </span>
             )}
           </span>
-          <span className="text-xs text-gray-500 mt-0.5 line-clamp-1">{tx.postId.title}</span>
+          <span className="text-sm text-gray-500 mt-0.5 line-clamp-1">{tx.postId.title}</span>
         </div>
       ),
     },
@@ -142,9 +143,17 @@ export default function TransactionsManagementPage() {
       key: 'parties',
       header: 'Giao dịch giữa',
       render: (tx) => (
-        <div className="flex flex-col text-xs gap-0.5">
-          <span className="text-gray-800"><strong className="text-gray-500 font-medium">Nhận:</strong> {tx.requesterId.fullName}</span>
-          <span className="text-gray-800"><strong className="text-gray-500 font-medium">Cấp:</strong> {tx.ownerId.fullName}</span>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-400 font-medium w-7 shrink-0">Nhận</span>
+            <UserAvatar fullName={tx.requesterId.fullName} avatar={tx.requesterId.avatar} size="sm" />
+            <span className="text-sm text-gray-800">{tx.requesterId.fullName}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-400 font-medium w-7 shrink-0">Cấp</span>
+            <UserAvatar fullName={tx.ownerId.fullName} avatar={tx.ownerId.avatar} size="sm" />
+            <span className="text-sm text-gray-800">{tx.ownerId.fullName}</span>
+          </div>
         </div>
       ),
     },
@@ -154,8 +163,8 @@ export default function TransactionsManagementPage() {
       align: 'right',
       render: (tx) => (
         <div className="flex flex-col">
-          <span className="text-gray-900 font-semibold">{formatTransactionCurrency(tx.postId.price * tx.quantity, tx.paymentMethod)}</span>
-          <span className="text-xs text-gray-500 mt-0.5">SL: {tx.quantity} • {tx.paymentMethod}</span>
+          <span className="text-base text-gray-900 font-semibold">{formatTransactionCurrency(tx.postId.price * tx.quantity, tx.paymentMethod)}</span>
+          <span className="text-sm text-gray-500 mt-0.5">SL: {tx.quantity} • {tx.paymentMethod}</span>
         </div>
       ),
     },
@@ -167,7 +176,7 @@ export default function TransactionsManagementPage() {
     {
       key: 'createdAt',
       header: 'Ngày tạo',
-      render: (tx) => <span className="text-gray-500 text-xs">{formatDateTime(tx.createdAt)}</span>,
+      render: (tx) => <span className="text-gray-500 text-sm">{formatDateTime(tx.createdAt)}</span>,
     },
     {
       key: 'actions',

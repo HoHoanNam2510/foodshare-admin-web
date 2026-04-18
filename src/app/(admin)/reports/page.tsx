@@ -8,6 +8,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import PageHeader from '@/components/ui/PageHeader';
 import ActionDropdown, { type DropdownAction } from '@/components/ui/ActionDropdown';
 import ReportDetailModal from '@/components/features/reports/ReportDetailModal';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
 import {
   fetchAdminReports,
@@ -111,19 +112,7 @@ export default function ReportsManagementPage() {
       header: 'Người tố cáo',
       render: (r) => (
         <div className="flex items-center gap-3">
-          <div className="relative w-8 h-8 shrink-0">
-            <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold absolute inset-0">
-              {r.reporterId.fullName.charAt(0).toUpperCase()}
-            </div>
-            {r.reporterId.avatar && (
-              <img
-                src={r.reporterId.avatar}
-                alt={r.reporterId.fullName}
-                className="w-8 h-8 rounded-full object-cover absolute inset-0"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            )}
-          </div>
+          <UserAvatar fullName={r.reporterId.fullName} avatar={r.reporterId.avatar} size="md" />
           <div className="flex flex-col">
             <span className="text-gray-900 font-medium">{r.reporterId.fullName}</span>
             <span className="text-xs text-gray-500 mt-0.5">{r.reporterId.email}</span>

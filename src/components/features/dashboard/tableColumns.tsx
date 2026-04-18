@@ -1,4 +1,5 @@
 import StatusBadge from '@/components/ui/StatusBadge';
+import UserAvatar from '@/components/ui/UserAvatar';
 import type { Column } from '@/components/ui/DataTable';
 import type { TabId } from '@/lib/dashboardApi';
 
@@ -26,19 +27,7 @@ const userColumns: Column<any>[] = [
     header: 'Họ tên',
     render: (row) => (
       <div className="flex items-center gap-3">
-        <div className="relative w-8 h-8 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-primary-container flex items-center justify-center text-white text-xs font-bold absolute inset-0">
-            {row.fullName?.charAt(0)?.toUpperCase() || '?'}
-          </div>
-          {row.avatar && (
-            <img
-              src={row.avatar}
-              alt={row.fullName}
-              className="w-8 h-8 rounded-lg object-cover absolute inset-0"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          )}
-        </div>
+        <UserAvatar fullName={row.fullName || '?'} avatar={row.avatar} size="md" />
         <span className="font-semibold text-neutral-T10">{row.fullName}</span>
       </div>
     ),
@@ -90,9 +79,15 @@ const postColumns: Column<any>[] = [
   {
     key: 'owner',
     header: 'Người đăng',
-    render: (row) => (
-      <span className="text-neutral-T50">{row.ownerId?.fullName || '—'}</span>
-    ),
+    render: (row) =>
+      row.ownerId ? (
+        <div className="flex items-center gap-2">
+          <UserAvatar fullName={row.ownerId.fullName} avatar={row.ownerId.avatar} size="sm" />
+          <span className="text-neutral-T50">{row.ownerId.fullName}</span>
+        </div>
+      ) : (
+        <span className="text-neutral-T60">—</span>
+      ),
   },
   {
     key: 'type',
@@ -152,18 +147,28 @@ const transactionColumns: Column<any>[] = [
   {
     key: 'requester',
     header: 'Người yêu cầu',
-    render: (row) => (
-      <span className="text-neutral-T50">
-        {row.requesterId?.fullName || '—'}
-      </span>
-    ),
+    render: (row) =>
+      row.requesterId ? (
+        <div className="flex items-center gap-2">
+          <UserAvatar fullName={row.requesterId.fullName} avatar={row.requesterId.avatar} size="sm" />
+          <span className="text-neutral-T50">{row.requesterId.fullName}</span>
+        </div>
+      ) : (
+        <span className="text-neutral-T60">—</span>
+      ),
   },
   {
     key: 'owner',
     header: 'Chủ bài',
-    render: (row) => (
-      <span className="text-neutral-T50">{row.ownerId?.fullName || '—'}</span>
-    ),
+    render: (row) =>
+      row.ownerId ? (
+        <div className="flex items-center gap-2">
+          <UserAvatar fullName={row.ownerId.fullName} avatar={row.ownerId.avatar} size="sm" />
+          <span className="text-neutral-T50">{row.ownerId.fullName}</span>
+        </div>
+      ) : (
+        <span className="text-neutral-T60">—</span>
+      ),
   },
   {
     key: 'type',
@@ -214,11 +219,15 @@ const reportColumns: Column<any>[] = [
   {
     key: 'reporter',
     header: 'Người báo cáo',
-    render: (row) => (
-      <span className="font-semibold text-neutral-T10">
-        {row.reporterId?.fullName || '—'}
-      </span>
-    ),
+    render: (row) =>
+      row.reporterId ? (
+        <div className="flex items-center gap-2">
+          <UserAvatar fullName={row.reporterId.fullName} avatar={row.reporterId.avatar} size="sm" />
+          <span className="font-semibold text-neutral-T10">{row.reporterId.fullName}</span>
+        </div>
+      ) : (
+        <span className="text-neutral-T60">—</span>
+      ),
   },
   {
     key: 'targetType',
@@ -266,14 +275,17 @@ const auditColumns: Column<any>[] = [
   {
     key: 'info',
     header: 'Thông tin',
-    render: (row) => (
-      <span className="font-semibold text-neutral-T10">
-        {row.fullName ||
-          row.title ||
-          row.targetType ||
-          `${row.type} — ${row.status}`}
-      </span>
-    ),
+    render: (row) =>
+      row.fullName ? (
+        <div className="flex items-center gap-2">
+          <UserAvatar fullName={row.fullName} avatar={row.avatar} size="sm" />
+          <span className="font-semibold text-neutral-T10">{row.fullName}</span>
+        </div>
+      ) : (
+        <span className="font-semibold text-neutral-T10">
+          {row.title || row.targetType || `${row.type} — ${row.status}`}
+        </span>
+      ),
   },
   {
     key: 'status',
@@ -308,7 +320,7 @@ export function getColumnsForTab(tab: TabId): Column<any>[] {
   return map[tab];
 }
 
-export function getRowKey(tab: TabId) {
+export function getRowKey(_tab: TabId) {
   return (row: any, index: number) =>
     row._id ? `${row._id}-${index}` : `row-${index}`;
 }

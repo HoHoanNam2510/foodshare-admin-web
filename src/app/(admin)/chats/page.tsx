@@ -1,44 +1,75 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Eye, MessageSquare } from 'lucide-react';
 import ChatDetailModal from '@/components/features/chats/ChatDetailModal';
-import { MOCK_CHATS } from '@/constants/mockChats';
 import { formatDateTime } from '@/lib/formatters';
 import PageHeader from '@/components/ui/PageHeader';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import ActionDropdown from '@/components/ui/ActionDropdown';
 import StatusBadge from '@/components/ui/StatusBadge';
+import UserAvatar from '@/components/ui/UserAvatar';
+import {
+  fetchAdminConversations,
+  type IConversation,
+  type PaginationMeta,
+} from '@/lib/chatApi';
 
-type Chat = (typeof MOCK_CHATS)[number];
+const PAGE_LIMIT = 15;
 
 export default function ChatsManagementPage() {
+  const [conversations, setConversations] = useState<IConversation[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [selectedChat, setSelectedChat] = useState<IConversation | null>(null);
 
-  const filteredChats = useMemo(() => {
-    let result = [...MOCK_CHATS];
-    result.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  const loadConversations = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetchAdminConversations({
+        page: currentPage,
+        limit: PAGE_LIMIT,
+      });
+      setConversations(res.data);
+      setPagination(res.pagination);
+    } catch {
+      setError('Không thể tải dữ liệu. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage]);
+
+  useEffect(() => { loadConversations(); }, [loadConversations]);
+  useEffect(() => { setCurrentPage(1); }, [statusFilter]);
+
+  const filteredConversations = useMemo(() => {
+    let result = [...conversations];
+    if (statusFilter !== 'ALL') {
+      result = result.filter((c) => c.status === statusFilter);
+    }
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(
         (c) =>
           c._id.toLowerCase().includes(lowerQuery) ||
-          c.participants.some((p: any) =>
-            p.fullName.toLowerCase().includes(lowerQuery)
+          c.participants.some((p) =>
+            p.fullName.toLowerCase().includes(lowerQuery) ||
+            (p.email ?? '').toLowerCase().includes(lowerQuery)
           )
       );
     }
-    if (statusFilter !== 'ALL') {
-      result = result.filter((c) => c.status === statusFilter);
-    }
     return result;
-  }, [searchQuery, statusFilter]);
+  }, [conversations, searchQuery, statusFilter]);
 
-  const columns: Column<Chat>[] = [
+  const columns: Column<IConversation>[] = [
     {
       key: 'id',
       header: 'Mã Chat & Giao dịch',
@@ -46,10 +77,10 @@ export default function ChatsManagementPage() {
         <div className="flex flex-col min-w-37.5">
           <span className="font-semibold text-gray-900 flex items-center gap-1.5">
             <MessageSquare size={14} className="text-primary" />
-            {chat._id}
+            <span className="font-mono text-xs">{chat._id.slice(-10).toUpperCase()}</span>
           </span>
           <span className="text-xs text-gray-500 mt-0.5">
-            Ref: {chat.transactionId || 'N/A'}
+            Ref: {chat.transactionId ? chat.transactionId.toString().slice(-8).toUpperCase() : 'N/A'}
           </span>
         </div>
       ),
@@ -58,15 +89,18 @@ export default function ChatsManagementPage() {
       key: 'participants',
       header: 'Thành viên tham gia',
       render: (chat) => (
-        <div className="flex flex-col gap-1">
-          {chat.participants.map((p: any) => (
+        <div className="flex flex-col gap-2">
+          {chat.participants.map((p) => (
             <div key={p._id} className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
-                {p.fullName.charAt(0)}
+              <UserAvatar fullName={p.fullName} avatar={p.avatar} size="sm" />
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-gray-800 line-clamp-1">
+                  {p.fullName}
+                </span>
+                {p.email && (
+                  <span className="text-[10px] text-gray-400">{p.email}</span>
+                )}
               </div>
-              <span className="text-sm font-medium text-gray-800 line-clamp-1">
-                {p.fullName}
-              </span>
             </div>
           ))}
         </div>
@@ -148,8 +182,9 @@ export default function ChatsManagementPage() {
       />
 
       <Toolbar
-        onSearch={setSearchQuery}
-        placeholder="Tìm theo Mã chat, Tên người dùng..."
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        placeholder="Tìm theo Mã chat, Tên hoặc Email người dùng..."
         filters={[
           {
             type: 'select',
@@ -166,9 +201,14 @@ export default function ChatsManagementPage() {
 
       <DataTable
         columns={columns}
-        data={filteredChats}
+        data={filteredConversations}
         rowKey={(chat) => chat._id}
+        loading={isLoading}
+        error={error}
         emptyMessage="Không tìm thấy hội thoại nào phù hợp."
+        pagination={pagination}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
         className="rounded-md overflow-visible relative"
         tableClassName="min-h-100"
         headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
@@ -180,7 +220,7 @@ export default function ChatsManagementPage() {
       <ChatDetailModal
         chat={selectedChat}
         onClose={() => setSelectedChat(null)}
-        formatDate={formatDateTime}
+        onToggleLock={loadConversations}
       />
     </div>
   );

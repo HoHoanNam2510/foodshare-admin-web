@@ -6,6 +6,7 @@ import PointLogDetailModal from '@/components/features/greenpoints/PointLogDetai
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
 import PageHeader from '@/components/ui/PageHeader';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
 import {
   IPointLog,
@@ -65,19 +66,7 @@ export default function GreenPointsManagementPage() {
       header: 'Người dùng',
       render: (log) => (
         <div className="flex items-center gap-3">
-          <div className="relative w-9 h-9 shrink-0">
-            <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-xs font-bold absolute inset-0">
-              {log.userId?.fullName?.charAt(0)?.toUpperCase() ?? '?'}
-            </div>
-            {log.userId?.avatar && (
-              <img
-                src={log.userId.avatar}
-                alt={log.userId.fullName}
-                className="w-9 h-9 rounded-full object-cover absolute inset-0"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            )}
-          </div>
+          <UserAvatar fullName={log.userId?.fullName || '?'} avatar={log.userId?.avatar} size="md" />
           <div className="flex flex-col min-w-0">
             <span className="font-semibold text-gray-900 line-clamp-1">{log.userId?.fullName || 'N/A'}</span>
             <span className="text-xs text-gray-500">{log.userId?.email}</span>

@@ -134,8 +134,8 @@ export default function DataTable<T>({
     <div
       className={`bg-surface-lowest rounded-lg shadow-soft border border-outline-variant/30 overflow-hidden ${className}`}
     >
-      <div className="overflow-x-auto">
-        <table className={`w-full text-left font-body ${tableClassName}`}>
+      <div className={`overflow-x-auto ${tableClassName}`}>
+        <table className="w-full text-left font-body">
           {/* ── THEAD ── */}
           <thead
             className={`bg-linear-to-r from-primary/5 to-primary-container/5 border-b border-outline-variant/30 ${headerClassName}`}

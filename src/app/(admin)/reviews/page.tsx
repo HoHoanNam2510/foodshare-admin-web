@@ -9,6 +9,7 @@ import ActionDropdown, {
   type DropdownAction,
 } from '@/components/ui/ActionDropdown';
 import ReviewDetailModal from '@/components/features/reviews/ReviewDetailModal';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
 import {
   fetchAdminReviews,
@@ -47,44 +48,6 @@ const renderStarsInline = (rating: number) => (
         }
       />
     ))}
-  </div>
-);
-
-// ─── User avatar cell helper ──────────────────────────────────
-
-const UserCell = ({
-  name,
-  email,
-  avatar,
-  gradientTo = 'to-secondary-container',
-}: {
-  name: string;
-  email?: string;
-  avatar?: string;
-  gradientTo?: string;
-}) => (
-  <div className="flex items-center gap-3">
-    <div className="relative w-8 h-8 shrink-0">
-      <div
-        className={`w-8 h-8 rounded-full bg-linear-to-br from-primary-container ${gradientTo} flex items-center justify-center text-white font-sans text-xs font-bold absolute inset-0`}
-      >
-        {name.charAt(0).toUpperCase()}
-      </div>
-      {avatar && (
-        <img
-          src={avatar}
-          alt={name}
-          className="w-8 h-8 rounded-full object-cover absolute inset-0"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-      )}
-    </div>
-    <div className="flex flex-col">
-      <span className="font-medium text-gray-900 line-clamp-1">{name}</span>
-      {email && <span className="text-xs text-gray-500">{email}</span>}
-    </div>
   </div>
 );
 
@@ -188,23 +151,26 @@ export default function ReviewsManagementPage() {
       key: 'reviewer',
       header: 'Người đánh giá',
       render: (review) => (
-        <UserCell
-          name={review.reviewerId.fullName}
-          email={review.reviewerId.email}
-          avatar={review.reviewerId.avatar}
-        />
+        <div className="flex items-center gap-3">
+          <UserAvatar fullName={review.reviewerId.fullName} avatar={review.reviewerId.avatar} size="md" />
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-900 line-clamp-1">{review.reviewerId.fullName}</span>
+            {review.reviewerId.email && <span className="text-xs text-gray-500">{review.reviewerId.email}</span>}
+          </div>
+        </div>
       ),
     },
     {
       key: 'reviewee',
       header: 'Người được đánh giá',
       render: (review) => (
-        <UserCell
-          name={review.revieweeId.fullName}
-          email={review.revieweeId.email}
-          avatar={review.revieweeId.avatar}
-          gradientTo="to-tertiary-T70"
-        />
+        <div className="flex items-center gap-3">
+          <UserAvatar fullName={review.revieweeId.fullName} avatar={review.revieweeId.avatar} size="md" />
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-900 line-clamp-1">{review.revieweeId.fullName}</span>
+            {review.revieweeId.email && <span className="text-xs text-gray-500">{review.revieweeId.email}</span>}
+          </div>
+        </div>
       ),
     },
     {

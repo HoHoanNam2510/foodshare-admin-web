@@ -18,6 +18,7 @@ import {
 } from '@/lib/postApi';
 import { formatDateTime, formatPostCurrency } from '@/lib/formatters';
 import { getStatusBadge } from '@/components/features/posts/postFormatters';
+import UserAvatar from '@/components/ui/UserAvatar';
 
 const PAGE_LIMIT = 10;
 
@@ -140,13 +141,19 @@ export default function PostsManagementPage() {
       key: 'post',
       header: 'Bài đăng',
       render: (post) => (
-        <div className="flex flex-col min-w-50">
+        <div className="flex flex-col min-w-50 gap-1">
           <span className="font-semibold text-gray-900 line-clamp-1">
             {post.title}
           </span>
-          <span className="text-xs text-gray-500 mt-0.5">
-            {post.category} &middot; {post.ownerId?.fullName || 'N/A'}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-400">{post.category} &middot;</span>
+            {post.ownerId && (
+              <>
+                <UserAvatar fullName={post.ownerId.fullName} avatar={post.ownerId.avatar} size="xs" />
+                <span className="text-xs text-gray-500">{post.ownerId.fullName}</span>
+              </>
+            )}
+          </div>
         </div>
       ),
     },

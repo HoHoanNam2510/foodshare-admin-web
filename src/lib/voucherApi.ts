@@ -6,6 +6,7 @@ export interface IVoucher {
     _id: string;
     fullName: string;
     email: string;
+    avatar?: string;
     storeInfo?: { businessAddress?: string };
   };
   code: string;
