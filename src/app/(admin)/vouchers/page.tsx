@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Eye, ToggleLeft, ToggleRight, Ticket } from 'lucide-react';
+import { Eye, ToggleLeft, ToggleRight, Ticket, Trash2 } from 'lucide-react';
 import VoucherDetailModal from '@/components/features/vouchers/VoucherDetailModal';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
@@ -15,6 +15,7 @@ import {
   PaginationMeta,
   fetchAdminVouchers,
   toggleAdminVoucher,
+  adminSoftDeleteVoucher,
 } from '@/lib/voucherApi';
 
 const getVoucherStatusBadge = (isActive: boolean, validUntil: string, remaining: number) => {
@@ -40,6 +41,7 @@ export default function VouchersManagementPage() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [selectedVoucher, setSelectedVoucher] = useState<IVoucher | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadVouchers = useCallback(async (page: number, isActive?: boolean) => {
     setLoading(true);
@@ -76,6 +78,25 @@ export default function VouchersManagementPage() {
     }
   };
 
+  const handleDelete = async (voucher: IVoucher) => {
+    setOpenDropdownId(null);
+    const confirmed = confirm(
+      `Chuyển voucher "${voucher.title}" (${voucher.code}) vào thùng rác?\nVoucher sẽ bị vô hiệu hóa và ẩn khỏi hệ thống.`
+    );
+    if (!confirmed) return;
+    setDeletingId(voucher._id);
+    try {
+      await adminSoftDeleteVoucher(voucher._id);
+      if (selectedVoucher?._id === voucher._id) setSelectedVoucher(null);
+      const isActive = statusFilter === 'ALL' ? undefined : statusFilter === 'true';
+      await loadVouchers(currentPage, isActive);
+    } catch {
+      alert('Xóa voucher thất bại. Vui lòng thử lại.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const filteredVouchers = searchQuery
     ? vouchers.filter(
         (v) =>
@@ -96,6 +117,13 @@ export default function VouchersManagementPage() {
       icon: voucher.isActive ? <ToggleLeft size={16} /> : <ToggleRight size={16} />,
       variant: voucher.isActive ? 'danger' : 'primary',
       onClick: () => { handleToggle(voucher._id); setOpenDropdownId(null); },
+    },
+    {
+      label: 'Chuyển vào thùng rác',
+      icon: <Trash2 size={16} />,
+      variant: 'danger',
+      dividerBefore: true,
+      onClick: () => deletingId !== voucher._id && handleDelete(voucher),
     },
   ];
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import PageHeader from '@/components/ui/PageHeader';
@@ -13,6 +13,7 @@ import {
   fetchAdminPosts,
   adminUpdatePost,
   adminToggleHidePost,
+  adminSoftDeletePost,
   type IPost,
   type PaginationMeta,
 } from '@/lib/postApi';
@@ -104,6 +105,15 @@ export default function PostsManagementPage() {
   const handleHide = (postId: string) =>
     withActionLoading(postId, () => adminToggleHidePost(postId));
 
+  const handleDelete = async (post: IPost) => {
+    setOpenDropdownId(null);
+    const confirmed = confirm(
+      `Chuyển bài đăng "${post.title}" vào thùng rác?\nAdmin có thể khôi phục trong trang Thùng Rác.`
+    );
+    if (!confirmed) return;
+    await withActionLoading(post._id, () => adminSoftDeletePost(post._id));
+  };
+
   const buildActions = (post: IPost): DropdownAction[] => [
     {
       label: 'Xem chi tiết',
@@ -134,6 +144,13 @@ export default function PostsManagementPage() {
       hidden: post.status === 'HIDDEN',
       onClick: () => handleHide(post._id),
     },
+    {
+      label: 'Chuyển vào thùng rác',
+      icon: <Trash2 size={16} />,
+      variant: 'danger',
+      dividerBefore: true,
+      onClick: () => handleDelete(post),
+    },
   ];
 
   const columns: Column<IPost>[] = [
@@ -146,11 +163,19 @@ export default function PostsManagementPage() {
             {post.title}
           </span>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-400">{post.category} &middot;</span>
+            <span className="text-xs text-gray-400">
+              {post.category} &middot;
+            </span>
             {post.ownerId && (
               <>
-                <UserAvatar fullName={post.ownerId.fullName} avatar={post.ownerId.avatar} size="xs" />
-                <span className="text-xs text-gray-500">{post.ownerId.fullName}</span>
+                <UserAvatar
+                  fullName={post.ownerId.fullName}
+                  avatar={post.ownerId.avatar}
+                  size="xs"
+                />
+                <span className="text-xs text-gray-500">
+                  {post.ownerId.fullName}
+                </span>
               </>
             )}
           </div>

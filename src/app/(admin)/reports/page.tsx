@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Layers, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Layers, Clock, CheckCircle, XCircle, Eye, Trash2 } from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -15,6 +15,7 @@ import {
   type IReport,
   type PaginationMeta,
 } from '@/lib/reportApi';
+import { adminSoftDeleteReport } from '@/lib/trashApi';
 
 const PAGE_LIMIT = 10;
 
@@ -88,11 +89,27 @@ export default function ReportsManagementPage() {
     );
   }, [reports, searchQuery]);
 
+  const handleDeleteReport = useCallback(async (r: IReport) => {
+    if (!window.confirm(`Chuyển báo cáo #${r._id.slice(-8).toUpperCase()} vào thùng rác?`)) return;
+    try {
+      await adminSoftDeleteReport(r._id);
+      setReports((prev) => prev.filter((x) => x._id !== r._id));
+    } catch {
+      alert('Không thể xóa báo cáo. Vui lòng thử lại.');
+    }
+  }, []);
+
   const buildActions = (r: IReport): DropdownAction[] => [
     {
       label: 'Xem & Xử lý',
       icon: <Eye size={16} />,
       onClick: () => { setSelectedReport(r); setOpenDropdownId(null); },
+    },
+    {
+      label: 'Chuyển vào thùng rác',
+      icon: <Trash2 size={16} />,
+      variant: 'danger',
+      onClick: () => { setOpenDropdownId(null); handleDeleteReport(r); },
     },
   ];
 

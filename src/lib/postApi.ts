@@ -96,3 +96,9 @@ export async function adminToggleHidePost(
   const res = await axiosInstance.patch(`/posts/admin/${postId}/hide`);
   return res.data;
 }
+
+// ── DELETE /api/admin/trash/posts/:id (admin soft delete) ──
+
+export async function adminSoftDeletePost(postId: string): Promise<void> {
+  await axiosInstance.delete(`/admin/trash/posts/${postId}`);
+}

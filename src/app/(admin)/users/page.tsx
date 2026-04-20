@@ -125,19 +125,13 @@ export default function UsersManagementPage() {
   const handleDelete = async (user: IUser) => {
     setOpenDropdownId(null);
 
-    if (user.status === 'ACTIVE') {
-      alert(
-        'Không thể xóa tài khoản đang hoạt động. Vui lòng khóa tài khoản trước.'
-      );
-      return;
-    }
     if (adminUser && user._id === adminUser._id) {
       alert('Bạn không thể xóa tài khoản của chính mình.');
       return;
     }
 
     const confirmed = confirm(
-      `Xóa vĩnh viễn tài khoản "${user.fullName}" (${user.email})?\n\nHành động này không thể hoàn tác.`
+      `Chuyển tài khoản "${user.fullName}" (${user.email}) vào thùng rác?\n\nTất cả bài đăng và voucher của tài khoản này cũng sẽ bị ẩn. Admin có thể khôi phục trong vòng ${30} ngày.`
     );
     if (!confirmed) return;
 

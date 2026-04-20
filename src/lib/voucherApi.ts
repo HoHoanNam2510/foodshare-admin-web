@@ -60,3 +60,9 @@ export async function toggleAdminVoucher(
   const res = await axiosInstance.patch(`/vouchers/admin/${id}/toggle`);
   return res.data;
 }
+
+// ── DELETE /api/admin/trash/vouchers/:id (admin soft delete) ──
+
+export async function adminSoftDeleteVoucher(id: string): Promise<void> {
+  await axiosInstance.delete(`/admin/trash/vouchers/${id}`);
+}

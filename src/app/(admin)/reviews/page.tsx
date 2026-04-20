@@ -11,11 +11,8 @@ import ActionDropdown, {
 import ReviewDetailModal from '@/components/features/reviews/ReviewDetailModal';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
-import {
-  fetchAdminReviews,
-  adminDeleteReview,
-  type IReview,
-} from '@/lib/reviewApi';
+import { fetchAdminReviews, type IReview } from '@/lib/reviewApi';
+import { adminSoftDeleteReview } from '@/lib/trashApi';
 
 const PAGE_SIZE = 15;
 
@@ -98,13 +95,13 @@ export default function ReviewsManagementPage() {
   }, [loadReviews]);
 
   const handleDelete = async (reviewId: string) => {
-    const confirmed = confirm('Bạn có chắc chắn muốn xóa đánh giá này?');
+    const confirmed = confirm('Chuyển đánh giá vào thùng rác? Admin có thể khôi phục trong trang Thùng Rác.');
     if (!confirmed) return;
 
     setDeletingId(reviewId);
     setOpenDropdownId(null);
     try {
-      await adminDeleteReview(reviewId);
+      await adminSoftDeleteReview(reviewId);
       if (selectedReview?._id === reviewId) setSelectedReview(null);
       await loadReviews();
     } catch {
