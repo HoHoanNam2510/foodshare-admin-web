@@ -76,7 +76,7 @@ function getSecondaryLabel(tab: TrashCollection, item: ITrashItem): string {
     case 'posts': {
       const owner = d.ownerId as AnyRecord | null;
       if (!owner || typeof owner !== 'object') return '';
-      return (owner.email as string) || (owner.fullName as string) || '';
+      return (owner.fullName as string) || (owner.email as string) || '';
     }
     case 'reviews': {
       const reviewer = d.reviewerId as AnyRecord | null;
@@ -94,7 +94,7 @@ function getSecondaryLabel(tab: TrashCollection, item: ITrashItem): string {
     case 'vouchers': {
       const creator = d.creatorId as AnyRecord | null;
       if (!creator || typeof creator !== 'object') return '';
-      return (creator.email as string) || (creator.fullName as string) || '';
+      return (creator.fullName as string) || (creator.email as string) || '';
     }
     case 'conversations': {
       const parts = d.participants as AnyRecord[] | null;
