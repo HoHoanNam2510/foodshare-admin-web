@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Eye, HeartHandshake, ShoppingBag, Layers, CheckCircle } from 'lucide-react';
+import { Eye, HeartHandshake, ShoppingBag, Layers } from 'lucide-react';
 import TransactionDetailModal from '@/components/features/transactions/TransactionDetailModal';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
@@ -13,7 +13,6 @@ import { formatDateTime, formatTransactionCurrency } from '@/lib/formatters';
 import {
   fetchAdminTransactions,
   adminForceUpdateTransactionStatus,
-  adminConfirmPayment,
   type ITransaction,
   type PaginationMeta,
 } from '@/lib/transactionApi';
@@ -21,12 +20,9 @@ import {
 const TX_STATUS_LABELS: Record<string, string> = {
   PENDING: 'Chờ xác nhận',
   ACCEPTED: 'Đã chấp nhận',
-  ESCROWED: 'Đang giữ tiền',
   COMPLETED: 'Hoàn thành',
   CANCELLED: 'Đã hủy',
   REJECTED: 'Đã từ chối',
-  REFUNDED: 'Đã hoàn tiền',
-  DISPUTED: 'Khiếu nại',
 };
 
 const txStatusBadge = (status: string) => (
@@ -75,9 +71,9 @@ export default function TransactionsManagementPage() {
     return transactions.filter(
       (tx) =>
         tx._id.toLowerCase().includes(q) ||
-        tx.postId.title.toLowerCase().includes(q) ||
-        tx.requesterId.fullName.toLowerCase().includes(q) ||
-        tx.ownerId.fullName.toLowerCase().includes(q)
+        tx.postId?.title?.toLowerCase().includes(q) ||
+        tx.requesterId?.fullName?.toLowerCase().includes(q) ||
+        tx.ownerId?.fullName?.toLowerCase().includes(q)
     );
   }, [transactions, searchQuery]);
 
@@ -95,29 +91,11 @@ export default function TransactionsManagementPage() {
     );
   };
 
-  const handleConfirmPayment = async (transactionId: string) => {
-    try {
-      await adminConfirmPayment(transactionId);
-      await loadTransactions();
-    } catch (err) {
-      console.error('Confirm payment failed:', err);
-    }
-    setOpenDropdownId(null);
-  };
-
   const buildActions = (tx: ITransaction): DropdownAction[] => [
     {
       label: 'Xem & Cập nhật',
       icon: <Eye size={16} />,
       onClick: () => { setSelectedTx(tx); setOpenDropdownId(null); },
-    },
-    {
-      label: 'Xác nhận đã nhận tiền',
-      icon: <CheckCircle size={16} />,
-      variant: 'primary',
-      dividerBefore: true,
-      hidden: !(tx.type === 'ORDER' && tx.status === 'PENDING'),
-      onClick: () => handleConfirmPayment(tx._id),
     },
   ];
 
@@ -135,7 +113,7 @@ export default function TransactionsManagementPage() {
               </span>
             )}
           </span>
-          <span className="text-sm text-gray-500 mt-0.5 line-clamp-1">{tx.postId.title}</span>
+          <span className="text-sm text-gray-500 mt-0.5 line-clamp-1">{tx.postId?.title ?? 'Bài đăng đã bị xóa'}</span>
         </div>
       ),
     },
@@ -146,13 +124,13 @@ export default function TransactionsManagementPage() {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-gray-400 font-medium w-7 shrink-0">Nhận</span>
-            <UserAvatar fullName={tx.requesterId.fullName} avatar={tx.requesterId.avatar} size="sm" />
-            <span className="text-sm text-gray-800">{tx.requesterId.fullName}</span>
+            <UserAvatar fullName={tx.requesterId?.fullName ?? 'Khách'} avatar={tx.requesterId?.avatar} size="sm" />
+            <span className="text-sm text-gray-800">{tx.requesterId?.fullName ?? 'Khách ẩn danh'}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-gray-400 font-medium w-7 shrink-0">Cấp</span>
-            <UserAvatar fullName={tx.ownerId.fullName} avatar={tx.ownerId.avatar} size="sm" />
-            <span className="text-sm text-gray-800">{tx.ownerId.fullName}</span>
+            <UserAvatar fullName={tx.ownerId?.fullName ?? 'Khách'} avatar={tx.ownerId?.avatar} size="sm" />
+            <span className="text-sm text-gray-800">{tx.ownerId?.fullName ?? 'Khách ẩn danh'}</span>
           </div>
         </div>
       ),
@@ -163,7 +141,7 @@ export default function TransactionsManagementPage() {
       align: 'right',
       render: (tx) => (
         <div className="flex flex-col">
-          <span className="text-base text-gray-900 font-semibold">{formatTransactionCurrency(tx.postId.price * tx.quantity, tx.paymentMethod)}</span>
+          <span className="text-base text-gray-900 font-semibold">{formatTransactionCurrency((tx.postId?.price ?? 0) * tx.quantity, tx.paymentMethod)}</span>
           <span className="text-sm text-gray-500 mt-0.5">SL: {tx.quantity} • {tx.paymentMethod}</span>
         </div>
       ),
@@ -236,12 +214,9 @@ export default function TransactionsManagementPage() {
               { value: 'ALL', label: 'Tất cả trạng thái' },
               { value: 'PENDING', label: 'Chờ xác nhận' },
               { value: 'ACCEPTED', label: 'Đã chấp nhận' },
-              { value: 'ESCROWED', label: 'Đã thanh toán (Giữ tiền)' },
               { value: 'COMPLETED', label: 'Hoàn thành' },
               { value: 'CANCELLED', label: 'Đã hủy' },
               { value: 'REJECTED', label: 'Đã từ chối' },
-              { value: 'REFUNDED', label: 'Đã hoàn tiền' },
-              { value: 'DISPUTED', label: 'Đang khiếu nại' },
             ],
           },
         ]}

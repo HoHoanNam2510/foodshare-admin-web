@@ -11,11 +11,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { ITransaction } from '@/lib/transactionApi';
-import {
-  adminRefundTransaction,
-  adminDisburseEscrow,
-  adminResolveDispute,
-} from '@/lib/transactionApi';
+import { adminForceUpdateTransactionStatus } from '@/lib/transactionApi';
 
 interface TransactionDetailModalProps {
   transaction: ITransaction | null;
@@ -31,18 +27,14 @@ const VALID_STATUSES = [
   'PENDING',
   'ACCEPTED',
   'REJECTED',
-  'ESCROWED',
   'COMPLETED',
   'CANCELLED',
-  'REFUNDED',
-  'DISPUTED',
 ] as const;
 
 export default function TransactionDetailModal({
   transaction,
   onClose,
   onStatusUpdate,
-  onRefresh,
   formatDate,
   formatCurrency,
   getStatusBadge,
@@ -51,8 +43,6 @@ export default function TransactionDetailModal({
   const [newStatus, setNewStatus] = useState(transaction?.status ?? 'PENDING');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
 
   if (!transaction) return null;
 
@@ -123,7 +113,7 @@ export default function TransactionDetailModal({
                 Bài đăng tương ứng
               </p>
               <p className="font-semibold text-gray-900 text-base">
-                {transaction.postId.title}
+                {transaction.postId?.title ?? 'Bài đăng đã bị xóa'}
               </p>
             </div>
 
@@ -148,7 +138,7 @@ export default function TransactionDetailModal({
               </p>
               <p className="font-bold text-lg text-primary">
                 {formatCurrency(
-                  transaction.postId.price * transaction.quantity,
+                  (transaction.postId?.price ?? 0) * transaction.quantity,
                   transaction.paymentMethod
                 )}
               </p>
@@ -173,10 +163,10 @@ export default function TransactionDetailModal({
                 Người Cấp (Owner / Donor)
               </h3>
               <p className="font-semibold text-gray-800">
-                {transaction.ownerId.fullName}
+                {transaction.ownerId?.fullName ?? 'Người dùng đã bị xóa'}
               </p>
               <p className="text-sm text-gray-600 flex items-center gap-1.5 mt-1">
-                <Mail size={13} /> {transaction.ownerId.email}
+                <Mail size={13} /> {transaction.ownerId?.email ?? 'N/A'}
               </p>
             </div>
             <div className="p-4 bg-primary/5 rounded-md border border-primary/20">
@@ -184,146 +174,13 @@ export default function TransactionDetailModal({
                 <Receipt size={16} /> Người Nhận (Requester)
               </h3>
               <p className="font-semibold text-gray-800">
-                {transaction.requesterId.fullName}
+                {transaction.requesterId?.fullName ?? 'Người dùng đã bị xóa'}
               </p>
               <p className="text-sm text-gray-600 flex items-center gap-1.5 mt-1">
-                <Mail size={13} /> {transaction.requesterId.email}
+                <Mail size={13} /> {transaction.requesterId?.email ?? 'N/A'}
               </p>
             </div>
           </div>
-
-          {/* Dispute info */}
-          {transaction.status === 'DISPUTED' && transaction.disputeReason && (
-            <div className="p-4 mb-4 rounded-md bg-rose-50 border border-rose-200">
-              <p className="text-xs font-label text-rose-600 mb-1 uppercase tracking-wider font-bold">
-                Lý do khiếu nại
-              </p>
-              <p className="text-sm text-gray-800">{transaction.disputeReason}</p>
-            </div>
-          )}
-
-          {/* Refund info */}
-          {transaction.status === 'REFUNDED' && (
-            <div className="p-4 mb-4 rounded-md bg-orange-50 border border-orange-200">
-              <p className="text-xs font-label text-orange-600 mb-1 uppercase tracking-wider font-bold">
-                Đã hoàn tiền
-              </p>
-              {transaction.refundReason && (
-                <p className="text-sm text-gray-800">{transaction.refundReason}</p>
-              )}
-              {transaction.refundedAt && (
-                <p className="text-xs text-gray-500 mt-1">Lúc: {formatDate(transaction.refundedAt)}</p>
-              )}
-            </div>
-          )}
-
-          {/* Admin Actions — Dispute Resolution / Refund / Disburse */}
-          {(transaction.status === 'DISPUTED' || transaction.status === 'ESCROWED') && (
-            <div className="border-t border-outline-variant/30 pt-4 mt-2 mb-4">
-              <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-3">
-                {transaction.status === 'DISPUTED' ? 'Xử lý khiếu nại' : 'Hành động Escrow'}
-              </p>
-
-              {actionError && (
-                <p className="text-xs text-error mb-2">{actionError}</p>
-              )}
-
-              <div className="flex gap-2">
-                {transaction.status === 'DISPUTED' ? (
-                  <>
-                    <button
-                      onClick={async () => {
-                        if (!confirm('Hoàn tiền cho buyer và kết thúc giao dịch?')) return;
-                        setActionLoading('refund');
-                        setActionError(null);
-                        try {
-                          await adminResolveDispute(transaction._id, 'REFUND');
-                          onRefresh?.();
-                          onClose();
-                        } catch {
-                          setActionError('Hoàn tiền thất bại');
-                        } finally {
-                          setActionLoading(null);
-                        }
-                      }}
-                      disabled={actionLoading !== null}
-                      className="flex-1 px-4 py-2 bg-orange-50 text-orange-700 border border-orange-200 text-sm font-bold rounded-md hover:bg-orange-100 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {actionLoading === 'refund' && <Loader2 size={14} className="animate-spin" />}
-                      Hoàn tiền cho Buyer
-                    </button>
-                    <button
-                      onClick={async () => {
-                        if (!confirm('Giải ngân cho store và kết thúc giao dịch?')) return;
-                        setActionLoading('disburse');
-                        setActionError(null);
-                        try {
-                          await adminResolveDispute(transaction._id, 'DISBURSE');
-                          onRefresh?.();
-                          onClose();
-                        } catch {
-                          setActionError('Giải ngân thất bại');
-                        } finally {
-                          setActionLoading(null);
-                        }
-                      }}
-                      disabled={actionLoading !== null}
-                      className="flex-1 px-4 py-2 bg-green-50 text-green-700 border border-green-200 text-sm font-bold rounded-md hover:bg-green-100 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {actionLoading === 'disburse' && <Loader2 size={14} className="animate-spin" />}
-                      Giải ngân cho Store
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={async () => {
-                        const reason = prompt('Nhập lý do hoàn tiền:');
-                        if (!reason) return;
-                        setActionLoading('refund');
-                        setActionError(null);
-                        try {
-                          await adminRefundTransaction(transaction._id, reason);
-                          onRefresh?.();
-                          onClose();
-                        } catch {
-                          setActionError('Hoàn tiền thất bại');
-                        } finally {
-                          setActionLoading(null);
-                        }
-                      }}
-                      disabled={actionLoading !== null}
-                      className="flex-1 px-4 py-2 bg-orange-50 text-orange-700 border border-orange-200 text-sm font-bold rounded-md hover:bg-orange-100 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {actionLoading === 'refund' && <Loader2 size={14} className="animate-spin" />}
-                      Hoàn tiền
-                    </button>
-                    <button
-                      onClick={async () => {
-                        if (!confirm('Giải ngân cho store?')) return;
-                        setActionLoading('disburse');
-                        setActionError(null);
-                        try {
-                          await adminDisburseEscrow(transaction._id);
-                          onRefresh?.();
-                          onClose();
-                        } catch {
-                          setActionError('Giải ngân thất bại');
-                        } finally {
-                          setActionLoading(null);
-                        }
-                      }}
-                      disabled={actionLoading !== null}
-                      className="flex-1 px-4 py-2 bg-green-50 text-green-700 border border-green-200 text-sm font-bold rounded-md hover:bg-green-100 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {actionLoading === 'disburse' && <Loader2 size={14} className="animate-spin" />}
-                      Giải ngân
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Force-update status */}
           <div className="border-t border-outline-variant/30 pt-4 mt-2">

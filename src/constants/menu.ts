@@ -17,7 +17,6 @@ import {
   History,
   Leaf,
   Star,
-  Wallet,
   Settings,
   Award,
 } from 'lucide-react';
@@ -81,13 +80,6 @@ export const adminMenus: MenuItem[] = [
         icon: History,
       },
     ],
-  },
-  {
-    id: 'escrow',
-    label: 'Quản Lý Escrow',
-    path: '/escrow',
-    icon: Wallet,
-    sub: [{ label: 'Danh sách Escrow', path: '/escrow', icon: List }],
   },
   {
     // Checked
