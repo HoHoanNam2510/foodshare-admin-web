@@ -55,14 +55,17 @@ const TRIGGER_LABEL: Record<ModerationTrigger, string> = {
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
-  const [softDelete, setSoftDelete] = useState<ISoftDeleteConfig>(DEFAULT_SOFT_DELETE);
+  const [softDelete, setSoftDelete] =
+    useState<ISoftDeleteConfig>(DEFAULT_SOFT_DELETE);
   const [isSavingTrash, setIsSavingTrash] = useState(false);
   const [trashSavedAt, setTrashSavedAt] = useState<Date | null>(null);
   const [trashError, setTrashError] = useState<string | null>(null);
   const [isCleaningUp, setIsCleaningUp] = useState(false);
   const [cleanupResult, setCleanupResult] = useState<string | null>(null);
 
-  const [aiModeration, setAiModeration] = useState<IAIModerationConfig>(DEFAULT_AI_MODERATION);
+  const [aiModeration, setAiModeration] = useState<IAIModerationConfig>(
+    DEFAULT_AI_MODERATION
+  );
   const [isSavingAI, setIsSavingAI] = useState(false);
   const [aiSavedAt, setAiSavedAt] = useState<Date | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -173,7 +176,8 @@ export default function SettingsPage() {
       setAiLogPage(1);
       await refreshLogs(1);
       const configRes = await fetchSystemConfig();
-      if (configRes.data?.aiModeration) setAiModeration(configRes.data.aiModeration);
+      if (configRes.data?.aiModeration)
+        setAiModeration(configRes.data.aiModeration);
     } catch {
       setAiError('Chạy AI thất bại. Vui lòng thử lại.');
     } finally {
@@ -227,7 +231,10 @@ export default function SettingsPage() {
                 <button
                   key={days}
                   onClick={() =>
-                    setSoftDelete((prev) => ({ ...prev, gracePeriodDays: days }))
+                    setSoftDelete((prev) => ({
+                      ...prev,
+                      gracePeriodDays: days,
+                    }))
                   }
                   className={`flex-1 py-3 rounded-xl border-2 text-sm font-semibold transition ${
                     softDelete.gracePeriodDays === days
@@ -253,14 +260,21 @@ export default function SettingsPage() {
               {(
                 [
                   { value: 'WEEKLY', label: 'Hàng tuần', sub: 'CN 3:00 AM' },
-                  { value: 'MONTHLY', label: 'Hàng tháng', sub: 'Ngày 1 hàng tháng' },
+                  {
+                    value: 'MONTHLY',
+                    label: 'Hàng tháng',
+                    sub: 'Ngày 1 hàng tháng',
+                  },
                   { value: 'BOTH', label: 'Cả hai', sub: 'Tuần + tháng' },
                 ] as { value: CleanupSchedule; label: string; sub: string }[]
               ).map(({ value, label, sub }) => (
                 <button
                   key={value}
                   onClick={() =>
-                    setSoftDelete((prev) => ({ ...prev, cleanupSchedule: value }))
+                    setSoftDelete((prev) => ({
+                      ...prev,
+                      cleanupSchedule: value,
+                    }))
                   }
                   className={`flex-1 py-3 px-2 rounded-xl border-2 text-center transition ${
                     softDelete.cleanupSchedule === value
@@ -354,9 +368,11 @@ export default function SettingsPage() {
           <Brain className="w-5 h-5 text-purple-500" />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h2 className="font-semibold text-gray-900">AI Kiểm Duyệt Bài Đăng</h2>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 uppercase tracking-wide">
-                Gemini
+              <h2 className="font-semibold text-gray-900">
+                AI Kiểm Duyệt Bài Đăng
+              </h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 uppercase tracking-wide">
+                Grok
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -374,7 +390,10 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() =>
-                  setAiModeration((prev) => ({ ...prev, enabled: !prev.enabled }))
+                  setAiModeration((prev) => ({
+                    ...prev,
+                    enabled: !prev.enabled,
+                  }))
                 }
                 className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
                   aiModeration.enabled ? 'bg-primary' : 'bg-gray-300'
@@ -394,7 +413,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Interval */}
+          {/* Interval + Run Now */}
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Tần suất kiểm tra tự động
@@ -419,6 +438,22 @@ export default function SettingsPage() {
             <p className="text-xs text-gray-400">
               Scheduler kiểm tra mỗi 30 phút và chạy AI khi đến interval đã cài.
             </p>
+            <div className="pt-1">
+              <button
+                onClick={handleRunAI}
+                disabled={isRunningAI}
+                className="flex items-center gap-2 px-4 py-2.5 bg-orange-50 text-orange-600 border border-orange-200 rounded-xl font-semibold text-sm hover:bg-orange-100 active:scale-95 transition disabled:opacity-60"
+              >
+                {isRunningAI ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
+                {isRunningAI
+                  ? 'Đang chạy AI...'
+                  : 'Chạy ngay — không cần đợi lịch'}
+              </button>
+            </div>
           </div>
 
           {/* Thresholds */}
@@ -477,7 +512,8 @@ export default function SettingsPage() {
               </div>
             </div>
             <p className="text-xs text-gray-400">
-              Bài có score nằm giữa hai ngưỡng sẽ được giữ lại để admin duyệt thủ công.
+              Bài có score nằm giữa hai ngưỡng sẽ được giữ lại để admin duyệt
+              thủ công.
             </p>
           </div>
 
@@ -514,11 +550,31 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-4 gap-2">
                   {(
                     [
-                      { label: 'Đã xử lý', key: 'processed', color: 'text-gray-700 bg-gray-50 border-gray-200' },
-                      { label: 'Đã duyệt', key: 'approved', color: 'text-green-700 bg-green-50 border-green-200' },
-                      { label: 'Từ chối', key: 'rejected', color: 'text-red-700 bg-red-50 border-red-200' },
-                      { label: 'Chờ manual', key: 'pendingManual', color: 'text-amber-700 bg-amber-50 border-amber-200' },
-                    ] as { label: string; key: keyof IBatchStats; color: string }[]
+                      {
+                        label: 'Đã xử lý',
+                        key: 'processed',
+                        color: 'text-gray-700 bg-gray-50 border-gray-200',
+                      },
+                      {
+                        label: 'Đã duyệt',
+                        key: 'approved',
+                        color: 'text-green-700 bg-green-50 border-green-200',
+                      },
+                      {
+                        label: 'Từ chối',
+                        key: 'rejected',
+                        color: 'text-red-700 bg-red-50 border-red-200',
+                      },
+                      {
+                        label: 'Chờ manual',
+                        key: 'pendingManual',
+                        color: 'text-amber-700 bg-amber-50 border-amber-200',
+                      },
+                    ] as {
+                      label: string;
+                      key: keyof IBatchStats;
+                      color: string;
+                    }[]
                   ).map(({ label, key, color }) => {
                     const stats = aiRunResult ?? aiModeration.lastRunStats;
                     return (
@@ -526,8 +582,12 @@ export default function SettingsPage() {
                         key={key}
                         className={`rounded-xl border px-3 py-2.5 text-center ${color}`}
                       >
-                        <div className="text-lg font-bold">{stats?.[key] ?? 0}</div>
-                        <div className="text-[10px] font-medium mt-0.5">{label}</div>
+                        <div className="text-lg font-bold">
+                          {stats?.[key] ?? 0}
+                        </div>
+                        <div className="text-[10px] font-medium mt-0.5">
+                          {label}
+                        </div>
                       </div>
                     );
                   })}
@@ -552,7 +612,7 @@ export default function SettingsPage() {
                 Chưa có lịch sử kiểm duyệt
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
+              <div className="overflow-x-auto rounded-2xl border border-gray-100">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100">
@@ -575,7 +635,10 @@ export default function SettingsPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {aiLogs.map((log) => (
-                      <tr key={log._id} className="hover:bg-gray-50/50 transition-colors">
+                      <tr
+                        key={log._id}
+                        className="hover:bg-gray-50/50 transition-colors"
+                      >
                         <td className="px-3 py-2.5 text-gray-700 max-w-0">
                           <span className="block truncate">
                             {log.postId?.title ?? log.postTitle}
@@ -587,8 +650,8 @@ export default function SettingsPage() {
                               log.trustScore >= 70
                                 ? 'text-green-600'
                                 : log.trustScore < 50
-                                ? 'text-red-500'
-                                : 'text-amber-600'
+                                  ? 'text-red-500'
+                                  : 'text-amber-600'
                             }`}
                           >
                             {log.trustScore}
@@ -630,7 +693,9 @@ export default function SettingsPage() {
                   Trang {aiLogPage} / {aiLogTotalPages}
                 </span>
                 <button
-                  onClick={() => setAiLogPage((p) => Math.min(p + 1, aiLogTotalPages))}
+                  onClick={() =>
+                    setAiLogPage((p) => Math.min(p + 1, aiLogTotalPages))
+                  }
                   disabled={aiLogPage === aiLogTotalPages || isLoadingLogs}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
@@ -642,22 +707,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3">
-          {/* Run now */}
-          <button
-            onClick={handleRunAI}
-            disabled={isRunningAI}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-500/10 text-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-500/20 active:scale-95 transition disabled:opacity-60"
-          >
-            {isRunningAI ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Play className="w-4 h-4" />
-            )}
-            {isRunningAI ? 'Đang chạy...' : 'Chạy ngay'}
-          </button>
-
-          {/* Save AI config */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
           <button
             onClick={handleSaveAI}
             disabled={isSavingAI}
