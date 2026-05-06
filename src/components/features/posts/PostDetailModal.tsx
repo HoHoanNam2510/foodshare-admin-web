@@ -219,14 +219,20 @@ export default function PostDetailModal({
           {post.status === 'PENDING_REVIEW' && (
             <>
               <button
-                onClick={() => { onReject(post._id); onClose(); }}
+                onClick={() => {
+                  onReject(post._id);
+                  onClose();
+                }}
                 className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-red-50 text-error hover:bg-error hover:text-white transition-colors"
               >
                 <XCircle size={16} />
                 Từ chối
               </button>
               <button
-                onClick={() => { onApprove(post._id); onClose(); }}
+                onClick={() => {
+                  onApprove(post._id);
+                  onClose();
+                }}
                 className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-green-50 text-green-700 hover:bg-primary hover:text-white transition-colors"
               >
                 <CheckCircle size={16} />
@@ -237,7 +243,10 @@ export default function PostDetailModal({
 
           {post.status !== 'HIDDEN' && post.status !== 'PENDING_REVIEW' && (
             <button
-              onClick={() => { onHide(post._id); onClose(); }}
+              onClick={() => {
+                onHide(post._id);
+                onClose();
+              }}
               className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-error/10 text-error hover:bg-error hover:text-white transition-colors"
             >
               <EyeOff size={16} />

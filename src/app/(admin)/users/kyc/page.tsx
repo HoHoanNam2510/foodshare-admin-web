@@ -147,21 +147,38 @@ export default function KycReviewPage() {
 
       {/* ── TOOLBAR ── */}
       <Toolbar
-        onSearch={(v) => { setSearchQuery(v); setCurrentPage(1); }}
+        onSearch={(v) => {
+          setSearchQuery(v);
+          setCurrentPage(1);
+        }}
         placeholder="Tìm theo tên, email..."
-        filters={[
-          {
-            type: 'tabs',
-            value: kycFilter,
-            onChange: (v) => setKycFilter(v as KycFilter),
-            options: [
-              { value: 'PENDING', label: 'Chờ duyệt', icon: <Clock size={14} /> },
-              { value: 'VERIFIED', label: 'Đã duyệt', icon: <CheckCircle2 size={14} /> },
-              { value: 'REJECTED', label: 'Từ chối', icon: <XCircle size={14} /> },
-              { value: 'ALL', label: 'Tất cả', icon: <FileText size={14} /> },
-            ],
-          },
-        ] satisfies ToolbarFilter[]}
+        filters={
+          [
+            {
+              type: 'tabs',
+              value: kycFilter,
+              onChange: (v) => setKycFilter(v as KycFilter),
+              options: [
+                {
+                  value: 'PENDING',
+                  label: 'Chờ duyệt',
+                  icon: <Clock size={14} />,
+                },
+                {
+                  value: 'VERIFIED',
+                  label: 'Đã duyệt',
+                  icon: <CheckCircle2 size={14} />,
+                },
+                {
+                  value: 'REJECTED',
+                  label: 'Từ chối',
+                  icon: <XCircle size={14} />,
+                },
+                { value: 'ALL', label: 'Tất cả', icon: <FileText size={14} /> },
+              ],
+            },
+          ] satisfies ToolbarFilter[]
+        }
       />
 
       {/* ── KYC CARDS ── */}
@@ -241,7 +258,8 @@ export default function KycReviewPage() {
                           {user.storeInfo.businessAddress && (
                             <div className="col-span-2">
                               <span className="text-gray-500 flex items-center gap-1">
-                                <MapPin size={11} /> {user.storeInfo.businessAddress}
+                                <MapPin size={11} />{' '}
+                                {user.storeInfo.businessAddress}
                               </span>
                             </div>
                           )}
@@ -336,10 +354,7 @@ export default function KycReviewPage() {
             Hiển thị{' '}
             <span className="font-semibold text-gray-700">
               {(pagination.page - 1) * pagination.limit + 1}–
-              {Math.min(
-                pagination.page * pagination.limit,
-                pagination.total
-              )}
+              {Math.min(pagination.page * pagination.limit, pagination.total)}
             </span>{' '}
             trong tổng số{' '}
             <span className="font-semibold text-gray-700">
@@ -394,9 +409,7 @@ export default function KycReviewPage() {
 
             <button
               onClick={() =>
-                setCurrentPage((p) =>
-                  Math.min(pagination.totalPages, p + 1)
-                )
+                setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))
               }
               disabled={currentPage === pagination.totalPages}
               className="p-1.5 rounded-md text-gray-500 hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-colors"

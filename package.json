@@ -7,7 +7,9 @@
     "dev:clean": "node -e \"const fs=require('fs');fs.rmSync('.next',{recursive:true,force:true});\" && next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "cd .. && npm run format",
+    "format:src": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "axios": "^1.13.6",
@@ -28,6 +30,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "prettier": "^3.8.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

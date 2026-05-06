@@ -95,7 +95,9 @@ export default function ReviewsManagementPage() {
   }, [loadReviews]);
 
   const handleDelete = async (reviewId: string) => {
-    const confirmed = confirm('Chuyển đánh giá vào thùng rác? Admin có thể khôi phục trong trang Thùng Rác.');
+    const confirmed = confirm(
+      'Chuyển đánh giá vào thùng rác? Admin có thể khôi phục trong trang Thùng Rác.'
+    );
     if (!confirmed) return;
 
     setDeletingId(reviewId);
@@ -149,10 +151,20 @@ export default function ReviewsManagementPage() {
       header: 'Người đánh giá',
       render: (review) => (
         <div className="flex items-center gap-3">
-          <UserAvatar fullName={review.reviewerId.fullName} avatar={review.reviewerId.avatar} size="md" />
+          <UserAvatar
+            fullName={review.reviewerId.fullName}
+            avatar={review.reviewerId.avatar}
+            size="md"
+          />
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900 line-clamp-1">{review.reviewerId.fullName}</span>
-            {review.reviewerId.email && <span className="text-xs text-gray-500">{review.reviewerId.email}</span>}
+            <span className="font-medium text-gray-900 line-clamp-1">
+              {review.reviewerId.fullName}
+            </span>
+            {review.reviewerId.email && (
+              <span className="text-xs text-gray-500">
+                {review.reviewerId.email}
+              </span>
+            )}
           </div>
         </div>
       ),
@@ -162,10 +174,20 @@ export default function ReviewsManagementPage() {
       header: 'Người được đánh giá',
       render: (review) => (
         <div className="flex items-center gap-3">
-          <UserAvatar fullName={review.revieweeId.fullName} avatar={review.revieweeId.avatar} size="md" />
+          <UserAvatar
+            fullName={review.revieweeId.fullName}
+            avatar={review.revieweeId.avatar}
+            size="md"
+          />
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900 line-clamp-1">{review.revieweeId.fullName}</span>
-            {review.revieweeId.email && <span className="text-xs text-gray-500">{review.revieweeId.email}</span>}
+            <span className="font-medium text-gray-900 line-clamp-1">
+              {review.revieweeId.fullName}
+            </span>
+            {review.revieweeId.email && (
+              <span className="text-xs text-gray-500">
+                {review.revieweeId.email}
+              </span>
+            )}
           </div>
         </div>
       ),

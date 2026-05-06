@@ -67,7 +67,10 @@ export default function ChatDetailModal({
 
   const getSenderName = (msg: IMessage) => {
     if (typeof msg.senderId === 'object') return msg.senderId.fullName;
-    return chat.participants.find((p) => p._id === msg.senderId)?.fullName ?? 'Unknown';
+    return (
+      chat.participants.find((p) => p._id === msg.senderId)?.fullName ??
+      'Unknown'
+    );
   };
 
   const renderMessageContent = (msg: IMessage) => {
@@ -80,7 +83,9 @@ export default function ChatDetailModal({
                 src={msg.imageUrl}
                 alt="Hình ảnh"
                 className="w-48 h-32 object-cover rounded-md border border-outline-variant/30"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             ) : (
               <div className="w-48 h-32 bg-surface-container rounded-md flex items-center justify-center border border-outline-variant/30">
@@ -132,7 +137,9 @@ export default function ChatDetailModal({
             <p className="text-xs font-body text-gray-500 mt-1">
               Giao dịch liên quan:{' '}
               <span className="font-semibold text-gray-800">
-                {chat.transactionId ? chat.transactionId.toString().slice(-8).toUpperCase() : 'Không có'}
+                {chat.transactionId
+                  ? chat.transactionId.toString().slice(-8).toUpperCase()
+                  : 'Không có'}
               </span>
             </p>
           </div>
@@ -155,8 +162,12 @@ export default function ChatDetailModal({
                 {p.fullName.charAt(0)}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-gray-800">{p.fullName}</span>
-                {p.email && <span className="text-[10px] text-gray-400">{p.email}</span>}
+                <span className="text-sm font-semibold text-gray-800">
+                  {p.fullName}
+                </span>
+                {p.email && (
+                  <span className="text-[10px] text-gray-400">{p.email}</span>
+                )}
               </div>
               {idx < chat.participants.length - 1 && (
                 <span className="text-gray-300 ml-4">|</span>
@@ -232,7 +243,11 @@ export default function ChatDetailModal({
               disabled={isLocking}
               className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-bold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors shadow-sm disabled:opacity-60"
             >
-              {isLocking ? <Loader2 size={16} className="animate-spin" /> : <Unlock size={16} />}
+              {isLocking ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Unlock size={16} />
+              )}
               Mở khóa hội thoại
             </button>
           ) : (
@@ -241,7 +256,11 @@ export default function ChatDetailModal({
               disabled={isLocking}
               className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-bold bg-error/10 text-error hover:bg-error hover:text-white transition-colors shadow-sm disabled:opacity-60"
             >
-              {isLocking ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
+              {isLocking ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Lock size={16} />
+              )}
               Khóa khẩn cấp
             </button>
           )}

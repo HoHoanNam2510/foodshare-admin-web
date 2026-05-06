@@ -37,8 +37,14 @@ export interface ISystemConfig {
 }
 
 // ── GET /api/config ──
-export async function fetchSystemConfig(): Promise<{ success: boolean; data: ISystemConfig | null }> {
-  const res = await axiosInstance.get<{ success: boolean; data: ISystemConfig | null }>('/config');
+export async function fetchSystemConfig(): Promise<{
+  success: boolean;
+  data: ISystemConfig | null;
+}> {
+  const res = await axiosInstance.get<{
+    success: boolean;
+    data: ISystemConfig | null;
+  }>('/config');
   return res.data;
 }
 
@@ -46,7 +52,10 @@ export async function fetchSystemConfig(): Promise<{ success: boolean; data: ISy
 export async function updateSoftDeleteConfig(
   softDelete: Pick<ISoftDeleteConfig, 'gracePeriodDays' | 'cleanupSchedule'>
 ): Promise<{ success: boolean; data: ISystemConfig }> {
-  const res = await axiosInstance.put<{ success: boolean; data: ISystemConfig }>('/config', { softDelete });
+  const res = await axiosInstance.put<{
+    success: boolean;
+    data: ISystemConfig;
+  }>('/config', { softDelete });
   return res.data;
 }
 
@@ -54,15 +63,18 @@ export async function updateSoftDeleteConfig(
 export async function updateAIModerationConfig(
   payload: Omit<IAIModerationConfig, 'lastRunAt' | 'lastRunStats'>
 ): Promise<{ success: boolean; data: ISystemConfig }> {
-  const res = await axiosInstance.put<{ success: boolean; data: ISystemConfig }>(
-    '/config/ai-moderation',
-    payload
-  );
+  const res = await axiosInstance.put<{
+    success: boolean;
+    data: ISystemConfig;
+  }>('/config/ai-moderation', payload);
   return res.data;
 }
 
 // ── POST /api/config/ai-moderation/run ──
-export async function triggerAIModerationNow(): Promise<{ success: boolean; data: IBatchStats }> {
+export async function triggerAIModerationNow(): Promise<{
+  success: boolean;
+  data: IBatchStats;
+}> {
   const res = await axiosInstance.post<{ success: boolean; data: IBatchStats }>(
     '/config/ai-moderation/run'
   );

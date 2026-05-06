@@ -13,7 +13,11 @@ import {
   Loader2,
 } from 'lucide-react';
 import StatusBadge from '@/components/ui/StatusBadge';
-import { adminProcessReport, type IReport, type ReportAction } from '@/lib/reportApi';
+import {
+  adminProcessReport,
+  type IReport,
+  type ReportAction,
+} from '@/lib/reportApi';
 
 const REASON_LABELS: Record<string, string> = {
   FOOD_SAFETY: 'An toàn thực phẩm',
@@ -45,7 +49,9 @@ export default function ReportDetailModal({
 }: ReportDetailModalProps) {
   const [actionTaken, setActionTaken] = useState<ReportAction>('NONE');
   const [resolutionNote, setResolutionNote] = useState('');
-  const [status, setStatus] = useState<'PENDING' | 'RESOLVED' | 'DISMISSED'>('PENDING');
+  const [status, setStatus] = useState<'PENDING' | 'RESOLVED' | 'DISMISSED'>(
+    'PENDING'
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -122,8 +128,12 @@ export default function ReportDetailModal({
               <h3 className="text-sm font-bold text-error mb-3 flex items-center gap-2">
                 <AlertTriangle size={16} /> Người tố cáo
               </h3>
-              <p className="font-semibold text-gray-800">{report.reporterId.fullName}</p>
-              <p className="text-sm text-gray-600 mt-1">{report.reporterId.email}</p>
+              <p className="font-semibold text-gray-800">
+                {report.reporterId.fullName}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {report.reporterId.email}
+              </p>
             </div>
             <div className="p-4 bg-surface-container/30 rounded-md border border-outline-variant/30">
               <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -142,7 +152,8 @@ export default function ReportDetailModal({
                 Lý do & Mô tả
               </p>
               <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider bg-surface text-gray-700 border-outline-variant/50">
-                {REASON_LABELS[report.reason] || report.reason.replace(/_/g, ' ')}
+                {REASON_LABELS[report.reason] ||
+                  report.reason.replace(/_/g, ' ')}
               </span>
             </div>
             <p className="text-sm text-gray-800 leading-relaxed bg-surface/50 p-4 rounded-md border border-outline-variant/20">
@@ -164,11 +175,17 @@ export default function ReportDetailModal({
                   >
                     {img.startsWith('http') ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={img} alt={`evidence-${idx + 1}`} className="w-full h-full object-cover" />
+                      <img
+                        src={img}
+                        alt={`evidence-${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center">
                         <ImageIcon size={24} className="text-gray-300 mb-2" />
-                        <span className="text-[10px] text-gray-400">Image {idx + 1}</span>
+                        <span className="text-[10px] text-gray-400">
+                          Image {idx + 1}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -184,25 +201,36 @@ export default function ReportDetailModal({
           {/* Admin judgment */}
           <div className="border-t-2 border-dashed border-outline-variant/50 pt-6">
             <h3 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <ShieldAlert size={18} className="text-primary" /> Phán xử & Hành động
+              <ShieldAlert size={18} className="text-primary" /> Phán xử & Hành
+              động
             </h3>
 
             {isResolved ? (
               <div className="bg-primary/5 border border-primary/20 rounded-md p-4">
                 <div className="grid grid-cols-2 gap-4 mb-3">
                   <div>
-                    <span className="text-xs text-gray-500 block mb-1">Kết quả phán xử:</span>
+                    <span className="text-xs text-gray-500 block mb-1">
+                      Kết quả phán xử:
+                    </span>
                     <span className="font-bold text-gray-900">
-                      {report.status === 'RESOLVED' ? 'Hợp lệ (Đã giải quyết)' : 'Bác bỏ (Không hợp lệ)'}
+                      {report.status === 'RESOLVED'
+                        ? 'Hợp lệ (Đã giải quyết)'
+                        : 'Bác bỏ (Không hợp lệ)'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500 block mb-1">Hình phạt áp dụng:</span>
-                    <span className="font-bold text-error">{report.actionTaken}</span>
+                    <span className="text-xs text-gray-500 block mb-1">
+                      Hình phạt áp dụng:
+                    </span>
+                    <span className="font-bold text-error">
+                      {report.actionTaken}
+                    </span>
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500 block mb-1">Ghi chú của Admin:</span>
+                  <span className="text-xs text-gray-500 block mb-1">
+                    Ghi chú của Admin:
+                  </span>
                   <p className="text-sm font-medium text-gray-800 bg-surface-lowest p-3 rounded border border-outline-variant/30">
                     {report.resolutionNote}
                   </p>
@@ -210,9 +238,13 @@ export default function ReportDetailModal({
                 <div className="mt-3 pt-3 border-t border-primary/10 text-xs text-gray-500 flex justify-between">
                   <span>
                     Xử lý bởi:{' '}
-                    <strong className="text-gray-900">{report.resolvedBy?.fullName}</strong>
+                    <strong className="text-gray-900">
+                      {report.resolvedBy?.fullName}
+                    </strong>
                   </span>
-                  {report.resolvedAt && <span>Lúc: {formatDate(report.resolvedAt)}</span>}
+                  {report.resolvedAt && (
+                    <span>Lúc: {formatDate(report.resolvedAt)}</span>
+                  )}
                 </div>
               </div>
             ) : (
@@ -224,7 +256,9 @@ export default function ReportDetailModal({
                     </label>
                     <select
                       value={status}
-                      onChange={(e) => setStatus(e.target.value as typeof status)}
+                      onChange={(e) =>
+                        setStatus(e.target.value as typeof status)
+                      }
                       className="w-full p-2.5 bg-surface-lowest border border-outline-variant/50 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="PENDING">-- Chọn kết luận --</option>
@@ -238,7 +272,9 @@ export default function ReportDetailModal({
                     </label>
                     <select
                       value={actionTaken}
-                      onChange={(e) => setActionTaken(e.target.value as ReportAction)}
+                      onChange={(e) =>
+                        setActionTaken(e.target.value as ReportAction)
+                      }
                       disabled={status !== 'RESOLVED'}
                       className="w-full p-2.5 bg-surface-lowest border border-outline-variant/50 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -262,9 +298,7 @@ export default function ReportDetailModal({
                     className="w-full p-3 bg-surface-lowest border border-outline-variant/50 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
                 </div>
-                {error && (
-                  <p className="mt-2 text-xs text-error">{error}</p>
-                )}
+                {error && <p className="mt-2 text-xs text-error">{error}</p>}
               </div>
             )}
           </div>
@@ -281,7 +315,9 @@ export default function ReportDetailModal({
           {!isResolved && (
             <button
               onClick={handleProcess}
-              disabled={status === 'PENDING' || !resolutionNote.trim() || isSubmitting}
+              disabled={
+                status === 'PENDING' || !resolutionNote.trim() || isSubmitting
+              }
               className="flex items-center gap-2 px-6 py-2 rounded-md font-body text-sm font-bold bg-primary text-white hover:bg-primary-T30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               {isSubmitting ? (

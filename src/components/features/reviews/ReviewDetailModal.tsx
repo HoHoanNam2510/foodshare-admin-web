@@ -34,9 +34,7 @@ export default function ReviewDetailModal({
           key={star}
           size={20}
           className={
-            star <= rating
-              ? 'text-yellow-500 fill-yellow-500'
-              : 'text-gray-300'
+            star <= rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'
           }
         />
       ))}

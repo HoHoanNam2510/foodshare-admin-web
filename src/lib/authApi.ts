@@ -30,7 +30,11 @@ export async function sendRegistrationCode(params: {
   password: string;
   fullName: string;
   phoneNumber?: string;
-}): Promise<{ success: boolean; message: string; data?: { expiresInMinutes: number } }> {
+}): Promise<{
+  success: boolean;
+  message: string;
+  data?: { expiresInMinutes: number };
+}> {
   const res = await axiosInstance.post('/auth/register/send-code', params);
   return res.data;
 }

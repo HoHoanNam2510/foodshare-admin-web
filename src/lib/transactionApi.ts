@@ -36,7 +36,7 @@ export interface ITransaction {
   _id: string;
   postId: ITransactionPost;
   requesterId: ITransactionUser; // Người nhận / người mua
-  ownerId: ITransactionUser;     // Người cho / cửa hàng
+  ownerId: ITransactionUser; // Người cho / cửa hàng
   type: 'REQUEST' | 'ORDER';
   quantity: number;
   status: TransactionStatus;
@@ -64,7 +64,8 @@ export async function fetchAdminTransactions(params: {
 }): Promise<AdminTransactionsResponse> {
   const query = new URLSearchParams();
   if (params.type && params.type !== 'ALL') query.set('type', params.type);
-  if (params.status && params.status !== 'ALL') query.set('status', params.status);
+  if (params.status && params.status !== 'ALL')
+    query.set('status', params.status);
   if (params.page) query.set('page', String(params.page));
   if (params.limit) query.set('limit', String(params.limit));
 

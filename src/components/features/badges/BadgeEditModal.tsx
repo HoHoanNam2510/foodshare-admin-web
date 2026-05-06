@@ -77,7 +77,8 @@ export default function BadgeEditModal({
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'pointReward' || name === 'sortOrder' ? Number(value) : value,
+      [name]:
+        name === 'pointReward' || name === 'sortOrder' ? Number(value) : value,
     }));
   };
 
@@ -91,7 +92,12 @@ export default function BadgeEditModal({
         const res = await createBadgeApi(form);
         saved = res.data;
       } else {
-        const { code: _code, triggerEvent: _te, targetRole: _tr, ...editableFields } = form;
+        const {
+          code: _code,
+          triggerEvent: _te,
+          targetRole: _tr,
+          ...editableFields
+        } = form;
         const res = await updateBadgeApi(badge!._id, editableFields);
         saved = res.data;
       }
@@ -132,7 +138,10 @@ export default function BadgeEditModal({
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="px-6 py-5 flex flex-col gap-4 max-h-[70vh] overflow-y-auto"
+        >
           {/* Image preview */}
           {form.imageUrl && (
             <div className="flex justify-center">
@@ -218,7 +227,9 @@ export default function BadgeEditModal({
                   )}
                 </select>
               ) : (
-                <p className={`${inputCls} bg-surface-container text-gray-500 cursor-not-allowed`}>
+                <p
+                  className={`${inputCls} bg-surface-container text-gray-500 cursor-not-allowed`}
+                >
                   {TARGET_ROLE_LABELS[form.targetRole]}
                 </p>
               )}
@@ -242,7 +253,9 @@ export default function BadgeEditModal({
                   )}
                 </select>
               ) : (
-                <p className={`${inputCls} bg-surface-container text-gray-500 cursor-not-allowed`}>
+                <p
+                  className={`${inputCls} bg-surface-container text-gray-500 cursor-not-allowed`}
+                >
                   {TRIGGER_EVENT_LABELS[form.triggerEvent]}
                 </p>
               )}

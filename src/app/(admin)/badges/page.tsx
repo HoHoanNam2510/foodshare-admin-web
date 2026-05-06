@@ -59,7 +59,10 @@ export default function BadgesManagementPage() {
   const [badges, setBadges] = useState<IBadge[]>([]);
   const [stats, setStats] = useState<BadgeStat[]>([]);
   const [pagination, setPagination] = useState<{
-    page: number; limit: number; total: number; totalPages: number;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -70,24 +73,32 @@ export default function BadgesManagementPage() {
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [editTarget, setEditTarget] = useState<IBadge | null | undefined>(undefined);
+  const [editTarget, setEditTarget] = useState<IBadge | null | undefined>(
+    undefined
+  );
 
-  const loadBadges = useCallback(async (page: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params: Parameters<typeof fetchAdminBadges>[0] = { page, limit: LIMIT };
-      if (roleFilter !== 'ALL') params.targetRole = roleFilter as TargetRole;
-      if (activeFilter !== 'ALL') params.isActive = activeFilter === 'true';
-      const res = await fetchAdminBadges(params);
-      setBadges(res.data.badges);
-      setPagination(res.data.pagination);
-    } catch {
-      setError('Không thể tải danh sách huy hiệu.');
-    } finally {
-      setLoading(false);
-    }
-  }, [roleFilter, activeFilter]);
+  const loadBadges = useCallback(
+    async (page: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params: Parameters<typeof fetchAdminBadges>[0] = {
+          page,
+          limit: LIMIT,
+        };
+        if (roleFilter !== 'ALL') params.targetRole = roleFilter as TargetRole;
+        if (activeFilter !== 'ALL') params.isActive = activeFilter === 'true';
+        const res = await fetchAdminBadges(params);
+        setBadges(res.data.badges);
+        setPagination(res.data.pagination);
+      } catch {
+        setError('Không thể tải danh sách huy hiệu.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [roleFilter, activeFilter]
+  );
 
   const loadStats = useCallback(async () => {
     try {
@@ -98,15 +109,25 @@ export default function BadgesManagementPage() {
     }
   }, []);
 
-  useEffect(() => { loadBadges(currentPage); }, [currentPage, loadBadges]);
-  useEffect(() => { loadStats(); }, [loadStats]);
-  useEffect(() => { setCurrentPage(1); }, [roleFilter, activeFilter]);
+  useEffect(() => {
+    loadBadges(currentPage);
+  }, [currentPage, loadBadges]);
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [roleFilter, activeFilter]);
 
   const handleToggle = async (badge: IBadge) => {
     setTogglingId(badge._id);
     try {
       const res = await toggleBadgeApi(badge._id);
-      setBadges((prev) => prev.map((b) => b._id === badge._id ? { ...b, isActive: res.data.isActive } : b));
+      setBadges((prev) =>
+        prev.map((b) =>
+          b._id === badge._id ? { ...b, isActive: res.data.isActive } : b
+        )
+      );
     } catch {
       // silent
     } finally {
@@ -140,7 +161,14 @@ export default function BadgesManagementPage() {
       render: (badge) => (
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center overflow-hidden shrink-0">
-            <Image src={badge.imageUrl} alt={badge.name} width={32} height={32} className="object-contain" unoptimized />
+            <Image
+              src={badge.imageUrl}
+              alt={badge.name}
+              width={32}
+              height={32}
+              className="object-contain"
+              unoptimized
+            />
           </div>
           <div>
             <p className="font-semibold text-gray-900">{badge.name}</p>
@@ -162,7 +190,9 @@ export default function BadgesManagementPage() {
       key: 'triggerEvent',
       header: 'Trigger',
       render: (badge) => (
-        <span className="text-xs text-gray-600">{TRIGGER_LABELS[badge.triggerEvent] ?? badge.triggerEvent}</span>
+        <span className="text-xs text-gray-600">
+          {TRIGGER_LABELS[badge.triggerEvent] ?? badge.triggerEvent}
+        </span>
       ),
     },
     {
@@ -180,7 +210,9 @@ export default function BadgesManagementPage() {
       header: 'Đã mở',
       align: 'center',
       render: (badge) => (
-        <span className="text-sm font-semibold text-gray-700">{badge.unlockedCount ?? 0}</span>
+        <span className="text-sm font-semibold text-gray-700">
+          {badge.unlockedCount ?? 0}
+        </span>
       ),
     },
     {
@@ -260,12 +292,25 @@ export default function BadgesManagementPage() {
             <TrendingUp size={18} className="text-secondary" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-0.5">Phổ biến nhất</p>
+            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-0.5">
+              Phổ biến nhất
+            </p>
             {topBadge ? (
               <div className="flex items-center gap-2">
-                <Image src={topBadge.badge.imageUrl} alt={topBadge.badge.name} width={24} height={24} className="object-contain" unoptimized />
-                <span className="text-sm font-semibold text-gray-900 truncate">{topBadge.badge.name}</span>
-                <span className="text-xs text-gray-500 shrink-0">({topBadge.unlockedCount} lượt)</span>
+                <Image
+                  src={topBadge.badge.imageUrl}
+                  alt={topBadge.badge.name}
+                  width={24}
+                  height={24}
+                  className="object-contain"
+                  unoptimized
+                />
+                <span className="text-sm font-semibold text-gray-900 truncate">
+                  {topBadge.badge.name}
+                </span>
+                <span className="text-xs text-gray-500 shrink-0">
+                  ({topBadge.unlockedCount} lượt)
+                </span>
               </div>
             ) : (
               <span className="text-sm text-gray-400">—</span>
@@ -291,7 +336,9 @@ export default function BadgesManagementPage() {
         </div>
         <div className="w-px h-5 bg-outline-variant/40 hidden sm:block" />
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-xs font-label text-gray-500 mr-1">Trạng thái:</span>
+          <span className="text-xs font-label text-gray-500 mr-1">
+            Trạng thái:
+          </span>
           {ACTIVE_FILTER_OPTIONS.map((opt) => (
             <button
               key={opt.value}
@@ -326,7 +373,7 @@ export default function BadgesManagementPage() {
         headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
-        cellClassName={(col) => col.key === 'actions' ? 'px-3' : ''}
+        cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
       />
 
       {/* Top badges stats */}
@@ -339,11 +386,25 @@ export default function BadgesManagementPage() {
           <div className="flex flex-col gap-3">
             {stats.slice(0, 5).map((stat, idx) => (
               <div key={stat.badge._id} className="flex items-center gap-3">
-                <span className="text-sm font-bold text-gray-400 w-5 text-right shrink-0">{idx + 1}</span>
-                <Image src={stat.badge.imageUrl} alt={stat.badge.name} width={28} height={28} className="object-contain shrink-0" unoptimized />
-                <span className="text-sm font-semibold text-gray-800 w-40 truncate shrink-0">{stat.badge.name}</span>
+                <span className="text-sm font-bold text-gray-400 w-5 text-right shrink-0">
+                  {idx + 1}
+                </span>
+                <Image
+                  src={stat.badge.imageUrl}
+                  alt={stat.badge.name}
+                  width={28}
+                  height={28}
+                  className="object-contain shrink-0"
+                  unoptimized
+                />
+                <span className="text-sm font-semibold text-gray-800 w-40 truncate shrink-0">
+                  {stat.badge.name}
+                </span>
                 <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
-                  <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${stat.percentage}%` }} />
+                  <div
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{ width: `${stat.percentage}%` }}
+                  />
                 </div>
                 <span className="text-xs font-label text-gray-500 w-20 text-right shrink-0">
                   {stat.unlockedCount} ({stat.percentage}%)
@@ -365,14 +426,28 @@ export default function BadgesManagementPage() {
   );
 }
 
-function StatCard({ icon, label, value, bg }: {
-  icon: React.ReactNode; label: string; value: number; bg: string;
+function StatCard({
+  icon,
+  label,
+  value,
+  bg,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  bg: string;
 }) {
   return (
-    <div className={`bg-surface-lowest border rounded-md p-4 shadow-sm flex items-center gap-4 ${bg}`}>
-      <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shrink-0">{icon}</div>
+    <div
+      className={`bg-surface-lowest border rounded-md p-4 shadow-sm flex items-center gap-4 ${bg}`}
+    >
+      <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shrink-0">
+        {icon}
+      </div>
       <div>
-        <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-0.5">{label}</p>
+        <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-0.5">
+          {label}
+        </p>
         <p className="text-2xl font-sans font-bold text-gray-900">{value}</p>
       </div>
     </div>

@@ -27,7 +27,11 @@ const userColumns: Column<any>[] = [
     header: 'Họ tên',
     render: (row) => (
       <div className="flex items-center gap-3">
-        <UserAvatar fullName={row.fullName || '?'} avatar={row.avatar} size="md" />
+        <UserAvatar
+          fullName={row.fullName || '?'}
+          avatar={row.avatar}
+          size="md"
+        />
         <span className="font-semibold text-neutral-T10">{row.fullName}</span>
       </div>
     ),
@@ -82,7 +86,11 @@ const postColumns: Column<any>[] = [
     render: (row) =>
       row.ownerId ? (
         <div className="flex items-center gap-2">
-          <UserAvatar fullName={row.ownerId.fullName} avatar={row.ownerId.avatar} size="sm" />
+          <UserAvatar
+            fullName={row.ownerId.fullName}
+            avatar={row.ownerId.avatar}
+            size="sm"
+          />
           <span className="text-neutral-T50">{row.ownerId.fullName}</span>
         </div>
       ) : (
@@ -150,7 +158,11 @@ const transactionColumns: Column<any>[] = [
     render: (row) =>
       row.requesterId ? (
         <div className="flex items-center gap-2">
-          <UserAvatar fullName={row.requesterId.fullName} avatar={row.requesterId.avatar} size="sm" />
+          <UserAvatar
+            fullName={row.requesterId.fullName}
+            avatar={row.requesterId.avatar}
+            size="sm"
+          />
           <span className="text-neutral-T50">{row.requesterId.fullName}</span>
         </div>
       ) : (
@@ -163,7 +175,11 @@ const transactionColumns: Column<any>[] = [
     render: (row) =>
       row.ownerId ? (
         <div className="flex items-center gap-2">
-          <UserAvatar fullName={row.ownerId.fullName} avatar={row.ownerId.avatar} size="sm" />
+          <UserAvatar
+            fullName={row.ownerId.fullName}
+            avatar={row.ownerId.avatar}
+            size="sm"
+          />
           <span className="text-neutral-T50">{row.ownerId.fullName}</span>
         </div>
       ) : (
@@ -222,8 +238,14 @@ const reportColumns: Column<any>[] = [
     render: (row) =>
       row.reporterId ? (
         <div className="flex items-center gap-2">
-          <UserAvatar fullName={row.reporterId.fullName} avatar={row.reporterId.avatar} size="sm" />
-          <span className="font-semibold text-neutral-T10">{row.reporterId.fullName}</span>
+          <UserAvatar
+            fullName={row.reporterId.fullName}
+            avatar={row.reporterId.avatar}
+            size="sm"
+          />
+          <span className="font-semibold text-neutral-T10">
+            {row.reporterId.fullName}
+          </span>
         </div>
       ) : (
         <span className="text-neutral-T60">—</span>

@@ -17,9 +17,12 @@ import {
 const getAmountBadge = (amount: number) => {
   const isPositive = amount > 0;
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-sm font-bold border ${isPositive ? 'bg-green-50 text-primary border-primary/20' : 'bg-red-50 text-error border-error/20'}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-sm font-bold border ${isPositive ? 'bg-green-50 text-primary border-primary/20' : 'bg-red-50 text-error border-error/20'}`}
+    >
       {isPositive ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
-      {isPositive ? '+' : ''}{amount}
+      {isPositive ? '+' : ''}
+      {amount}
     </span>
   );
 };
@@ -41,7 +44,11 @@ export default function GreenPointsManagementPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetchAdminPointLogs({ userId: userId || undefined, page, limit: LIMIT });
+      const res = await fetchAdminPointLogs({
+        userId: userId || undefined,
+        page,
+        limit: LIMIT,
+      });
       setLogs(res.data);
       setPagination(res.pagination);
     } catch {
@@ -66,9 +73,15 @@ export default function GreenPointsManagementPage() {
       header: 'Người dùng',
       render: (log) => (
         <div className="flex items-center gap-3">
-          <UserAvatar fullName={log.userId?.fullName || '?'} avatar={log.userId?.avatar} size="md" />
+          <UserAvatar
+            fullName={log.userId?.fullName || '?'}
+            avatar={log.userId?.avatar}
+            size="md"
+          />
           <div className="flex flex-col min-w-0">
-            <span className="font-semibold text-gray-900 line-clamp-1">{log.userId?.fullName || 'N/A'}</span>
+            <span className="font-semibold text-gray-900 line-clamp-1">
+              {log.userId?.fullName || 'N/A'}
+            </span>
             <span className="text-xs text-gray-500">{log.userId?.email}</span>
           </div>
         </div>
@@ -83,19 +96,30 @@ export default function GreenPointsManagementPage() {
       key: 'reason',
       header: 'Lý do',
       maxWidth: 'max-w-xs',
-      render: (log) => <span className="text-gray-800 line-clamp-2">{log.reason}</span>,
+      render: (log) => (
+        <span className="text-gray-800 line-clamp-2">{log.reason}</span>
+      ),
     },
     {
       key: 'referenceId',
       header: 'Tham chiếu',
-      render: (log) => log.referenceId
-        ? <span className="font-mono text-xs text-gray-500 bg-surface-container px-2 py-1 rounded-md">{log.referenceId.slice(-8)}…</span>
-        : <span className="text-gray-400 text-xs">—</span>,
+      render: (log) =>
+        log.referenceId ? (
+          <span className="font-mono text-xs text-gray-500 bg-surface-container px-2 py-1 rounded-md">
+            {log.referenceId.slice(-8)}…
+          </span>
+        ) : (
+          <span className="text-gray-400 text-xs">—</span>
+        ),
     },
     {
       key: 'createdAt',
       header: 'Thời gian',
-      render: (log) => <span className="text-sm text-gray-600 whitespace-nowrap">{formatDateTime(log.createdAt)}</span>,
+      render: (log) => (
+        <span className="text-sm text-gray-600 whitespace-nowrap">
+          {formatDateTime(log.createdAt)}
+        </span>
+      ),
     },
   ];
 
@@ -115,21 +139,29 @@ export default function GreenPointsManagementPage() {
       {pagination && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-surface-lowest border border-outline-variant/30 rounded-md p-4 shadow-sm">
-            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1">Tổng giao dịch</p>
-            <p className="text-2xl font-sans font-bold text-gray-900">{pagination.total.toLocaleString('vi-VN')}</p>
+            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1">
+              Tổng giao dịch
+            </p>
+            <p className="text-2xl font-sans font-bold text-gray-900">
+              {pagination.total.toLocaleString('vi-VN')}
+            </p>
           </div>
           <div className="bg-surface-lowest border border-primary/20 rounded-md p-4 shadow-sm">
             <p className="text-xs font-label text-primary uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <TrendingUp size={12} /> Cộng điểm
             </p>
-            <p className="text-2xl font-sans font-bold text-primary">{logs.filter((l) => l.amount > 0).length}</p>
+            <p className="text-2xl font-sans font-bold text-primary">
+              {logs.filter((l) => l.amount > 0).length}
+            </p>
             <p className="text-xs text-gray-500 mt-0.5">trên trang này</p>
           </div>
           <div className="bg-surface-lowest border border-error/20 rounded-md p-4 shadow-sm">
             <p className="text-xs font-label text-error uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <TrendingDown size={12} /> Trừ điểm
             </p>
-            <p className="text-2xl font-sans font-bold text-error">{logs.filter((l) => l.amount < 0).length}</p>
+            <p className="text-2xl font-sans font-bold text-error">
+              {logs.filter((l) => l.amount < 0).length}
+            </p>
             <p className="text-xs text-gray-500 mt-0.5">trên trang này</p>
           </div>
         </div>
@@ -141,7 +173,11 @@ export default function GreenPointsManagementPage() {
         rowKey={(log) => log._id}
         loading={loading}
         error={error}
-        emptyMessage={userIdFilter ? 'Không tìm thấy lịch sử điểm cho User ID này.' : 'Chưa có lịch sử giao dịch điểm nào.'}
+        emptyMessage={
+          userIdFilter
+            ? 'Không tìm thấy lịch sử điểm cho User ID này.'
+            : 'Chưa có lịch sử giao dịch điểm nào.'
+        }
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}

@@ -125,9 +125,7 @@ export const adminMenus: MenuItem[] = [
     label: 'Quản Lý Huy Hiệu',
     path: '/badges',
     icon: Award,
-    sub: [
-      { label: 'Danh sách huy hiệu', path: '/badges', icon: List },
-    ],
+    sub: [{ label: 'Danh sách huy hiệu', path: '/badges', icon: List }],
   },
   {
     id: 'notifications',

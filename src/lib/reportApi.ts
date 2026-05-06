@@ -64,8 +64,10 @@ export async function fetchAdminReports(params: {
   limit?: number;
 }): Promise<AdminReportsResponse> {
   const query = new URLSearchParams();
-  if (params.status && params.status !== 'ALL') query.set('status', params.status);
-  if (params.targetType && params.targetType !== 'ALL') query.set('targetType', params.targetType);
+  if (params.status && params.status !== 'ALL')
+    query.set('status', params.status);
+  if (params.targetType && params.targetType !== 'ALL')
+    query.set('targetType', params.targetType);
   if (params.page) query.set('page', String(params.page));
   if (params.limit) query.set('limit', String(params.limit));
 

@@ -80,7 +80,9 @@ export default function Toolbar({
   const hasFilters = filters && filters.length > 0;
 
   const searchInput = (
-    <div className={`flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50 ${hasFilters ? 'w-full sm:w-80' : 'w-full'} focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all`}>
+    <div
+      className={`flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50 ${hasFilters ? 'w-full sm:w-80' : 'w-full'} focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all`}
+    >
       <Search size={16} className="text-gray-400 shrink-0" />
       <input
         type="text"
@@ -106,57 +108,59 @@ export default function Toolbar({
     >
       {searchInput}
 
-      {hasFilters && <div className="flex items-center gap-3 w-full sm:w-auto">
-        {filters.map((filter, i) => {
-          if (filter.type === 'select') {
+      {hasFilters && (
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {filters.map((filter, i) => {
+            if (filter.type === 'select') {
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50"
+                >
+                  <Filter size={16} className="text-gray-400" />
+                  <select
+                    value={filter.value}
+                    onChange={(e) => filter.onChange(e.target.value)}
+                    className="bg-transparent text-sm outline-none font-body text-gray-700 cursor-pointer"
+                  >
+                    {filter.options.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              );
+            }
+
+            // Tab-style filter
             return (
               <div
                 key={i}
-                className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50"
+                className="flex items-center gap-1 bg-surface rounded-lg border border-outline-variant/50 p-1"
               >
-                <Filter size={16} className="text-gray-400" />
-                <select
-                  value={filter.value}
-                  onChange={(e) => filter.onChange(e.target.value)}
-                  className="bg-transparent text-sm outline-none font-body text-gray-700 cursor-pointer"
-                >
-                  {filter.options.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                {filter.options.map((tab) => {
+                  const isActive = filter.value === tab.value;
+                  return (
+                    <button
+                      key={tab.value}
+                      onClick={() => filter.onChange(tab.value)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                        isActive
+                          ? 'bg-primary text-white shadow-sm'
+                          : 'text-gray-500 hover:bg-primary/5 hover:text-primary'
+                      }`}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  );
+                })}
               </div>
             );
-          }
-
-          // Tab-style filter
-          return (
-            <div
-              key={i}
-              className="flex items-center gap-1 bg-surface rounded-lg border border-outline-variant/50 p-1"
-            >
-              {filter.options.map((tab) => {
-                const isActive = filter.value === tab.value;
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => filter.onChange(tab.value)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                      isActive
-                        ? 'bg-primary text-white shadow-sm'
-                        : 'text-gray-500 hover:bg-primary/5 hover:text-primary'
-                    }`}
-                  >
-                    {tab.icon}
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>}
+          })}
+        </div>
+      )}
     </div>
   );
 }

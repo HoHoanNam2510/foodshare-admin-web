@@ -1,7 +1,11 @@
 import axiosInstance from './axios';
 
 export type ModerationDecision = 'APPROVED' | 'REJECTED' | 'PENDING_MANUAL';
-export type ModerationTrigger = 'ON_CREATE' | 'ON_UPDATE' | 'BATCH_SCHEDULER' | 'MANUAL_ADMIN';
+export type ModerationTrigger =
+  | 'ON_CREATE'
+  | 'ON_UPDATE'
+  | 'BATCH_SCHEDULER'
+  | 'MANUAL_ADMIN';
 
 export interface IAIModerationLog {
   _id: string;
@@ -20,7 +24,12 @@ export async function fetchAIModerationLogs(
 ): Promise<{
   success: boolean;
   data: IAIModerationLog[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }> {
   const res = await axiosInstance.get('/config/ai-moderation/logs', {
     params: { page, limit },

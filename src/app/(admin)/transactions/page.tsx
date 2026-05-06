@@ -6,7 +6,9 @@ import TransactionDetailModal from '@/components/features/transactions/Transacti
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
 import StatusBadge from '@/components/ui/StatusBadge';
-import ActionDropdown, { type DropdownAction } from '@/components/ui/ActionDropdown';
+import ActionDropdown, {
+  type DropdownAction,
+} from '@/components/ui/ActionDropdown';
 import PageHeader from '@/components/ui/PageHeader';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime, formatTransactionCurrency } from '@/lib/formatters';
@@ -36,7 +38,9 @@ export default function TransactionsManagementPage() {
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState<'ALL' | 'REQUEST' | 'ORDER'>('ALL');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'REQUEST' | 'ORDER'>(
+    'ALL'
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,8 +66,12 @@ export default function TransactionsManagementPage() {
     }
   }, [activeTab, statusFilter, currentPage]);
 
-  useEffect(() => { loadTransactions(); }, [loadTransactions]);
-  useEffect(() => { setCurrentPage(1); }, [activeTab, statusFilter]);
+  useEffect(() => {
+    loadTransactions();
+  }, [loadTransactions]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, statusFilter]);
 
   const filteredTransactions = useMemo(() => {
     if (!searchQuery) return transactions;
@@ -83,11 +91,16 @@ export default function TransactionsManagementPage() {
     setSearchQuery('');
   };
 
-  const handleStatusUpdate = async (transactionId: string, newStatus: string) => {
+  const handleStatusUpdate = async (
+    transactionId: string,
+    newStatus: string
+  ) => {
     await adminForceUpdateTransactionStatus(transactionId, newStatus);
     await loadTransactions();
     setSelectedTx((prev) =>
-      prev?._id === transactionId ? { ...prev, status: newStatus as ITransaction['status'] } : prev
+      prev?._id === transactionId
+        ? { ...prev, status: newStatus as ITransaction['status'] }
+        : prev
     );
   };
 
@@ -95,7 +108,10 @@ export default function TransactionsManagementPage() {
     {
       label: 'Xem & Cập nhật',
       icon: <Eye size={16} />,
-      onClick: () => { setSelectedTx(tx); setOpenDropdownId(null); },
+      onClick: () => {
+        setSelectedTx(tx);
+        setOpenDropdownId(null);
+      },
     },
   ];
 
@@ -108,12 +124,16 @@ export default function TransactionsManagementPage() {
           <span className="font-semibold text-gray-900 flex items-center gap-2 font-mono text-sm">
             {tx._id.slice(-8).toUpperCase()}
             {activeTab === 'ALL' && (
-              <span className={`text-xs px-1.5 py-0.5 rounded uppercase font-bold ${tx.type === 'REQUEST' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}>
+              <span
+                className={`text-xs px-1.5 py-0.5 rounded uppercase font-bold ${tx.type === 'REQUEST' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}
+              >
                 {tx.type === 'REQUEST' ? 'P2P' : 'B2C'}
               </span>
             )}
           </span>
-          <span className="text-sm text-gray-500 mt-0.5 line-clamp-1">{tx.postId?.title ?? 'Bài đăng đã bị xóa'}</span>
+          <span className="text-sm text-gray-500 mt-0.5 line-clamp-1">
+            {tx.postId?.title ?? 'Bài đăng đã bị xóa'}
+          </span>
         </div>
       ),
     },
@@ -123,14 +143,30 @@ export default function TransactionsManagementPage() {
       render: (tx) => (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-400 font-medium w-7 shrink-0">Nhận</span>
-            <UserAvatar fullName={tx.requesterId?.fullName ?? 'Khách'} avatar={tx.requesterId?.avatar} size="sm" />
-            <span className="text-sm text-gray-800">{tx.requesterId?.fullName ?? 'Khách ẩn danh'}</span>
+            <span className="text-xs text-gray-400 font-medium w-7 shrink-0">
+              Nhận
+            </span>
+            <UserAvatar
+              fullName={tx.requesterId?.fullName ?? 'Khách'}
+              avatar={tx.requesterId?.avatar}
+              size="sm"
+            />
+            <span className="text-sm text-gray-800">
+              {tx.requesterId?.fullName ?? 'Khách ẩn danh'}
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-400 font-medium w-7 shrink-0">Cấp</span>
-            <UserAvatar fullName={tx.ownerId?.fullName ?? 'Khách'} avatar={tx.ownerId?.avatar} size="sm" />
-            <span className="text-sm text-gray-800">{tx.ownerId?.fullName ?? 'Khách ẩn danh'}</span>
+            <span className="text-xs text-gray-400 font-medium w-7 shrink-0">
+              Cấp
+            </span>
+            <UserAvatar
+              fullName={tx.ownerId?.fullName ?? 'Khách'}
+              avatar={tx.ownerId?.avatar}
+              size="sm"
+            />
+            <span className="text-sm text-gray-800">
+              {tx.ownerId?.fullName ?? 'Khách ẩn danh'}
+            </span>
           </div>
         </div>
       ),
@@ -141,8 +177,15 @@ export default function TransactionsManagementPage() {
       align: 'right',
       render: (tx) => (
         <div className="flex flex-col">
-          <span className="text-base text-gray-900 font-semibold">{formatTransactionCurrency((tx.postId?.price ?? 0) * tx.quantity, tx.paymentMethod)}</span>
-          <span className="text-sm text-gray-500 mt-0.5">SL: {tx.quantity} • {tx.paymentMethod}</span>
+          <span className="text-base text-gray-900 font-semibold">
+            {formatTransactionCurrency(
+              (tx.postId?.price ?? 0) * tx.quantity,
+              tx.paymentMethod
+            )}
+          </span>
+          <span className="text-sm text-gray-500 mt-0.5">
+            SL: {tx.quantity} • {tx.paymentMethod}
+          </span>
         </div>
       ),
     },
@@ -154,7 +197,11 @@ export default function TransactionsManagementPage() {
     {
       key: 'createdAt',
       header: 'Ngày tạo',
-      render: (tx) => <span className="text-gray-500 text-sm">{formatDateTime(tx.createdAt)}</span>,
+      render: (tx) => (
+        <span className="text-gray-500 text-sm">
+          {formatDateTime(tx.createdAt)}
+        </span>
+      ),
     },
     {
       key: 'actions',
@@ -164,7 +211,9 @@ export default function TransactionsManagementPage() {
         <ActionDropdown
           id={tx._id}
           openId={openDropdownId}
-          onToggle={(id) => setOpenDropdownId(openDropdownId === id ? null : id)}
+          onToggle={(id) =>
+            setOpenDropdownId(openDropdownId === id ? null : id)
+          }
           actions={buildActions(tx)}
           width="w-52"
         />
@@ -173,7 +222,10 @@ export default function TransactionsManagementPage() {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-6" onClick={() => setOpenDropdownId(null)}>
+    <div
+      className="w-full max-w-7xl mx-auto flex flex-col gap-6"
+      onClick={() => setOpenDropdownId(null)}
+    >
       <PageHeader
         title="Quản Lý Giao Dịch"
         subtitle="Quản lý và giải quyết sự cố đơn xin đồ (P2P) và đơn mua túi mù (B2C)"
@@ -236,7 +288,7 @@ export default function TransactionsManagementPage() {
         headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
-        cellClassName={(col) => col.key === 'actions' ? 'px-3' : ''}
+        cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
       />
 
       <TransactionDetailModal

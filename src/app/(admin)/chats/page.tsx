@@ -47,8 +47,12 @@ export default function ChatsManagementPage() {
     }
   }, [currentPage]);
 
-  useEffect(() => { loadConversations(); }, [loadConversations]);
-  useEffect(() => { setCurrentPage(1); }, [statusFilter]);
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter]);
 
   const filteredConversations = useMemo(() => {
     let result = [...conversations];
@@ -60,9 +64,10 @@ export default function ChatsManagementPage() {
       result = result.filter(
         (c) =>
           c._id.toLowerCase().includes(lowerQuery) ||
-          c.participants.some((p) =>
-            p.fullName.toLowerCase().includes(lowerQuery) ||
-            (p.email ?? '').toLowerCase().includes(lowerQuery)
+          c.participants.some(
+            (p) =>
+              p.fullName.toLowerCase().includes(lowerQuery) ||
+              (p.email ?? '').toLowerCase().includes(lowerQuery)
           )
       );
     }
@@ -77,10 +82,15 @@ export default function ChatsManagementPage() {
         <div className="flex flex-col min-w-37.5">
           <span className="font-semibold text-gray-900 flex items-center gap-1.5">
             <MessageSquare size={14} className="text-primary" />
-            <span className="font-mono text-xs">{chat._id.slice(-10).toUpperCase()}</span>
+            <span className="font-mono text-xs">
+              {chat._id.slice(-10).toUpperCase()}
+            </span>
           </span>
           <span className="text-xs text-gray-500 mt-0.5">
-            Ref: {chat.transactionId ? chat.transactionId.toString().slice(-8).toUpperCase() : 'N/A'}
+            Ref:{' '}
+            {chat.transactionId
+              ? chat.transactionId.toString().slice(-8).toUpperCase()
+              : 'N/A'}
           </span>
         </div>
       ),
@@ -122,9 +132,7 @@ export default function ChatsManagementPage() {
             &quot;
           </span>
         ) : (
-          <span className="text-gray-400 italic text-sm">
-            Chưa có tin nhắn
-          </span>
+          <span className="text-gray-400 italic text-sm">Chưa có tin nhắn</span>
         ),
     },
     {
@@ -142,7 +150,9 @@ export default function ChatsManagementPage() {
       key: 'updatedAt',
       header: 'Cập nhật',
       render: (chat) => (
-        <span className="text-gray-500 text-xs">{formatDateTime(chat.updatedAt)}</span>
+        <span className="text-gray-500 text-xs">
+          {formatDateTime(chat.updatedAt)}
+        </span>
       ),
     },
     {
@@ -185,18 +195,20 @@ export default function ChatsManagementPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         placeholder="Tìm theo Mã chat, Tên hoặc Email người dùng..."
-        filters={[
-          {
-            type: 'select',
-            value: statusFilter,
-            onChange: setStatusFilter,
-            options: [
-              { value: 'ALL', label: 'Tất cả trạng thái' },
-              { value: 'ACTIVE', label: 'Đang hoạt động' },
-              { value: 'LOCKED', label: 'Đã khóa' },
-            ],
-          },
-        ] satisfies ToolbarFilter[]}
+        filters={
+          [
+            {
+              type: 'select',
+              value: statusFilter,
+              onChange: setStatusFilter,
+              options: [
+                { value: 'ALL', label: 'Tất cả trạng thái' },
+                { value: 'ACTIVE', label: 'Đang hoạt động' },
+                { value: 'LOCKED', label: 'Đã khóa' },
+              ],
+            },
+          ] satisfies ToolbarFilter[]
+        }
       />
 
       <DataTable

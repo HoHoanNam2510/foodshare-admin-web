@@ -6,7 +6,9 @@ import VoucherDetailModal from '@/components/features/vouchers/VoucherDetailModa
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
 import StatusBadge from '@/components/ui/StatusBadge';
-import ActionDropdown, { type DropdownAction } from '@/components/ui/ActionDropdown';
+import ActionDropdown, {
+  type DropdownAction,
+} from '@/components/ui/ActionDropdown';
 import PageHeader from '@/components/ui/PageHeader';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDate, formatDiscount } from '@/lib/formatters';
@@ -18,11 +20,16 @@ import {
   adminSoftDeleteVoucher,
 } from '@/lib/voucherApi';
 
-const getVoucherStatusBadge = (isActive: boolean, validUntil: string, remaining: number) => {
+const getVoucherStatusBadge = (
+  isActive: boolean,
+  validUntil: string,
+  remaining: number
+) => {
   const isExpired = new Date(validUntil) < new Date();
   if (!isActive) return <StatusBadge status="BANNED" label="Đã khóa" />;
   if (isExpired) return <StatusBadge status="CANCELLED" label="Hết hạn" />;
-  if (remaining === 0) return <StatusBadge status="OUT_OF_STOCK" label="Hết lượt" />;
+  if (remaining === 0)
+    return <StatusBadge status="OUT_OF_STOCK" label="Hết lượt" />;
   return <StatusBadge status="ACTIVE" label="Hoạt động" />;
 };
 
@@ -35,7 +42,9 @@ export default function VouchersManagementPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'true' | 'false'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'true' | 'false'>(
+    'ALL'
+  );
   const [currentPage, setCurrentPage] = useState(1);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -58,7 +67,8 @@ export default function VouchersManagementPage() {
   }, []);
 
   useEffect(() => {
-    const isActive = statusFilter === 'ALL' ? undefined : statusFilter === 'true';
+    const isActive =
+      statusFilter === 'ALL' ? undefined : statusFilter === 'true';
     loadVouchers(currentPage, isActive);
   }, [currentPage, statusFilter, loadVouchers]);
 
@@ -67,10 +77,14 @@ export default function VouchersManagementPage() {
     try {
       const res = await toggleAdminVoucher(id);
       setVouchers((prev) =>
-        prev.map((v) => v._id === id ? { ...v, isActive: res.data.isActive } : v)
+        prev.map((v) =>
+          v._id === id ? { ...v, isActive: res.data.isActive } : v
+        )
       );
       if (selectedVoucher?._id === id)
-        setSelectedVoucher((prev) => prev ? { ...prev, isActive: res.data.isActive } : prev);
+        setSelectedVoucher((prev) =>
+          prev ? { ...prev, isActive: res.data.isActive } : prev
+        );
     } catch {
       alert('Thao tác thất bại. Vui lòng thử lại.');
     } finally {
@@ -88,7 +102,8 @@ export default function VouchersManagementPage() {
     try {
       await adminSoftDeleteVoucher(voucher._id);
       if (selectedVoucher?._id === voucher._id) setSelectedVoucher(null);
-      const isActive = statusFilter === 'ALL' ? undefined : statusFilter === 'true';
+      const isActive =
+        statusFilter === 'ALL' ? undefined : statusFilter === 'true';
       await loadVouchers(currentPage, isActive);
     } catch {
       alert('Xóa voucher thất bại. Vui lòng thử lại.');
@@ -102,7 +117,9 @@ export default function VouchersManagementPage() {
         (v) =>
           v.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
           v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          v.creatorId?.fullName?.toLowerCase().includes(searchQuery.toLowerCase())
+          v.creatorId?.fullName
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase())
       )
     : vouchers;
 
@@ -110,13 +127,23 @@ export default function VouchersManagementPage() {
     {
       label: 'Xem chi tiết',
       icon: <Eye size={16} />,
-      onClick: () => { setSelectedVoucher(voucher); setOpenDropdownId(null); },
+      onClick: () => {
+        setSelectedVoucher(voucher);
+        setOpenDropdownId(null);
+      },
     },
     {
       label: voucher.isActive ? 'Vô hiệu hóa' : 'Kích hoạt lại',
-      icon: voucher.isActive ? <ToggleLeft size={16} /> : <ToggleRight size={16} />,
+      icon: voucher.isActive ? (
+        <ToggleLeft size={16} />
+      ) : (
+        <ToggleRight size={16} />
+      ),
       variant: voucher.isActive ? 'danger' : 'primary',
-      onClick: () => { handleToggle(voucher._id); setOpenDropdownId(null); },
+      onClick: () => {
+        handleToggle(voucher._id);
+        setOpenDropdownId(null);
+      },
     },
     {
       label: 'Chuyển vào thùng rác',
@@ -137,8 +164,12 @@ export default function VouchersManagementPage() {
             <Ticket size={16} className="text-secondary" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-bold text-secondary tracking-wider text-xs mb-0.5">{voucher.code}</span>
-            <span className="font-semibold text-gray-900 text-sm line-clamp-1">{voucher.title}</span>
+            <span className="font-bold text-secondary tracking-wider text-xs mb-0.5">
+              {voucher.code}
+            </span>
+            <span className="font-semibold text-gray-900 text-sm line-clamp-1">
+              {voucher.title}
+            </span>
           </div>
         </div>
       ),
@@ -149,8 +180,14 @@ export default function VouchersManagementPage() {
       render: (voucher) =>
         voucher.creatorId ? (
           <div className="flex items-center gap-2">
-            <UserAvatar fullName={voucher.creatorId.fullName} avatar={voucher.creatorId.avatar} size="sm" />
-            <span className="font-medium text-gray-900">{voucher.creatorId.fullName}</span>
+            <UserAvatar
+              fullName={voucher.creatorId.fullName}
+              avatar={voucher.creatorId.avatar}
+              size="sm"
+            />
+            <span className="font-medium text-gray-900">
+              {voucher.creatorId.fullName}
+            </span>
           </div>
         ) : (
           <span className="text-gray-400">N/A</span>
@@ -161,8 +198,12 @@ export default function VouchersManagementPage() {
       header: 'Mức giảm',
       render: (voucher) => (
         <>
-          <span className="font-semibold text-secondary">{formatDiscount(voucher.discountType, voucher.discountValue)}</span>
-          <span className="ml-1.5 text-xs text-gray-400">{voucher.discountType === 'PERCENTAGE' ? '%' : 'cố định'}</span>
+          <span className="font-semibold text-secondary">
+            {formatDiscount(voucher.discountType, voucher.discountValue)}
+          </span>
+          <span className="ml-1.5 text-xs text-gray-400">
+            {voucher.discountType === 'PERCENTAGE' ? '%' : 'cố định'}
+          </span>
         </>
       ),
     },
@@ -183,22 +224,35 @@ export default function VouchersManagementPage() {
       align: 'center',
       render: (voucher) => (
         <>
-          <span className={`font-bold ${voucher.remainingQuantity === 0 ? 'text-error' : voucher.remainingQuantity <= 5 ? 'text-yellow-600' : 'text-gray-900'}`}>
+          <span
+            className={`font-bold ${voucher.remainingQuantity === 0 ? 'text-error' : voucher.remainingQuantity <= 5 ? 'text-yellow-600' : 'text-gray-900'}`}
+          >
             {voucher.remainingQuantity}
           </span>
-          <span className="text-xs text-gray-400">/{voucher.totalQuantity}</span>
+          <span className="text-xs text-gray-400">
+            /{voucher.totalQuantity}
+          </span>
         </>
       ),
     },
     {
       key: 'validUntil',
       header: 'Hết hạn',
-      render: (voucher) => <span className="text-sm text-gray-600">{formatDate(voucher.validUntil)}</span>,
+      render: (voucher) => (
+        <span className="text-sm text-gray-600">
+          {formatDate(voucher.validUntil)}
+        </span>
+      ),
     },
     {
       key: 'status',
       header: 'Trạng thái',
-      render: (voucher) => getVoucherStatusBadge(voucher.isActive, voucher.validUntil, voucher.remainingQuantity),
+      render: (voucher) =>
+        getVoucherStatusBadge(
+          voucher.isActive,
+          voucher.validUntil,
+          voucher.remainingQuantity
+        ),
     },
     {
       key: 'actions',
@@ -208,7 +262,9 @@ export default function VouchersManagementPage() {
         <ActionDropdown
           id={voucher._id}
           openId={openDropdownId}
-          onToggle={(id) => setOpenDropdownId(openDropdownId === id ? null : id)}
+          onToggle={(id) =>
+            setOpenDropdownId(openDropdownId === id ? null : id)
+          }
           loading={togglingId === voucher._id}
           actions={buildActions(voucher)}
         />
@@ -217,7 +273,10 @@ export default function VouchersManagementPage() {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-6" onClick={() => setOpenDropdownId(null)}>
+    <div
+      className="w-full max-w-7xl mx-auto flex flex-col gap-6"
+      onClick={() => setOpenDropdownId(null)}
+    >
       <PageHeader
         title="Quản Lý Voucher"
         subtitle="Giám sát và xử lý các mã giảm giá từ cửa hàng trên toàn hệ thống"
@@ -231,7 +290,10 @@ export default function VouchersManagementPage() {
           {
             type: 'select',
             value: statusFilter,
-            onChange: (v) => { setStatusFilter(v as 'ALL' | 'true' | 'false'); setCurrentPage(1); },
+            onChange: (v) => {
+              setStatusFilter(v as 'ALL' | 'true' | 'false');
+              setCurrentPage(1);
+            },
             options: [
               { value: 'ALL', label: 'Tất cả trạng thái' },
               { value: 'true', label: 'Đang hoạt động' },
@@ -247,7 +309,11 @@ export default function VouchersManagementPage() {
         rowKey={(v) => v._id}
         loading={loading}
         error={error}
-        emptyMessage={searchQuery ? 'Không tìm thấy voucher phù hợp.' : 'Chưa có voucher nào.'}
+        emptyMessage={
+          searchQuery
+            ? 'Không tìm thấy voucher phù hợp.'
+            : 'Chưa có voucher nào.'
+        }
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
@@ -256,7 +322,7 @@ export default function VouchersManagementPage() {
         headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
-        cellClassName={(col) => col.key === 'actions' ? 'px-3' : ''}
+        cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
       />
 
       {selectedVoucher && (

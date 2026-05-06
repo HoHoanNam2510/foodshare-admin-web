@@ -6,7 +6,9 @@ import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import PageHeader from '@/components/ui/PageHeader';
-import ActionDropdown, { type DropdownAction } from '@/components/ui/ActionDropdown';
+import ActionDropdown, {
+  type DropdownAction,
+} from '@/components/ui/ActionDropdown';
 import ReportDetailModal from '@/components/features/reports/ReportDetailModal';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
@@ -75,8 +77,12 @@ export default function ReportsManagementPage() {
     }
   }, [activeTab, targetFilter, currentPage]);
 
-  useEffect(() => { loadReports(); }, [loadReports]);
-  useEffect(() => { setCurrentPage(1); }, [activeTab, targetFilter]);
+  useEffect(() => {
+    loadReports();
+  }, [loadReports]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, targetFilter]);
 
   const filteredReports = useMemo(() => {
     if (!searchQuery) return reports;
@@ -90,7 +96,12 @@ export default function ReportsManagementPage() {
   }, [reports, searchQuery]);
 
   const handleDeleteReport = useCallback(async (r: IReport) => {
-    if (!window.confirm(`Chuyển báo cáo #${r._id.slice(-8).toUpperCase()} vào thùng rác?`)) return;
+    if (
+      !window.confirm(
+        `Chuyển báo cáo #${r._id.slice(-8).toUpperCase()} vào thùng rác?`
+      )
+    )
+      return;
     try {
       await adminSoftDeleteReport(r._id);
       setReports((prev) => prev.filter((x) => x._id !== r._id));
@@ -103,13 +114,19 @@ export default function ReportsManagementPage() {
     {
       label: 'Xem & Xử lý',
       icon: <Eye size={16} />,
-      onClick: () => { setSelectedReport(r); setOpenDropdownId(null); },
+      onClick: () => {
+        setSelectedReport(r);
+        setOpenDropdownId(null);
+      },
     },
     {
       label: 'Chuyển vào thùng rác',
       icon: <Trash2 size={16} />,
       variant: 'danger',
-      onClick: () => { setOpenDropdownId(null); handleDeleteReport(r); },
+      onClick: () => {
+        setOpenDropdownId(null);
+        handleDeleteReport(r);
+      },
     },
   ];
 
@@ -119,8 +136,12 @@ export default function ReportsManagementPage() {
       header: 'Mã & Ngày gửi',
       render: (r) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-gray-900 font-mono text-xs">{r._id.slice(-8).toUpperCase()}</span>
-          <span className="text-xs text-gray-500 mt-0.5">{formatDateTime(r.createdAt)}</span>
+          <span className="font-semibold text-gray-900 font-mono text-xs">
+            {r._id.slice(-8).toUpperCase()}
+          </span>
+          <span className="text-xs text-gray-500 mt-0.5">
+            {formatDateTime(r.createdAt)}
+          </span>
         </div>
       ),
     },
@@ -129,10 +150,18 @@ export default function ReportsManagementPage() {
       header: 'Người tố cáo',
       render: (r) => (
         <div className="flex items-center gap-3">
-          <UserAvatar fullName={r.reporterId.fullName} avatar={r.reporterId.avatar} size="md" />
+          <UserAvatar
+            fullName={r.reporterId.fullName}
+            avatar={r.reporterId.avatar}
+            size="md"
+          />
           <div className="flex flex-col">
-            <span className="text-gray-900 font-medium">{r.reporterId.fullName}</span>
-            <span className="text-xs text-gray-500 mt-0.5">{r.reporterId.email}</span>
+            <span className="text-gray-900 font-medium">
+              {r.reporterId.fullName}
+            </span>
+            <span className="text-xs text-gray-500 mt-0.5">
+              {r.reporterId.email}
+            </span>
           </div>
         </div>
       ),
@@ -142,11 +171,14 @@ export default function ReportsManagementPage() {
       header: 'Lý do & Đối tượng',
       render: (r) => (
         <div className="flex flex-col items-start gap-1.5">
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${REASON_STYLES[r.reason] || REASON_STYLES.OTHER}`}>
+          <span
+            className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${REASON_STYLES[r.reason] || REASON_STYLES.OTHER}`}
+          >
             {REASON_LABELS[r.reason] || r.reason.replace(/_/g, ' ')}
           </span>
           <span className="text-xs text-gray-600">
-            <strong className="text-gray-900">{r.targetType}:</strong> {r.targetId.slice(-8).toUpperCase()}
+            <strong className="text-gray-900">{r.targetType}:</strong>{' '}
+            {r.targetId.slice(-8).toUpperCase()}
           </span>
         </div>
       ),
@@ -155,7 +187,12 @@ export default function ReportsManagementPage() {
       key: 'status',
       header: 'Trạng thái',
       align: 'center',
-      render: (r) => <StatusBadge status={r.status} label={STATUS_LABELS[r.status] || r.status} />,
+      render: (r) => (
+        <StatusBadge
+          status={r.status}
+          label={STATUS_LABELS[r.status] || r.status}
+        />
+      ),
     },
     {
       key: 'actions',
@@ -165,7 +202,9 @@ export default function ReportsManagementPage() {
         <ActionDropdown
           id={r._id}
           openId={openDropdownId}
-          onToggle={(id) => setOpenDropdownId(openDropdownId === id ? null : id)}
+          onToggle={(id) =>
+            setOpenDropdownId(openDropdownId === id ? null : id)
+          }
           actions={buildActions(r)}
         />
       ),
@@ -199,10 +238,30 @@ export default function ReportsManagementPage() {
       {/* Tabs — giữ nguyên vì mỗi tab có màu active riêng */}
       <div className="flex items-center gap-2 border-b border-outline-variant/30 pb-px">
         {[
-          { value: 'ALL', label: 'Tất cả', icon: <Layers size={18} />, activeClass: 'border-gray-900 text-gray-900' },
-          { value: 'PENDING', label: 'Cần xử lý', icon: <Clock size={18} />, activeClass: 'border-yellow-600 text-yellow-700' },
-          { value: 'RESOLVED', label: 'Đã giải quyết', icon: <CheckCircle size={18} />, activeClass: 'border-primary text-primary' },
-          { value: 'DISMISSED', label: 'Đã bác bỏ', icon: <XCircle size={18} />, activeClass: 'border-gray-400 text-gray-600' },
+          {
+            value: 'ALL',
+            label: 'Tất cả',
+            icon: <Layers size={18} />,
+            activeClass: 'border-gray-900 text-gray-900',
+          },
+          {
+            value: 'PENDING',
+            label: 'Cần xử lý',
+            icon: <Clock size={18} />,
+            activeClass: 'border-yellow-600 text-yellow-700',
+          },
+          {
+            value: 'RESOLVED',
+            label: 'Đã giải quyết',
+            icon: <CheckCircle size={18} />,
+            activeClass: 'border-primary text-primary',
+          },
+          {
+            value: 'DISMISSED',
+            label: 'Đã bác bỏ',
+            icon: <XCircle size={18} />,
+            activeClass: 'border-gray-400 text-gray-600',
+          },
         ].map((tab) => (
           <button
             key={tab.value}
@@ -236,7 +295,7 @@ export default function ReportsManagementPage() {
         headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
-        cellClassName={(col) => col.key === 'actions' ? 'px-3' : ''}
+        cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
       />
 
       <ReportDetailModal

@@ -101,7 +101,8 @@ export default function TransactionDetailModal({
               <p className="font-bold">Khu vực kiểm soát Admin</p>
               <p className="mt-1">
                 Đây là thông tin giao dịch nhạy cảm. Bạn có thể ép đổi trạng
-                thái giao dịch trong trường hợp lỗi mạng hoặc theo yêu cầu kỹ thuật.
+                thái giao dịch trong trường hợp lỗi mạng hoặc theo yêu cầu kỹ
+                thuật.
               </p>
             </div>
           </div>
@@ -123,7 +124,9 @@ export default function TransactionDetailModal({
               </p>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-gray-900">
-                  {transaction.type === 'REQUEST' ? 'Xin đồ (P2P)' : 'Mua hàng (B2C)'}
+                  {transaction.type === 'REQUEST'
+                    ? 'Xin đồ (P2P)'
+                    : 'Mua hàng (B2C)'}
                 </span>
                 <span className="text-gray-300">|</span>
                 <span className="text-sm font-semibold flex items-center gap-1">
@@ -205,7 +208,9 @@ export default function TransactionDetailModal({
                 <div className="flex items-center gap-3">
                   <select
                     value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value as ITransaction['status'])}
+                    onChange={(e) =>
+                      setNewStatus(e.target.value as ITransaction['status'])
+                    }
                     className="flex-1 p-2 bg-surface rounded-md border border-outline-variant/50 outline-none text-sm font-semibold"
                   >
                     {VALID_STATUSES.map((st) => (
@@ -223,9 +228,7 @@ export default function TransactionDetailModal({
                     Lưu
                   </button>
                 </div>
-                {saveError && (
-                  <p className="text-xs text-error">{saveError}</p>
-                )}
+                {saveError && <p className="text-xs text-error">{saveError}</p>}
               </div>
             )}
           </div>
