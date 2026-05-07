@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -15,21 +15,23 @@ function isPathActive(pathname: string, itemPath: string): boolean {
 export default function Sidebar() {
   const pathname = usePathname();
   const [search, setSearch] = useState('');
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [manualExpanded, setManualExpanded] = useState<Record<string, boolean>>(
+    {}
+  );
 
-  // Tự động mở menu cha nếu đang ở trang con
-  useEffect(() => {
-    const initialExpanded: Record<string, boolean> = {};
+  // Derive expanded state từ pathname (auto) + user toggle (manual), không cần effect
+  const expanded = useMemo(() => {
+    const auto: Record<string, boolean> = {};
     adminMenus.forEach((item) => {
       if (isPathActive(pathname, item.path)) {
-        initialExpanded[item.id] = true;
+        auto[item.id] = true;
       }
     });
-    setExpanded((prev) => ({ ...prev, ...initialExpanded }));
-  }, [pathname]);
+    return { ...auto, ...manualExpanded };
+  }, [pathname, manualExpanded]);
 
   const toggleExpand = (id: string) => {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+    setManualExpanded((prev) => ({ ...prev, [id]: !expanded[id] }));
   };
 
   const filteredMenus = adminMenus.filter(

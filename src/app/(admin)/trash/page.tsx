@@ -13,6 +13,7 @@ import {
   MessageCircle,
   RefreshCw,
   Loader2,
+  Flag,
 } from 'lucide-react';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import PageHeader from '@/components/ui/PageHeader';
@@ -29,7 +30,6 @@ import {
 } from '@/lib/trashApi';
 
 // ─── Tab config ───────────────────────────────────────────────
-
 const TABS: {
   key: TrashCollection;
   label: string;
@@ -40,12 +40,12 @@ const TABS: {
   { key: 'reviews', label: 'Đánh giá', icon: Star },
   { key: 'vouchers', label: 'Voucher', icon: Ticket },
   { key: 'conversations', label: 'Hội thoại', icon: MessageCircle },
+  { key: 'reports', label: 'Báo cáo', icon: Flag }, // ✅ Added Reports tab
 ];
 
 const PAGE_SIZE = 15;
 
 // ─── Helpers ──────────────────────────────────────────────────
-
 type AnyRecord = Record<string, unknown>;
 
 function getPrimaryLabel(tab: TrashCollection, item: ITrashItem): string {
@@ -63,6 +63,18 @@ function getPrimaryLabel(tab: TrashCollection, item: ITrashItem): string {
       return `Hội thoại #${item._id.slice(-8).toUpperCase()}`;
     case 'messages':
       return (d.text as string)?.slice(0, 50) || '[Không có nội dung]';
+    case 'reports': {
+      // ✅ Report primary label (reason display)
+      const reason = d.reason as string;
+      const reasonMap: Record<string, string> = {
+        FOOD_SAFETY: 'An toàn thực phẩm',
+        SCAM: 'Lừa đảo',
+        INAPPROPRIATE_CONTENT: 'Nội dung không phù hợp',
+        NO_SHOW: 'Không đến',
+        OTHER: 'Khác',
+      };
+      return reasonMap[reason] || reason || '—';
+    }
     default:
       return item._id.slice(-8).toUpperCase();
   }
@@ -109,6 +121,24 @@ function getSecondaryLabel(tab: TrashCollection, item: ITrashItem): string {
           .join(', ');
       }
       return '';
+    }
+    case 'reports': {
+      // ✅ Report secondary label (target type + reporter)
+      const targetType = d.targetType as string;
+      const reporter = d.reporterId as AnyRecord | null;
+      let reporterName = '';
+      if (reporter && typeof reporter === 'object') {
+        reporterName =
+          (reporter.fullName as string) || (reporter.email as string) || '';
+      }
+      const targetTypeMap: Record<string, string> = {
+        POST: 'Bài đăng',
+        USER: 'Người dùng',
+        TRANSACTION: 'Giao dịch',
+        REVIEW: 'Đánh giá',
+      };
+      const targetDisplay = targetTypeMap[targetType] || targetType || '?';
+      return [targetDisplay, reporterName].filter(Boolean).join(' — ');
     }
     default:
       return '';
@@ -169,13 +199,23 @@ function getAvatarProps(
           }
         : { fullName: '?' };
     }
+    case 'reports': {
+      // ✅ Report avatar (reporter's avatar)
+      const reporter = d.reporterId as AnyRecord | null;
+      if (reporter && isPopulated(reporter)) {
+        return {
+          fullName: (reporter.fullName as string) || '?',
+          avatar: reporter.avatar as string | undefined,
+        };
+      }
+      return { fullName: '?' };
+    }
     default:
       return { fullName: '?' };
   }
 }
 
 // ─── Page Component ───────────────────────────────────────────
-
 export default function TrashPage() {
   const [activeTab, setActiveTab] = useState<TrashCollection>('users');
   const [items, setItems] = useState<ITrashItem[]>([]);
@@ -220,7 +260,6 @@ export default function TrashPage() {
   }, [activeTab, dateFrom, dateTo]);
 
   // ─── Handlers ─────────────────────────────────────────────
-
   const handleRestore = async (item: ITrashItem) => {
     const label = getPrimaryLabel(activeTab, item);
     if (
@@ -260,7 +299,7 @@ export default function TrashPage() {
   };
 
   // ─── Columns ──────────────────────────────────────────────
-
+  // ✅ Fixed: changed from `let` to `const` (lint compliance)
   const columns: Column<ITrashItem>[] = [
     {
       key: 'id',
@@ -319,53 +358,71 @@ export default function TrashPage() {
         </span>
       ),
     },
-    {
-      key: 'actions',
-      header: 'Hành động',
-      align: 'center',
-      render: (item) => {
-        const isRestoring = restoringId === item._id;
-        const isPurging = purgingId === item._id;
-        const busy = isRestoring || isPurging;
-        return (
-          <div className="flex items-center justify-center gap-2">
-            {/* Restore */}
-            <button
-              onClick={() => handleRestore(item)}
-              disabled={busy}
-              title="Khôi phục"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-primary bg-primary/8 hover:bg-primary/15 disabled:opacity-40 disabled:cursor-not-allowed transition"
-            >
-              {isRestoring ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <RotateCcw size={13} />
-              )}
-              Khôi phục
-            </button>
-
-            {/* Purge */}
-            <button
-              onClick={() => handlePurge(item)}
-              disabled={busy}
-              title="Xóa vĩnh viễn"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-error bg-error/8 hover:bg-error/15 disabled:opacity-40 disabled:cursor-not-allowed transition"
-            >
-              {isPurging ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <Trash2 size={13} />
-              )}
-              Xóa vĩnh viễn
-            </button>
-          </div>
-        );
-      },
-    },
   ];
 
-  // ─── Render ───────────────────────────────────────────────
+  // ✅ Added: Status column for Reports tab only
+  if (activeTab === 'reports') {
+    columns.splice(2, 0, {
+      key: 'status',
+      header: 'Trạng thái',
+      render: (item) => {
+        const status = (item as AnyRecord).status as string;
+        const statusMap: Record<string, string> = {
+          PENDING: 'Chờ xử lý',
+          RESOLVED: 'Đã xử lý',
+          DISMISSED: 'Đã bác bỏ',
+          WITHDRAWN: 'Đã rút lại',
+        };
+        const display = statusMap[status] || status || '—';
+        return <span className="text-sm text-gray-700">{display}</span>;
+      },
+    });
+  }
 
+  // Actions column (always last)
+  columns.push({
+    key: 'actions',
+    header: 'Hành động',
+    align: 'center',
+    render: (item) => {
+      const isRestoring = restoringId === item._id;
+      const isPurging = purgingId === item._id;
+      const busy = isRestoring || isPurging;
+      return (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => handleRestore(item)}
+            disabled={busy}
+            title="Khôi phục"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-primary bg-primary/8 hover:bg-primary/15 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          >
+            {isRestoring ? (
+              <Loader2 size={13} className="animate-spin" />
+            ) : (
+              <RotateCcw size={13} />
+            )}
+            Khôi phục
+          </button>
+
+          <button
+            onClick={() => handlePurge(item)}
+            disabled={busy}
+            title="Xóa vĩnh viễn"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-error bg-error/8 hover:bg-error/15 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          >
+            {isPurging ? (
+              <Loader2 size={13} className="animate-spin" />
+            ) : (
+              <Trash2 size={13} />
+            )}
+            Xóa vĩnh viễn
+          </button>
+        </div>
+      );
+    },
+  });
+
+  // ─── Render ───────────────────────────────────────────────
   return (
     <div className="space-y-6">
       <PageHeader
