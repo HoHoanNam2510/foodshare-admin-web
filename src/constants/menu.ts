@@ -19,6 +19,7 @@ import {
   Star,
   Settings,
   Award,
+  Tag,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -54,6 +55,13 @@ export const adminMenus: MenuItem[] = [
       { label: 'Xét duyệt KYC', path: '/users/kyc', icon: ShieldCheck },
       { label: 'Tạo mới tài khoản', path: '/users/create', icon: UserPlus },
     ],
+  },
+  {
+    id: 'categories',
+    label: 'Quản Lý Danh Mục',
+    path: '/categories',
+    icon: Tag,
+    sub: [{ label: 'Danh sách danh mục', path: '/categories', icon: List }],
   },
   {
     id: 'posts',
