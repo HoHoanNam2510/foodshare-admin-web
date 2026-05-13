@@ -13,6 +13,9 @@ export interface IUser {
   defaultAddress?: string;
   kycStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
   kycDocuments: string[];
+  pendingKycDocuments: string[];
+  pendingKycStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
+  kycGracePeriodEndsAt: string | null;
   storeInfo?: {
     businessName?: string;
     openHours?: string;
@@ -46,6 +49,7 @@ export async function fetchUsers(params: {
   role?: string;
   status?: string;
   kycStatus?: string;
+  pendingKycStatus?: string;
   page?: number;
   limit?: number;
   sortBy?: string;
@@ -58,6 +62,8 @@ export async function fetchUsers(params: {
     query.set('status', params.status);
   if (params.kycStatus && params.kycStatus !== 'ALL')
     query.set('kycStatus', params.kycStatus);
+  if (params.pendingKycStatus && params.pendingKycStatus !== 'ALL')
+    query.set('pendingKycStatus', params.pendingKycStatus);
   if (params.page) query.set('page', String(params.page));
   if (params.limit) query.set('limit', String(params.limit));
   if (params.sortBy) query.set('sortBy', params.sortBy);

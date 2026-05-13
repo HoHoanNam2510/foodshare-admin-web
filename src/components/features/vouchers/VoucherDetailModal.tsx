@@ -137,7 +137,7 @@ export default function VoucherDetailModal({
                 {voucher.creatorId?.fullName || 'N/A'}
               </p>
               <p className="text-xs text-gray-500">
-                {voucher.creatorId?.email}
+                {voucher.creatorId?.email || 'N/A'}
               </p>
             </div>
           </div>

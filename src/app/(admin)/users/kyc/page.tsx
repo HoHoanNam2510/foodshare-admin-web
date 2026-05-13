@@ -17,6 +17,8 @@ import {
   XCircle,
   Eye,
   X,
+  RefreshCw,
+  AlertTriangle,
 } from 'lucide-react';
 import Image from 'next/image';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
@@ -25,6 +27,15 @@ import { fetchUsers, reviewKyc, type IUser } from '@/lib/userApi';
 import { formatDateTime } from '@/lib/formatters';
 
 const PAGE_SIZE = 10;
+
+type KycFilter =
+  | 'NEW_REGISTRATION'
+  | 'RESUBMISSION'
+  | 'VERIFIED'
+  | 'REJECTED'
+  | 'ALL';
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 const getKycBadge = (status: string) => {
   switch (status) {
@@ -54,11 +65,100 @@ const getKycBadge = (status: string) => {
   }
 };
 
-type KycFilter = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'ALL';
+const getPendingKycBadge = (status: string | null) => {
+  if (!status) return null;
+  switch (status) {
+    case 'PENDING':
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+          <RefreshCw size={12} />
+          Tái duyệt đang chờ
+        </span>
+      );
+    case 'REJECTED':
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-50 text-error border border-error/20">
+          <ShieldX size={12} />
+          Tái duyệt bị từ chối
+        </span>
+      );
+    default:
+      return null;
+  }
+};
+
+const getGracePeriodBadge = (endsAt: string | null) => {
+  if (!endsAt) return null;
+  const end = new Date(endsAt);
+  const now = new Date();
+  if (now >= end) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-100 text-error border border-error/30">
+        <AlertTriangle size={12} />
+        Hết hạn — tài khoản có thể bị khóa
+      </span>
+    );
+  }
+  const daysLeft = Math.ceil(
+    (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  return (
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
+      <AlertTriangle size={12} />
+      Gia hạn còn {daysLeft} ngày
+    </span>
+  );
+};
+
+// ── Doc thumbnails ────────────────────────────────────────────────────────────
+
+function DocThumbnails({
+  docs,
+  label,
+  onPreview,
+}: {
+  docs: string[];
+  label: string;
+  onPreview: (url: string) => void;
+}) {
+  if (!docs || docs.length === 0) return null;
+  return (
+    <div className="mt-3">
+      <p className="font-label text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+        {label} ({docs.length})
+      </p>
+      <div className="flex gap-2 flex-wrap">
+        {docs.map((doc, idx) => (
+          <button
+            key={idx}
+            onClick={() => onPreview(doc)}
+            className="w-20 h-14 rounded-lg overflow-hidden border border-outline-variant/30 hover:ring-2 hover:ring-primary/50 transition-all relative group"
+          >
+            <Image
+              src={doc}
+              alt={`doc ${idx + 1}`}
+              fill
+              className="object-cover"
+              sizes="80px"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+              <Eye
+                size={16}
+                className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 
 export default function KycReviewPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [kycFilter, setKycFilter] = useState<KycFilter>('PENDING');
+  const [kycFilter, setKycFilter] = useState<KycFilter>('NEW_REGISTRATION');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [users, setUsers] = useState<IUser[]>([]);
@@ -71,8 +171,6 @@ export default function KycReviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Detail modal
-  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -84,27 +182,39 @@ export default function KycReviewPage() {
     setLoading(true);
     setError(null);
     try {
-      const params: Parameters<typeof fetchUsers>[0] = {
+      const baseParams = {
         search: searchQuery,
         page: currentPage,
         limit: PAGE_SIZE,
-        sortBy: 'updatedAt',
-        sortOrder: 'desc',
+        sortBy: 'updatedAt' as const,
+        sortOrder: 'desc' as const,
       };
 
-      if (kycFilter === 'PENDING') {
-        // PENDING_KYC is the new authoritative status for "awaiting review"
-        (params as Record<string, unknown>).status = 'PENDING_KYC';
-      } else if (kycFilter !== 'ALL') {
-        // VERIFIED / REJECTED — filter by kycStatus field
-        (params as Record<string, unknown>).kycStatus = kycFilter;
+      let params: Parameters<typeof fetchUsers>[0] = { ...baseParams };
+
+      if (kycFilter === 'NEW_REGISTRATION') {
+        params = { ...params, status: 'PENDING_KYC' };
+      } else if (kycFilter === 'RESUBMISSION') {
+        params = { ...params, role: 'STORE', pendingKycStatus: 'PENDING' };
+      } else if (kycFilter === 'VERIFIED') {
+        params = { ...params, role: 'STORE', kycStatus: 'VERIFIED' };
+      } else if (kycFilter === 'REJECTED') {
+        params = { ...params, kycStatus: 'REJECTED' };
       }
+      // ALL: no extra filters — but only show users with any KYC involvement
 
       const res = await fetchUsers(params);
-      // Always ensure we only show users that have submitted KYC documents
-      const filtered = res.data.filter(
-        (u) => u.kycDocuments && u.kycDocuments.length > 0
-      );
+
+      // For ALL tab: filter to users that have submitted KYC at some point
+      const filtered =
+        kycFilter === 'ALL'
+          ? res.data.filter(
+              (u) =>
+                (u.kycDocuments && u.kycDocuments.length > 0) ||
+                (u.pendingKycDocuments && u.pendingKycDocuments.length > 0)
+            )
+          : res.data;
+
       setUsers(filtered);
       setPagination(res.pagination);
     } catch {
@@ -119,8 +229,14 @@ export default function KycReviewPage() {
   }, [loadUsers]);
 
   const handleReview = async (user: IUser, action: 'APPROVE' | 'REJECT') => {
-    const confirmMsg =
-      action === 'APPROVE'
+    const isResubmission =
+      user.role === 'STORE' && user.pendingKycStatus === 'PENDING';
+
+    const confirmMsg = isResubmission
+      ? action === 'APPROVE'
+        ? `Duyệt hồ sơ KYC mới của cửa hàng "${user.fullName}"?\n\nHồ sơ mới sẽ thay thế hồ sơ cũ, kycStatus = VERIFIED.`
+        : `Từ chối hồ sơ KYC mới của "${user.fullName}"?\n\nCửa hàng vẫn hoạt động nhưng sẽ có thêm 30 ngày để nộp lại.`
+      : action === 'APPROVE'
         ? `Duyệt đăng ký cửa hàng cho "${user.fullName}"?\n\nTài khoản sẽ được nâng cấp lên STORE.`
         : `Từ chối đăng ký cửa hàng của "${user.fullName}"?\n\nNgười dùng có thể nộp lại đơn mới.`;
 
@@ -130,7 +246,6 @@ export default function KycReviewPage() {
     try {
       await reviewKyc(user._id, action);
       await loadUsers();
-      setSelectedUser(null);
     } catch {
       alert('Thao tác thất bại. Vui lòng thử lại.');
     } finally {
@@ -138,11 +253,19 @@ export default function KycReviewPage() {
     }
   };
 
+  const isResubmission = (user: IUser) =>
+    user.role === 'STORE' && user.pendingKycStatus === 'PENDING';
+
+  const hasPendingAction = (user: IUser) =>
+    user.status === 'PENDING_KYC' || isResubmission(user);
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
       <PageHeader
         title="Xét Duyệt KYC"
-        subtitle="Duyệt hoặc từ chối đơn đăng ký cửa hàng từ người dùng"
+        subtitle="Duyệt hoặc từ chối đơn đăng ký và tái xét duyệt KYC từ cửa hàng"
       />
 
       {/* ── TOOLBAR ── */}
@@ -160,9 +283,14 @@ export default function KycReviewPage() {
               onChange: (v) => setKycFilter(v as KycFilter),
               options: [
                 {
-                  value: 'PENDING',
-                  label: 'Chờ duyệt',
-                  icon: <Clock size={14} />,
+                  value: 'NEW_REGISTRATION',
+                  label: 'Đăng ký mới',
+                  icon: <Store size={14} />,
+                },
+                {
+                  value: 'RESUBMISSION',
+                  label: 'Tái duyệt KYC',
+                  icon: <RefreshCw size={14} />,
                 },
                 {
                   value: 'VERIFIED',
@@ -181,8 +309,7 @@ export default function KycReviewPage() {
         }
       />
 
-      {/* ── KYC CARDS ── */}
-
+      {/* ── CARDS ── */}
       <div className="grid gap-4">
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-16 text-gray-400">
@@ -195,155 +322,168 @@ export default function KycReviewPage() {
           <div className="py-16 text-center">
             <ShieldCheck size={48} className="mx-auto text-gray-300 mb-3" />
             <p className="text-gray-500 font-body text-sm">
-              {kycFilter === 'PENDING'
-                ? 'Không có đơn nào đang chờ duyệt.'
-                : 'Không tìm thấy kết quả phù hợp.'}
+              {kycFilter === 'NEW_REGISTRATION'
+                ? 'Không có đơn đăng ký mới nào đang chờ duyệt.'
+                : kycFilter === 'RESUBMISSION'
+                  ? 'Không có hồ sơ tái duyệt KYC nào đang chờ.'
+                  : 'Không tìm thấy kết quả phù hợp.'}
             </p>
           </div>
         ) : (
-          users.map((user) => (
-            <div
-              key={user._id}
-              className="bg-surface-lowest rounded-md shadow-sm border border-outline-variant/30 p-5 hover:shadow-soft transition-shadow"
-            >
-              <div className="flex items-start justify-between gap-4">
-                {/* Left: User info */}
-                <div className="flex items-start gap-4 flex-1 min-w-0">
-                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-lg font-bold shrink-0">
-                    {user.fullName.charAt(0).toUpperCase()}
-                  </div>
+          users.map((user) => {
+            const resubmit = isResubmission(user);
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-sans font-bold text-gray-900">
-                        {user.fullName}
-                      </h3>
-                      {getKycBadge(user.kycStatus)}
+            return (
+              <div
+                key={user._id}
+                className={`bg-surface-lowest rounded-md shadow-sm border p-5 hover:shadow-soft transition-shadow ${
+                  resubmit
+                    ? 'border-blue-200 bg-blue-50/30'
+                    : 'border-outline-variant/30'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  {/* ── Left: User info ── */}
+                  <div className="flex items-start gap-4 flex-1 min-w-0">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-lg font-bold shrink-0">
+                      {user.fullName.charAt(0).toUpperCase()}
                     </div>
 
-                    <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-500 font-body">
-                      <span className="flex items-center gap-1">
-                        <Mail size={12} /> {user.email}
-                      </span>
-                      {user.phoneNumber && (
+                    <div className="flex-1 min-w-0">
+                      {/* Name + badges */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-sans font-bold text-gray-900">
+                          {user.fullName}
+                        </h3>
+                        {resubmit ? (
+                          <>
+                            {getKycBadge(user.kycStatus)}
+                            {getPendingKycBadge(user.pendingKycStatus)}
+                          </>
+                        ) : (
+                          getKycBadge(user.kycStatus)
+                        )}
+                        {getGracePeriodBadge(user.kycGracePeriodEndsAt)}
+                      </div>
+
+                      {/* Contact */}
+                      <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-500 font-body">
                         <span className="flex items-center gap-1">
-                          <Phone size={12} /> {user.phoneNumber}
+                          <Mail size={12} /> {user.email}
                         </span>
-                      )}
-                    </div>
-
-                    {/* Store info preview */}
-                    {user.storeInfo && (
-                      <div className="mt-3 p-3 bg-secondary/5 rounded-lg border border-secondary/15">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Store size={14} className="text-secondary" />
-                          <span className="font-label text-xs font-bold text-secondary uppercase tracking-wider">
-                            Thông tin cửa hàng
+                        {user.phoneNumber && (
+                          <span className="flex items-center gap-1">
+                            <Phone size={12} /> {user.phoneNumber}
                           </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs font-body">
-                          <div>
-                            <span className="text-gray-500">Tên: </span>
-                            <span className="font-semibold text-gray-900">
-                              {user.storeInfo.businessName || 'N/A'}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Giờ: </span>
-                            <span className="font-semibold text-gray-900">
-                              {user.storeInfo.openHours || '?'} –{' '}
-                              {user.storeInfo.closeHours || '?'}
-                            </span>
-                          </div>
-                          {user.storeInfo.businessAddress && (
-                            <div className="col-span-2">
-                              <span className="text-gray-500 flex items-center gap-1">
-                                <MapPin size={11} />{' '}
-                                {user.storeInfo.businessAddress}
-                              </span>
-                            </div>
-                          )}
-                          {user.storeInfo.description && (
-                            <div className="col-span-2">
-                              <span className="text-gray-500 italic">
-                                &quot;{user.storeInfo.description}&quot;
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
-                    )}
 
-                    {/* KYC documents thumbnails */}
-                    {user.kycDocuments && user.kycDocuments.length > 0 && (
-                      <div className="mt-3">
-                        <p className="font-label text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
-                          Tài liệu KYC ({user.kycDocuments.length})
-                        </p>
-                        <div className="flex gap-2 flex-wrap">
-                          {user.kycDocuments.map((doc, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => setPreviewImage(doc)}
-                              className="w-20 h-14 rounded-lg overflow-hidden border border-outline-variant/30 hover:ring-2 hover:ring-primary/50 transition-all relative group"
-                            >
-                              <Image
-                                src={doc}
-                                alt={`KYC document ${idx + 1}`}
-                                fill
-                                className="object-cover"
-                                sizes="80px"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                                <Eye
-                                  size={16}
-                                  className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                />
+                      {/* Store info preview */}
+                      {user.storeInfo && (
+                        <div className="mt-3 p-3 bg-secondary/5 rounded-lg border border-secondary/15">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Store size={14} className="text-secondary" />
+                            <span className="font-label text-xs font-bold text-secondary uppercase tracking-wider">
+                              Thông tin cửa hàng
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs font-body">
+                            <div>
+                              <span className="text-gray-500">Tên: </span>
+                              <span className="font-semibold text-gray-900">
+                                {user.storeInfo.businessName || 'N/A'}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Giờ: </span>
+                              <span className="font-semibold text-gray-900">
+                                {user.storeInfo.openHours || '?'} –{' '}
+                                {user.storeInfo.closeHours || '?'}
+                              </span>
+                            </div>
+                            {user.storeInfo.businessAddress && (
+                              <div className="col-span-2">
+                                <span className="text-gray-500 flex items-center gap-1">
+                                  <MapPin size={11} />{' '}
+                                  {user.storeInfo.businessAddress}
+                                </span>
                               </div>
-                            </button>
-                          ))}
+                            )}
+                            {user.storeInfo.description && (
+                              <div className="col-span-2">
+                                <span className="text-gray-500 italic">
+                                  &quot;{user.storeInfo.description}&quot;
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    <p className="text-[11px] text-gray-400 font-body mt-2">
-                      Ngày gửi: {formatDateTime(user.updatedAt)}
-                    </p>
+                      {/* KYC docs — tái nộp: show new docs prominently, old docs as reference */}
+                      {resubmit ? (
+                        <>
+                          <DocThumbnails
+                            docs={user.pendingKycDocuments}
+                            label="Hồ sơ KYC mới (cần duyệt)"
+                            onPreview={setPreviewImage}
+                          />
+                          {user.kycDocuments &&
+                            user.kycDocuments.length > 0 && (
+                              <DocThumbnails
+                                docs={user.kycDocuments}
+                                label="Hồ sơ KYC hiện tại (đối chiếu)"
+                                onPreview={setPreviewImage}
+                              />
+                            )}
+                        </>
+                      ) : (
+                        <DocThumbnails
+                          docs={user.kycDocuments}
+                          label="Tài liệu KYC"
+                          onPreview={setPreviewImage}
+                        />
+                      )}
+
+                      <p className="text-[11px] text-gray-400 font-body mt-2">
+                        Cập nhật: {formatDateTime(user.updatedAt)}
+                      </p>
+                    </div>
                   </div>
+
+                  {/* ── Right: Action buttons ── */}
+                  {hasPendingAction(user) && (
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button
+                        onClick={() => handleReview(user, 'APPROVE')}
+                        disabled={reviewingId === user._id}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors disabled:opacity-50"
+                      >
+                        {reviewingId === user._id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <CheckCircle2 size={16} />
+                        )}
+                        Duyệt
+                      </button>
+                      <button
+                        onClick={() => handleReview(user, 'REJECT')}
+                        disabled={reviewingId === user._id}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-error/10 text-error hover:bg-error hover:text-white transition-colors disabled:opacity-50"
+                      >
+                        {reviewingId === user._id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <XCircle size={16} />
+                        )}
+                        Từ chối
+                      </button>
+                    </div>
+                  )}
                 </div>
-
-                {/* Right: Action buttons */}
-                {user.kycStatus === 'PENDING' && (
-                  <div className="flex flex-col gap-2 shrink-0">
-                    <button
-                      onClick={() => handleReview(user, 'APPROVE')}
-                      disabled={reviewingId === user._id}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors disabled:opacity-50"
-                    >
-                      {reviewingId === user._id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <CheckCircle2 size={16} />
-                      )}
-                      Duyệt
-                    </button>
-                    <button
-                      onClick={() => handleReview(user, 'REJECT')}
-                      disabled={reviewingId === user._id}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-error/10 text-error hover:bg-error hover:text-white transition-colors disabled:opacity-50"
-                    >
-                      {reviewingId === user._id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <XCircle size={16} />
-                      )}
-                      Từ chối
-                    </button>
-                  </div>
-                )}
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
