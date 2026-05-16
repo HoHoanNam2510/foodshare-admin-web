@@ -12,6 +12,12 @@ export const formatDate = (date: string | Date): string => {
   });
 };
 
+/** Chỉ giờ: HH:MM */
+export const formatTime = (date: string | Date): string => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+};
+
 /** Ngày + giờ: HH:MM DD/MM/YYYY */
 export const formatDateTime = (date: string | Date): string => {
   const d = typeof date === 'string' ? new Date(date) : date;

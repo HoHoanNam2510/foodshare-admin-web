@@ -1,3 +1,4 @@
+import type { ElementType } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -10,9 +11,7 @@ import {
   Trash2,
   List,
   UserPlus,
-  Edit,
   ShieldCheck,
-  EyeOff,
   Send,
   History,
   Leaf,
@@ -25,14 +24,14 @@ import {
 export interface SubMenuItem {
   label: string;
   path: string;
-  icon: React.ElementType;
+  icon: ElementType;
 }
 
 export interface MenuItem {
   id: string;
   label: string;
   path: string;
-  icon: React.ElementType;
+  icon: ElementType;
   sub: SubMenuItem[];
 }
 
@@ -68,11 +67,7 @@ export const adminMenus: MenuItem[] = [
     label: 'Quản Lý Bài Đăng',
     path: '/posts',
     icon: FileText,
-    sub: [
-      { label: 'Xem danh sách', path: '/posts', icon: List },
-      { label: 'Cập nhật', path: '/posts/edit', icon: Edit },
-      { label: 'Ẩn/Khóa', path: '/posts/status', icon: EyeOff },
-    ],
+    sub: [{ label: 'Xem danh sách', path: '/posts', icon: List }],
   },
   {
     // Checked

@@ -59,6 +59,7 @@ export interface AdminPostsResponse {
 
 export async function fetchAdminPosts(params: {
   status?: string;
+  type?: string;
   page?: number;
   limit?: number;
   sortBy?: string;
@@ -67,6 +68,7 @@ export async function fetchAdminPosts(params: {
   const query = new URLSearchParams();
   if (params.status && params.status !== 'ALL')
     query.set('status', params.status);
+  if (params.type && params.type !== 'ALL') query.set('type', params.type);
   if (params.page) query.set('page', String(params.page));
   if (params.limit) query.set('limit', String(params.limit));
   if (params.sortBy) query.set('sortBy', params.sortBy);
@@ -80,9 +82,23 @@ export async function fetchAdminPosts(params: {
 
 // ── PUT /api/posts/admin/:id  (approve / reject / edit) ──
 
+export type AdminUpdatePostBody = Partial<
+  Pick<
+    IPost,
+    | 'status'
+    | 'title'
+    | 'category'
+    | 'description'
+    | 'totalQuantity'
+    | 'remainingQuantity'
+    | 'price'
+    | 'expiryDate'
+  > & { pickupTime: { start: string; end: string } }
+>;
+
 export async function adminUpdatePost(
   postId: string,
-  updates: Partial<Pick<IPost, 'status' | 'title' | 'category' | 'description'>>
+  updates: AdminUpdatePostBody
 ): Promise<{ success: boolean; data: IPost }> {
   const res = await axiosInstance.put(`/posts/admin/${postId}`, updates);
   return res.data;

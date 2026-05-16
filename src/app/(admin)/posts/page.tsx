@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Eye, EyeOff, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  CheckCircle,
+  XCircle,
+  Trash2,
+  Pencil,
+} from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import PageHeader from '@/components/ui/PageHeader';
@@ -9,6 +16,7 @@ import ActionDropdown, {
   type DropdownAction,
 } from '@/components/ui/ActionDropdown';
 import PostDetailModal from '@/components/features/posts/PostDetailModal';
+import EditPostModal from '@/components/features/posts/EditPostModal';
 import {
   fetchAdminPosts,
   adminUpdatePost,
@@ -16,10 +24,23 @@ import {
   adminSoftDeletePost,
   type IPost,
   type PaginationMeta,
+  type AdminUpdatePostBody,
 } from '@/lib/postApi';
-import { formatDateTime, formatPostCurrency } from '@/lib/formatters';
-import { getStatusBadge } from '@/components/features/posts/postFormatters';
+import {
+  formatDate,
+  formatTime,
+  formatDateTime,
+  formatPostCurrency,
+} from '@/lib/formatters';
+import {
+  getStatusBadge,
+  getHiddenReason,
+} from '@/components/features/posts/postFormatters';
+import StatusBadge from '@/components/ui/StatusBadge';
 import UserAvatar from '@/components/ui/UserAvatar';
+
+const isExpired = (post: IPost): boolean =>
+  !!post.expiryDate && new Date(post.expiryDate) < new Date();
 
 const PAGE_LIMIT = 10;
 
@@ -36,12 +57,14 @@ export default function PostsManagementPage() {
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
+  const [editPost, setEditPost] = useState<IPost | null>(null);
 
   const loadPosts = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await fetchAdminPosts({
         status: statusFilter !== 'ALL' ? statusFilter : undefined,
+        type: typeFilter !== 'ALL' ? typeFilter : undefined,
         page: currentPage,
         limit: PAGE_LIMIT,
         sortBy: 'createdAt',
@@ -54,26 +77,18 @@ export default function PostsManagementPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [statusFilter, currentPage]);
+  }, [statusFilter, typeFilter, currentPage]);
 
   useEffect(() => {
     loadPosts();
   }, [loadPosts]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusFilter]);
-
   const filteredPosts = posts.filter((p) => {
-    let match = true;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      match =
-        p.title.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q);
-    }
-    if (typeFilter !== 'ALL') match = match && p.type === typeFilter;
-    return match;
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
+    );
   });
 
   const withActionLoading = async (
@@ -114,44 +129,76 @@ export default function PostsManagementPage() {
     await withActionLoading(post._id, () => adminSoftDeletePost(post._id));
   };
 
-  const buildActions = (post: IPost): DropdownAction[] => [
-    {
-      label: 'Xem chi tiết',
-      icon: <Eye size={16} />,
-      onClick: () => {
-        setSelectedPost(post);
-        setOpenDropdownId(null);
+  const handleSaveEdit = async (
+    postId: string,
+    updates: AdminUpdatePostBody
+  ) => {
+    setActionLoading(postId);
+    try {
+      await adminUpdatePost(postId, updates);
+      await loadPosts();
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const buildActions = (post: IPost): DropdownAction[] => {
+    const expired = isExpired(post);
+    return [
+      {
+        label: 'Xem chi tiết',
+        icon: <Eye size={16} />,
+        onClick: () => {
+          setSelectedPost(post);
+          setOpenDropdownId(null);
+        },
       },
-    },
-    {
-      label: 'Duyệt bài đăng',
-      icon: <CheckCircle size={16} />,
-      variant: 'primary',
-      hidden: post.status !== 'PENDING_REVIEW',
-      onClick: () => handleApprove(post._id),
-    },
-    {
-      label: 'Từ chối',
-      icon: <XCircle size={16} />,
-      variant: 'danger',
-      hidden: post.status !== 'PENDING_REVIEW',
-      onClick: () => handleReject(post._id),
-    },
-    {
-      label: 'Ẩn bài đăng',
-      icon: <EyeOff size={16} />,
-      variant: 'danger',
-      hidden: post.status === 'HIDDEN',
-      onClick: () => handleHide(post._id),
-    },
-    {
-      label: 'Chuyển vào thùng rác',
-      icon: <Trash2 size={16} />,
-      variant: 'danger',
-      dividerBefore: true,
-      onClick: () => handleDelete(post),
-    },
-  ];
+      {
+        label: 'Chỉnh sửa',
+        icon: <Pencil size={16} />,
+        onClick: () => {
+          setEditPost(post);
+          setOpenDropdownId(null);
+        },
+      },
+      {
+        label: 'Duyệt bài đăng',
+        icon: <CheckCircle size={16} />,
+        variant: 'primary',
+        hidden: post.status !== 'PENDING_REVIEW',
+        onClick: () => handleApprove(post._id),
+      },
+      {
+        label: 'Từ chối',
+        icon: <XCircle size={16} />,
+        variant: 'danger',
+        hidden: post.status !== 'PENDING_REVIEW',
+        onClick: () => handleReject(post._id),
+      },
+      {
+        label: 'Ẩn bài đăng',
+        icon: <EyeOff size={16} />,
+        variant: 'danger',
+        hidden: post.status === 'HIDDEN' || expired,
+        onClick: () => handleHide(post._id),
+      },
+      {
+        label: 'Hiện bài đăng',
+        icon: <Eye size={16} />,
+        variant: 'primary',
+        hidden:
+          post.status !== 'HIDDEN' || expired || post.remainingQuantity <= 0,
+        onClick: () => handleHide(post._id),
+      },
+      {
+        label: 'Chuyển vào thùng rác',
+        icon: <Trash2 size={16} />,
+        variant: 'danger',
+        dividerBefore: true,
+        onClick: () => handleDelete(post),
+      },
+    ];
+  };
 
   const columns: Column<IPost>[] = [
     {
@@ -212,16 +259,52 @@ export default function PostsManagementPage() {
     {
       key: 'status',
       header: 'Trạng thái',
-      render: (post) => getStatusBadge(post.status),
+      render: (post) => (
+        <div className="flex flex-col gap-1 items-start">
+          {getStatusBadge(post.status)}
+          {isExpired(post) && post.status !== 'HIDDEN' && (
+            <StatusBadge status="EXPIRED" label="Hết hạn" />
+          )}
+          {post.status === 'HIDDEN' && (
+            <span className="text-[10px] text-gray-400 leading-tight">
+              {getHiddenReason(post)}
+            </span>
+          )}
+        </div>
+      ),
     },
     {
       key: 'createdAt',
       header: 'Ngày tạo',
       render: (post) => (
-        <span className="text-gray-500 text-xs">
-          {formatDateTime(post.createdAt)}
-        </span>
+        <div className="flex flex-col text-xs">
+          <span className="text-gray-700 font-medium">
+            {formatTime(post.createdAt)}
+          </span>
+          <span className="text-gray-400">{formatDate(post.createdAt)}</span>
+        </div>
       ),
+    },
+    {
+      key: 'expiryDate',
+      header: 'Ngày hết hạn',
+      render: (post) => {
+        const expired = isExpired(post);
+        return (
+          <div className="flex flex-col text-xs">
+            <span
+              className={
+                expired ? 'text-error font-medium' : 'text-gray-700 font-medium'
+              }
+            >
+              {formatTime(post.expiryDate)}
+            </span>
+            <span className={expired ? 'text-error/70' : 'text-gray-400'}>
+              {formatDate(post.expiryDate)}
+            </span>
+          </div>
+        );
+      },
     },
     {
       key: 'actions',
@@ -260,7 +343,10 @@ export default function PostsManagementPage() {
             {
               type: 'select',
               value: typeFilter,
-              onChange: setTypeFilter,
+              onChange: (v) => {
+                setTypeFilter(v);
+                setCurrentPage(1);
+              },
               options: [
                 { value: 'ALL', label: 'Tất cả loại hình' },
                 { value: 'P2P_FREE', label: 'Chia sẻ miễn phí (P2P)' },
@@ -270,7 +356,10 @@ export default function PostsManagementPage() {
             {
               type: 'select',
               value: statusFilter,
-              onChange: setStatusFilter,
+              onChange: (v) => {
+                setStatusFilter(v);
+                setCurrentPage(1);
+              },
               options: [
                 { value: 'ALL', label: 'Tất cả trạng thái' },
                 { value: 'PENDING_REVIEW', label: 'Chờ duyệt' },
@@ -310,6 +399,13 @@ export default function PostsManagementPage() {
         formatDate={formatDateTime}
         formatCurrency={formatPostCurrency}
         getStatusBadge={getStatusBadge}
+      />
+
+      <EditPostModal
+        key={editPost?._id}
+        post={editPost}
+        onClose={() => setEditPost(null)}
+        onSave={handleSaveEdit}
       />
     </div>
   );

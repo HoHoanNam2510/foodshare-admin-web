@@ -1,7 +1,8 @@
 'use client';
 
 import { MoreVertical, Loader2 } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useRef, useState, type ReactNode, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface DropdownAction {
   label: string;
@@ -43,14 +44,65 @@ export default function ActionDropdown({
 }: ActionDropdownProps) {
   const isOpen = openId === id;
   const visibleActions = actions.filter((a) => !a.hidden);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      // ~36px per item + 16px padding — nếu không đủ chỗ phía dưới thì mở lên trên
+      const estimatedMenuHeight = visibleActions.length * 36 + 16;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const rightOffset = window.innerWidth - rect.right;
+
+      if (spaceBelow < estimatedMenuHeight) {
+        setMenuStyle({
+          position: 'fixed',
+          bottom: window.innerHeight - rect.top + 4,
+          right: rightOffset,
+        });
+      } else {
+        setMenuStyle({
+          position: 'fixed',
+          top: rect.bottom + 4,
+          right: rightOffset,
+        });
+      }
+    }
+    onToggle(id);
+  };
+
+  const menu = (
+    <div
+      style={menuStyle}
+      className={`${width} bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-9999 py-1 overflow-hidden animate-in fade-in zoom-in-95`}
+    >
+      {visibleActions.map((action) => (
+        <div key={action.label}>
+          {action.dividerBefore && (
+            <div className="h-px bg-outline-variant/20 my-1" />
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              action.onClick();
+            }}
+            className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors ${VARIANT_CLASS[action.variant ?? 'default']}`}
+          >
+            {action.icon}
+            {action.label}
+          </button>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="text-center relative">
+    <div className="text-center">
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle(id);
-        }}
+        ref={triggerRef}
+        onClick={handleToggle}
         disabled={loading}
         className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors disabled:opacity-50"
       >
@@ -61,29 +113,7 @@ export default function ActionDropdown({
         )}
       </button>
 
-      {isOpen && (
-        <div
-          className={`absolute right-8 top-10 ${width} bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-50 py-1 overflow-hidden animate-in fade-in zoom-in-95`}
-        >
-          {visibleActions.map((action, idx) => (
-            <div key={idx}>
-              {action.dividerBefore && (
-                <div className="h-px bg-outline-variant/20 my-1" />
-              )}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  action.onClick();
-                }}
-                className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors ${VARIANT_CLASS[action.variant ?? 'default']}`}
-              >
-                {action.icon}
-                {action.label}
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      {isOpen && createPortal(menu, document.body)}
     </div>
   );
 }
