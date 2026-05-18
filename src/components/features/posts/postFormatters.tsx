@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import StatusBadge from '@/components/ui/StatusBadge';
 import type { IPost } from '@/lib/postApi';
 
