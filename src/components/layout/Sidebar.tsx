@@ -3,9 +3,10 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Search, ChevronDown, ChevronRight, LogOut } from 'lucide-react';
 import { adminMenus } from '@/constants/menu';
+import { useAuthStore } from '@/stores/authStore';
 
 function isPathActive(pathname: string, itemPath: string): boolean {
   if (itemPath === '/dashboard') return pathname === '/dashboard';
@@ -14,6 +15,8 @@ function isPathActive(pathname: string, itemPath: string): boolean {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuthStore();
   const [search, setSearch] = useState('');
   const [manualExpanded, setManualExpanded] = useState<Record<string, boolean>>(
     {}
@@ -174,7 +177,10 @@ export default function Sidebar() {
 
       {/* ── 4. Bottom Logout / Profile ── */}
       <div className="px-4 py-2.5 shrink-0 border-t border-outline-variant/50">
-        <button className="flex items-center justify-center gap-2 w-full py-2 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-error/10 hover:text-error transition-all duration-200">
+        <button
+          onClick={() => { logout(); router.push('/login'); }}
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-error/10 hover:text-error transition-all duration-200"
+        >
           <LogOut size={18} />
           Đăng xuất
         </button>

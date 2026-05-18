@@ -1,12 +1,16 @@
 import { create } from 'zustand';
 import { loginApi, type LoginResponse } from '@/lib/authApi';
 
-interface AdminUser {
+export interface AdminUser {
   _id: string;
   email: string;
   fullName: string;
   role: string;
-  [key: string]: unknown;
+  avatar?: string;
+  phoneNumber?: string;
+  defaultAddress?: string;
+  status: string;
+  createdAt?: string;
 }
 
 interface AuthState {
@@ -17,6 +21,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   hydrate: () => void;
+  updateUser: (patch: Partial<AdminUser>) => void;
 }
 
 const TOKEN_KEY = 'admin_token';
@@ -52,7 +57,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({
         token: data.token,
-        user: data.data,
+        user: data.data as AdminUser,
         isLoading: false,
         error: null,
       });
@@ -83,5 +88,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         localStorage.removeItem(USER_KEY);
       }
     }
+  },
+
+  updateUser: (patch: Partial<AdminUser>) => {
+    set((state) => {
+      if (!state.user) return state;
+      const updated = { ...state.user, ...patch };
+      localStorage.setItem(USER_KEY, JSON.stringify(updated));
+      return { user: updated };
+    });
   },
 }));
