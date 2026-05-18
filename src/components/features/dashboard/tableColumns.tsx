@@ -3,6 +3,74 @@ import UserAvatar from '@/components/ui/UserAvatar';
 import type { Column } from '@/components/ui/DataTable';
 import type { TabId } from '@/lib/dashboardApi';
 
+// ─── Row types ───────────────────────────────────────────────
+
+interface UserRef {
+  fullName: string;
+  avatar?: string;
+}
+
+interface PostRef {
+  title: string;
+}
+
+export interface UserRow {
+  _id: string;
+  fullName: string;
+  email: string;
+  avatar?: string;
+  role: string;
+  status: string;
+  kycStatus: string;
+  createdAt: string;
+}
+
+export interface PostRow {
+  _id: string;
+  title: string;
+  type: string;
+  status: string;
+  remainingQuantity: number;
+  totalQuantity: number;
+  createdAt: string;
+  ownerId?: UserRef;
+}
+
+export interface TransactionRow {
+  _id: string;
+  type: string;
+  status: string;
+  totalAmount?: number;
+  createdAt: string;
+  postId?: PostRef;
+  requesterId?: UserRef;
+  ownerId?: UserRef;
+}
+
+export interface ReportRow {
+  _id: string;
+  targetType: string;
+  reason: string;
+  status: string;
+  actionTaken: string;
+  createdAt: string;
+  reporterId?: UserRef;
+}
+
+export interface AuditRow {
+  _id: string;
+  _type: string;
+  fullName?: string;
+  avatar?: string;
+  title?: string;
+  targetType?: string;
+  type?: string;
+  status?: string;
+  updatedAt: string;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────
+
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('vi-VN', {
     day: '2-digit',
@@ -21,7 +89,7 @@ function formatDateTime(dateStr: string) {
   });
 }
 
-const userColumns: Column<any>[] = [
+const userColumns: Column<UserRow>[] = [
   {
     key: 'fullName',
     header: 'Họ tên',
@@ -70,7 +138,7 @@ const userColumns: Column<any>[] = [
   },
 ];
 
-const postColumns: Column<any>[] = [
+const postColumns: Column<PostRow>[] = [
   {
     key: 'title',
     header: 'Tiêu đề',
@@ -140,7 +208,7 @@ const postColumns: Column<any>[] = [
   },
 ];
 
-const transactionColumns: Column<any>[] = [
+const transactionColumns: Column<TransactionRow>[] = [
   {
     key: 'post',
     header: 'Bài đăng',
@@ -231,7 +299,7 @@ const transactionColumns: Column<any>[] = [
   },
 ];
 
-const reportColumns: Column<any>[] = [
+const reportColumns: Column<ReportRow>[] = [
   {
     key: 'reporter',
     header: 'Người báo cáo',
@@ -287,7 +355,7 @@ const reportColumns: Column<any>[] = [
   },
 ];
 
-const auditColumns: Column<any>[] = [
+const auditColumns: Column<AuditRow>[] = [
   {
     key: '_type',
     header: 'Loại',
@@ -331,18 +399,20 @@ const auditColumns: Column<any>[] = [
   },
 ];
 
-export function getColumnsForTab(tab: TabId): Column<any>[] {
-  const map: Record<TabId, Column<any>[]> = {
-    users: userColumns,
-    posts: postColumns,
-    transactions: transactionColumns,
-    reports: reportColumns,
-    audits: auditColumns,
+export function getColumnsForTab(tab: TabId): Column<unknown>[] {
+  const map: Record<TabId, Column<unknown>[]> = {
+    users: userColumns as Column<unknown>[],
+    posts: postColumns as Column<unknown>[],
+    transactions: transactionColumns as Column<unknown>[],
+    reports: reportColumns as Column<unknown>[],
+    audits: auditColumns as Column<unknown>[],
   };
   return map[tab];
 }
 
 export function getRowKey(_tab: TabId) {
-  return (row: any, index: number) =>
-    row._id ? `${row._id}-${index}` : `row-${index}`;
+  return (row: unknown, index: number) => {
+    const r = row as Record<string, unknown>;
+    return r._id ? `${String(r._id)}-${index}` : `row-${index}`;
+  };
 }

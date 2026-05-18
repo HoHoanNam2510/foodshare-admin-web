@@ -69,10 +69,10 @@ export async function fetchDashboardTable(
   page: number = 1,
   limit: number = 10,
   sortOrder: SortOrder = 'desc'
-): Promise<{ data: any[]; pagination: PaginationMeta }> {
+): Promise<{ data: unknown[]; pagination: PaginationMeta }> {
   const res = await axiosInstance.get<{
     success: boolean;
-    data: any[];
+    data: unknown[];
     pagination: PaginationMeta;
   }>(
     `/dashboard/table?tab=${tab}&page=${page}&limit=${limit}&sortOrder=${sortOrder}`
