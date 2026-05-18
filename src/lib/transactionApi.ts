@@ -79,6 +79,50 @@ export async function fetchAdminTransactions(params: {
   return res.data;
 }
 
+// ── Types for status log ──
+
+export interface ITransactionStatusLogAdmin {
+  _id: string;
+  transactionId: {
+    _id: string;
+    type: 'REQUEST' | 'ORDER';
+    status: TransactionStatus;
+  };
+  previousStatus: TransactionStatus;
+  newStatus: TransactionStatus;
+  changedBy: {
+    _id: string;
+    fullName: string;
+    email: string;
+    avatar?: string;
+  };
+  createdAt: string;
+}
+
+export interface AdminStatusLogsResponse {
+  success: boolean;
+  data: ITransactionStatusLogAdmin[];
+  pagination: PaginationMeta;
+}
+
+// ── GET /api/transactions/admin/status-logs ──
+
+export async function fetchAdminStatusLogs(params: {
+  transactionId?: string;
+  page?: number;
+  limit?: number;
+}): Promise<AdminStatusLogsResponse> {
+  const query = new URLSearchParams();
+  if (params.transactionId) query.set('transactionId', params.transactionId);
+  if (params.page) query.set('page', String(params.page));
+  if (params.limit) query.set('limit', String(params.limit));
+
+  const res = await axiosInstance.get<AdminStatusLogsResponse>(
+    `/transactions/admin/status-logs?${query.toString()}`
+  );
+  return res.data;
+}
+
 // ── PATCH /api/transactions/admin/:id/status ──
 
 export async function adminForceUpdateTransactionStatus(

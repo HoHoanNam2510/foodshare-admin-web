@@ -44,7 +44,6 @@ export const adminMenus: MenuItem[] = [
     sub: [],
   },
   {
-    // Checked
     id: 'users',
     label: 'Quản Lý Người Dùng',
     path: '/users',
@@ -70,7 +69,6 @@ export const adminMenus: MenuItem[] = [
     sub: [{ label: 'Xem danh sách', path: '/posts', icon: List }],
   },
   {
-    // Checked
     id: 'transactions',
     label: 'Quản Lý Giao Dịch',
     path: '/transactions',
@@ -85,7 +83,6 @@ export const adminMenus: MenuItem[] = [
     ],
   },
   {
-    // Checked
     id: 'reports',
     label: 'Quản Lý Báo Cáo',
     path: '/reports',
@@ -93,7 +90,6 @@ export const adminMenus: MenuItem[] = [
     sub: [{ label: 'Xem danh sách', path: '/reports', icon: List }],
   },
   {
-    // Checked
     id: 'chats',
     label: 'Quản Lý Hội Thoại',
     path: '/chats',
