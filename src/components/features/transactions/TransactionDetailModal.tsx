@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { ITransaction } from '@/lib/transactionApi';
-import { adminForceUpdateTransactionStatus } from '@/lib/transactionApi';
 
 interface TransactionDetailModalProps {
   transaction: ITransaction | null;

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import {
   Package,
   MapPin,
@@ -188,13 +189,13 @@ export default function PostDetailModal({
                     key={idx}
                     className="w-24 h-24 rounded-md bg-surface border border-outline-variant/30 overflow-hidden"
                   >
-                    <img
+                    <Image
                       src={img}
                       alt={`Ảnh ${idx + 1}`}
+                      width={96}
+                      height={96}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
+                      unoptimized
                     />
                   </div>
                 ))}

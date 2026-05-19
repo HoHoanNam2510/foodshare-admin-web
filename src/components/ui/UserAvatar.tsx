@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface UserAvatarProps {
   fullName: string;
@@ -37,11 +38,13 @@ export default function UserAvatar({
 
       {/* Avatar image — overlays the initials */}
       {avatar && !imgError && (
-        <img
+        <Image
           src={avatar}
           alt={fullName}
-          className="absolute inset-0 w-full h-full rounded-full object-cover"
+          fill
+          className="rounded-full object-cover"
           onError={() => setImgError(true)}
+          unoptimized
         />
       )}
     </div>

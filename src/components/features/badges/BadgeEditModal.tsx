@@ -92,12 +92,13 @@ export default function BadgeEditModal({
         const res = await createBadgeApi(form);
         saved = res.data;
       } else {
-        const {
-          code: _code,
-          triggerEvent: _te,
-          targetRole: _tr,
-          ...editableFields
-        } = form;
+        const editableFields = {
+          name: form.name,
+          description: form.description,
+          imageUrl: form.imageUrl,
+          pointReward: form.pointReward,
+          sortOrder: form.sortOrder,
+        };
         const res = await updateBadgeApi(badge!._id, editableFields);
         saved = res.data;
       }
