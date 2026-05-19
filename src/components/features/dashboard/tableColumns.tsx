@@ -410,6 +410,7 @@ export function getColumnsForTab(tab: TabId): Column<unknown>[] {
   return map[tab];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getRowKey(_tab: TabId) {
   return (row: unknown, index: number) => {
     const r = row as Record<string, unknown>;
