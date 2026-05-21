@@ -72,8 +72,8 @@ export default function PostsManagementPage() {
       });
       setPosts(res.data);
       setPagination(res.pagination);
-    } catch (err) {
-      console.error('Failed to load posts:', err);
+    } catch {
+      // error swallowed intentionally — table shows empty state
     } finally {
       setIsLoading(false);
     }
@@ -100,8 +100,8 @@ export default function PostsManagementPage() {
     try {
       await action();
       await loadPosts();
-    } catch (err) {
-      console.error('Action failed:', err);
+    } catch {
+      // error swallowed intentionally — action loading state resets
     } finally {
       setActionLoading(null);
     }

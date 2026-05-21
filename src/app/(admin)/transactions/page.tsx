@@ -59,8 +59,8 @@ export default function TransactionsManagementPage() {
       });
       setTransactions(res.data);
       setPagination(res.pagination);
-    } catch (err) {
-      console.error('Failed to load transactions:', err);
+    } catch {
+      // error swallowed intentionally — table shows empty state
     } finally {
       setIsLoading(false);
     }

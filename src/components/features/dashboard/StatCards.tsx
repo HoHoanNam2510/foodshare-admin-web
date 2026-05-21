@@ -5,8 +5,6 @@ import {
   FileText,
   CreditCard,
   AlertTriangle,
-  Activity,
-  TrendingUp,
   ShieldCheck,
   Ban,
   Clock,

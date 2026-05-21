@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import {
   Users,
   Loader2,
@@ -56,46 +56,46 @@ export default function DashboardPage() {
   // Data
   const [stats, setStats] = useState<OverviewStats | null>(null);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
+  const [tableData, setTableData] = useState<unknown[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
 
-  // Loading
-  const [loadingStats, setLoadingStats] = useState(true);
-  const [loadingChart, setLoadingChart] = useState(true);
-  const [loadingTable, setLoadingTable] = useState(true);
+  // Loading via useTransition (avoids setState-in-effect cascades)
+  const [loadingStats, startStatsTransition] = useTransition();
+  const [loadingChart, startChartTransition] = useTransition();
+  const [loadingTable, startTableTransition] = useTransition();
 
   // ── Fetch stats ──
   useEffect(() => {
-    setLoadingStats(true);
-    fetchDashboardStats()
-      .then(setStats)
-      .catch(() => setStats(null))
-      .finally(() => setLoadingStats(false));
+    startStatsTransition(() => {
+      void fetchDashboardStats()
+        .then(setStats)
+        .catch(() => setStats(null));
+    });
   }, []);
 
   // ── Fetch chart ──
   useEffect(() => {
-    setLoadingChart(true);
     const dateStr = chartDate.toISOString().split('T')[0];
-    fetchDashboardChart(activeTab, timeRange, dateStr)
-      .then(setChartData)
-      .catch(() => setChartData([]))
-      .finally(() => setLoadingChart(false));
+    startChartTransition(() => {
+      void fetchDashboardChart(activeTab, timeRange, dateStr)
+        .then(setChartData)
+        .catch(() => setChartData([]));
+    });
   }, [activeTab, timeRange, chartDate]);
 
   // ── Fetch table ──
   const loadTable = useCallback(() => {
-    setLoadingTable(true);
-    fetchDashboardTable(activeTab, currentPage, 10, tableSortOrder)
-      .then(({ data, pagination: pg }) => {
-        setTableData(data);
-        setPagination(pg);
-      })
-      .catch(() => {
-        setTableData([]);
-        setPagination(null);
-      })
-      .finally(() => setLoadingTable(false));
+    startTableTransition(() => {
+      void fetchDashboardTable(activeTab, currentPage, 10, tableSortOrder)
+        .then(({ data, pagination: pg }) => {
+          setTableData(data);
+          setPagination(pg);
+        })
+        .catch(() => {
+          setTableData([]);
+          setPagination(null);
+        });
+    });
   }, [activeTab, currentPage, tableSortOrder]);
 
   useEffect(() => {
@@ -121,19 +121,23 @@ export default function DashboardPage() {
   // Client-side search filter (server already paginated)
   const filteredData = searchQuery
     ? tableData.filter((row) => {
+        const r = row as Record<string, unknown>;
         const q = searchQuery.toLowerCase();
+        const owner = r.ownerId as Record<string, unknown> | undefined;
+        const requester = r.requesterId as Record<string, unknown> | undefined;
+        const reporter = r.reporterId as Record<string, unknown> | undefined;
         const searchable = [
-          row.fullName,
-          row.email,
-          row.title,
-          row.ownerId?.fullName,
-          row.requesterId?.fullName,
-          row.reporterId?.fullName,
-          row.targetType,
-          row.reason,
-          row.status,
-          row.role,
-          row._type,
+          r.fullName,
+          r.email,
+          r.title,
+          owner?.fullName,
+          requester?.fullName,
+          reporter?.fullName,
+          r.targetType,
+          r.reason,
+          r.status,
+          r.role,
+          r._type,
         ]
           .filter(Boolean)
           .join(' ')

@@ -11,13 +11,11 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { ITransaction } from '@/lib/transactionApi';
-import { adminForceUpdateTransactionStatus } from '@/lib/transactionApi';
 
 interface TransactionDetailModalProps {
   transaction: ITransaction | null;
   onClose: () => void;
   onStatusUpdate: (transactionId: string, newStatus: string) => Promise<void>;
-  onRefresh?: () => void;
   formatDate: (date: string | Date) => string;
   formatCurrency: (amount: number, method: string) => React.ReactNode;
   getStatusBadge: (status: string) => React.ReactNode;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   X,
   AlertTriangle,
@@ -174,11 +175,13 @@ export default function ReportDetailModal({
                     className="w-32 h-32 shrink-0 rounded-md bg-surface border border-outline-variant/30 overflow-hidden"
                   >
                     {img.startsWith('http') ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={img}
                         alt={`evidence-${idx + 1}`}
+                        width={128}
+                        height={128}
                         className="w-full h-full object-cover"
+                        unoptimized
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center">

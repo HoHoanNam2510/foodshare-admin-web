@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -23,30 +23,39 @@ interface GrowthChartProps {
   type?: 'bar' | 'line';
 }
 
+interface TooltipProps {
+  active?: boolean;
+  payload?: { value: number }[];
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: TooltipProps) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-surface-lowest border border-outline-variant/50 p-3 rounded-2xl shadow-hover">
+        <p className="font-label text-xs text-gray-500 mb-1">{label}</p>
+        <p className="font-body text-sm font-bold text-primary">
+          Số lượng: {payload[0].value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
+// Màu primary từ hệ thống: #296C24
+const PRIMARY_COLOR = '#296C24';
+
+const subscribe = () => () => {};
+
 export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
-  const [isMounted, setIsMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  );
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  // Màu primary từ hệ thống: #296C24
-  const primaryColor = '#296C24';
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-surface-lowest border border-outline-variant/50 p-3 rounded-2xl shadow-hover">
-          <p className="font-label text-xs text-gray-500 mb-1">{label}</p>
-          <p className="font-body text-sm font-bold text-primary">
-            Số lượng: {payload[0].value}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  if (!isMounted) {
+  if (!isClient) {
     return <div className="w-full h-75" />;
   }
 
@@ -78,7 +87,7 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F8F9F8' }} />
             <Bar
               dataKey="total"
-              fill={primaryColor}
+              fill={PRIMARY_COLOR}
               radius={[4, 4, 0, 0]}
               maxBarSize={40}
             />
@@ -109,11 +118,11 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
             <Line
               type="monotone"
               dataKey="total"
-              stroke={primaryColor}
+              stroke={PRIMARY_COLOR}
               strokeWidth={3}
               dot={{
                 r: 4,
-                fill: primaryColor,
+                fill: PRIMARY_COLOR,
                 strokeWidth: 2,
                 stroke: '#fff',
               }}

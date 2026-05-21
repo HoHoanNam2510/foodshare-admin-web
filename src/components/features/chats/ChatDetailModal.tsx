@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   X,
   Lock,
@@ -79,13 +80,13 @@ export default function ChatDetailModal({
         return (
           <div className="flex flex-col gap-1">
             {msg.imageUrl ? (
-              <img
+              <Image
                 src={msg.imageUrl}
                 alt="Hình ảnh"
-                className="w-48 h-32 object-cover rounded-md border border-outline-variant/30"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
+                width={192}
+                height={128}
+                className="object-cover rounded-md border border-outline-variant/30"
+                unoptimized
               />
             ) : (
               <div className="w-48 h-32 bg-surface-container rounded-md flex items-center justify-center border border-outline-variant/30">

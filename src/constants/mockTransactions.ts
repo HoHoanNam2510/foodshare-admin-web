@@ -57,7 +57,7 @@ export const MOCK_TRANSACTIONS = [
     type: 'ORDER',
     quantity: 1,
     status: 'CANCELLED',
-    paymentMethod: 'MOMO', // Was ZALOPAY — disabled for now
+    paymentMethod: 'MOMO',
     createdAt: new Date('2026-03-27T19:00:00'),
     post: {
       _id: 'POST004',

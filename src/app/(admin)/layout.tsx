@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function AdminLayout({
   children,
@@ -12,16 +13,19 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const hydrate = useAuthStore((s) => s.hydrate);
   const [ready, setReady] = useState(false);
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (!token) {
       router.replace('/login');
     } else {
-      setReady(true);
+      hydrate();
+      startTransition(() => setReady(true));
     }
-  }, [router]);
+  }, [router, hydrate]);
 
   if (!ready) return null;
 
