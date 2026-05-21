@@ -178,7 +178,10 @@ export default function Sidebar() {
       {/* ── 4. Bottom Logout / Profile ── */}
       <div className="px-4 py-2.5 shrink-0 border-t border-outline-variant/50">
         <button
-          onClick={() => { logout(); router.push('/login'); }}
+          onClick={() => {
+            logout();
+            router.push('/login');
+          }}
           className="flex items-center justify-center gap-2 w-full py-2 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-error/10 hover:text-error transition-all duration-200"
         >
           <LogOut size={18} />

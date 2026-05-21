@@ -49,7 +49,11 @@ const PRIMARY_COLOR = '#296C24';
 const subscribe = () => () => {};
 
 export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
-  const isClient = useSyncExternalStore(subscribe, () => true, () => false);
+  const isClient = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  );
 
   if (!isClient) {
     return <div className="w-full h-75" />;
