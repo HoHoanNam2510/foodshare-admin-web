@@ -19,6 +19,7 @@ import {
   Settings,
   Award,
   Tag,
+  MessageSquare,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -88,6 +89,13 @@ export const adminMenus: MenuItem[] = [
     path: '/reports',
     icon: AlertTriangle,
     sub: [{ label: 'Xem danh sách', path: '/reports', icon: List }],
+  },
+  {
+    id: 'feedbacks',
+    label: 'Quản Lý Phản Hồi',
+    path: '/feedbacks',
+    icon: MessageSquare,
+    sub: [{ label: 'Xem danh sách', path: '/feedbacks', icon: List }],
   },
   {
     id: 'chats',

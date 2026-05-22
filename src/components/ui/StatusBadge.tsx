@@ -53,6 +53,18 @@ const presets: Record<string, { bg: string; text: string; border: string }> = {
     border: 'border-secondary/20',
   },
 
+  // In-progress
+  PROCESSING: {
+    bg: 'bg-blue-50',
+    text: 'text-blue-700',
+    border: 'border-blue-200',
+  },
+  CLOSED: {
+    bg: 'bg-primary-T95',
+    text: 'text-primary',
+    border: 'border-primary/20',
+  },
+
   // Negative
   BANNED: { bg: 'bg-red-50', text: 'text-error', border: 'border-error/20' },
   HIDDEN: { bg: 'bg-red-50', text: 'text-error', border: 'border-error/20' },
