@@ -194,7 +194,7 @@ export default function FeedbacksManagementPage() {
       header: 'Tiêu đề',
       render: (fb) => (
         <span
-          className="text-sm text-gray-800 line-clamp-1 max-w-[200px]"
+          className="text-sm text-gray-800 line-clamp-1 max-w-50"
           title={fb.title}
         >
           {fb.title.length > 40 ? `${fb.title.slice(0, 40)}…` : fb.title}

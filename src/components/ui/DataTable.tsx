@@ -131,8 +131,19 @@ export default function DataTable<T>({
 
   return (
     <div
-      className={`bg-surface-lowest rounded-lg shadow-soft border border-outline-variant/30 overflow-hidden ${className}`}
+      className={`relative bg-surface-lowest rounded-lg shadow-soft border border-outline-variant/30 overflow-hidden ${className}`}
     >
+      {/* Overlay spinner — keeps table at its current size during reload */}
+      {loading && data.length > 0 && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75 rounded-lg">
+          <div className="flex items-center gap-2.5 bg-white shadow-md rounded-xl px-4 py-2.5 border border-gray-100">
+            <Loader2 size={16} className="animate-spin text-primary" />
+            <span className="text-sm font-medium text-gray-500">
+              Đang tải...
+            </span>
+          </div>
+        </div>
+      )}
       <div className={`overflow-x-auto ${tableClassName}`}>
         <table className="w-full text-left font-body">
           {/* ── THEAD ── */}
@@ -173,7 +184,7 @@ export default function DataTable<T>({
           <tbody
             className={`divide-y divide-outline-variant/15 text-sm ${bodyClassName}`}
           >
-            {loading ? (
+            {loading && data.length === 0 ? (
               <tr>
                 <td colSpan={colCount} className="px-5 py-20 text-center">
                   <div className="flex flex-col items-center gap-3 text-neutral-T60">

@@ -444,7 +444,10 @@ export default function TrashPage() {
         {TABS.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
-            onClick={() => setActiveTab(key)}
+            onClick={() => {
+              setLoading(true);
+              setActiveTab(key);
+            }}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold transition ${
               activeTab === key
                 ? 'bg-white text-primary shadow-sm'
