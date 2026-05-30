@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   AlertTriangle,
   LayoutDashboard,
+  Download,
 } from 'lucide-react';
 import StatCards from '@/components/features/dashboard/StatCards';
 import ChartSection from '@/components/features/dashboard/ChartSection';
@@ -118,6 +119,34 @@ export default function DashboardPage() {
     setCurrentPage(1);
   };
 
+  const handleExportCSV = () => {
+    const cols = getColumnsForTab(activeTab);
+    const headerRow = cols.map((c) => c.header).join(',');
+    const rows = filteredData.map((row) => {
+      const r = row as Record<string, unknown>;
+      return cols
+        .map((c) => {
+          const val = r[c.key];
+          if (val === null || val === undefined) return '';
+          if (typeof val === 'object') {
+            const o = val as Record<string, unknown>;
+            return `"${o.fullName ?? o.title ?? JSON.stringify(val)}"`;
+          }
+          const str = String(val).replace(/"/g, '""');
+          return str.includes(',') || str.includes('\n') ? `"${str}"` : str;
+        })
+        .join(',');
+    });
+    const csv = [headerRow, ...rows].join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `foodshare_${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Client-side search filter (server already paginated)
   const filteredData = searchQuery
     ? tableData.filter((row) => {
@@ -166,6 +195,14 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
+        <button
+          onClick={handleExportCSV}
+          disabled={filteredData.length === 0}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-primary text-white hover:bg-primary-T30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-soft"
+        >
+          <Download size={16} />
+          Xuất CSV
+        </button>
       </div>
 
       {/* ── STAT CARDS ── */}

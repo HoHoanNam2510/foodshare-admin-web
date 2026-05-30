@@ -32,6 +32,7 @@ export interface IPost {
   };
   status:
     | 'PENDING_REVIEW'
+    | 'PENDING_MANUAL'
     | 'AVAILABLE'
     | 'BOOKED'
     | 'OUT_OF_STOCK'
@@ -117,4 +118,15 @@ export async function adminToggleHidePost(
 
 export async function adminSoftDeletePost(postId: string): Promise<void> {
   await axiosInstance.delete(`/admin/trash/posts/${postId}`);
+}
+
+export async function adminBulkUpdateStatus(
+  postIds: string[],
+  status: 'AVAILABLE' | 'REJECTED'
+): Promise<{ modifiedCount: number }> {
+  const res = await axiosInstance.patch<{
+    success: boolean;
+    data: { modifiedCount: number };
+  }>('/posts/admin/bulk-status', { postIds, status });
+  return res.data.data;
 }

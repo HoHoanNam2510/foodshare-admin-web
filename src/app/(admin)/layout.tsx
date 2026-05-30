@@ -30,7 +30,7 @@ export default function AdminLayout({
   if (!ready) return null;
 
   return (
-    <div className="min-h-screen flex bg-neutral-T95">
+    <div className="min-h-screen flex bg-neutral-T95 dark:bg-gray-950">
       <Sidebar />
       <div className="flex-1 flex flex-col ml-70 min-h-screen">
         <Header />

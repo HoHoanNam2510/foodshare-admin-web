@@ -29,10 +29,21 @@ export interface IAIModerationConfig {
   lastRunStats?: IBatchStats;
 }
 
+export interface ISystemBankConfig {
+  systemBankName: string;
+  systemBankCode: string;
+  systemBankAccountNumber: string;
+  systemBankAccountName: string;
+}
+
 export interface ISystemConfig {
   _id?: string;
   softDelete?: ISoftDeleteConfig;
   aiModeration?: IAIModerationConfig;
+  systemBankName?: string;
+  systemBankCode?: string;
+  systemBankAccountNumber?: string;
+  systemBankAccountName?: string;
   updatedAt?: string;
 }
 
@@ -48,14 +59,14 @@ export async function fetchSystemConfig(): Promise<{
   return res.data;
 }
 
-// ── PUT /api/config (soft delete config only) ──
+// ── PATCH /api/config/soft-delete ──
 export async function updateSoftDeleteConfig(
   softDelete: Pick<ISoftDeleteConfig, 'gracePeriodDays' | 'cleanupSchedule'>
 ): Promise<{ success: boolean; data: ISystemConfig }> {
-  const res = await axiosInstance.put<{
+  const res = await axiosInstance.patch<{
     success: boolean;
     data: ISystemConfig;
-  }>('/config', { softDelete });
+  }>('/config/soft-delete', { softDelete });
   return res.data;
 }
 
@@ -78,5 +89,16 @@ export async function triggerAIModerationNow(): Promise<{
   const res = await axiosInstance.post<{ success: boolean; data: IBatchStats }>(
     '/config/ai-moderation/run'
   );
+  return res.data;
+}
+
+// ── PUT /api/config ──
+export async function updateBankConfig(
+  payload: ISystemBankConfig
+): Promise<{ success: boolean; data: ISystemConfig }> {
+  const res = await axiosInstance.put<{
+    success: boolean;
+    data: ISystemConfig;
+  }>('/config', payload);
   return res.data;
 }

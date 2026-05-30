@@ -20,7 +20,8 @@ export interface IAIModerationLog {
 
 export async function fetchAIModerationLogs(
   page: number,
-  limit: number
+  limit: number,
+  decision?: ModerationDecision | 'ALL'
 ): Promise<{
   success: boolean;
   data: IAIModerationLog[];
@@ -31,8 +32,8 @@ export async function fetchAIModerationLogs(
     totalPages: number;
   };
 }> {
-  const res = await axiosInstance.get('/config/ai-moderation/logs', {
-    params: { page, limit },
-  });
+  const params: Record<string, unknown> = { page, limit };
+  if (decision && decision !== 'ALL') params.decision = decision;
+  const res = await axiosInstance.get('/config/ai-moderation/logs', { params });
   return res.data;
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Epilogue, Be_Vietnam_Pro } from 'next/font/google';
+import { ThemeProvider } from 'next-themes';
 import './globals.css';
 
 // 1. Cấu hình font Epilogue (dùng cho Heading/Display)
@@ -36,10 +37,16 @@ export default function RootLayout({
     >
       {/* Thêm suppressHydrationWarning vào body */}
       <body
-        className="font-body antialiased bg-surface text-gray-900"
+        className="font-body antialiased bg-surface dark:bg-gray-900 text-gray-900 dark:text-gray-100"
         suppressHydrationWarning
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

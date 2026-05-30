@@ -20,6 +20,7 @@ import {
   Award,
   Tag,
   MessageSquare,
+  ClipboardList,
 } from 'lucide-react';
 
 export interface SubMenuItem {
@@ -156,6 +157,13 @@ export const adminMenus: MenuItem[] = [
     label: 'Cài Đặt Hệ Thống',
     path: '/settings',
     icon: Settings,
-    sub: [],
+    sub: [
+      { label: 'Cấu hình hệ thống', path: '/settings', icon: Settings },
+      {
+        label: 'Lịch sử kiểm duyệt AI',
+        path: '/moderation-logs',
+        icon: ClipboardList,
+      },
+    ],
   },
 ];

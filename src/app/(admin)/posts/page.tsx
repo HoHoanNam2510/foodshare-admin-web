@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Eye,
   EyeOff,
@@ -8,6 +9,7 @@ import {
   XCircle,
   Trash2,
   Pencil,
+  RefreshCw,
 } from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
@@ -22,6 +24,7 @@ import {
   adminUpdatePost,
   adminToggleHidePost,
   adminSoftDeletePost,
+  adminBulkUpdateStatus,
   type IPost,
   type PaginationMeta,
   type AdminUpdatePostBody,
@@ -45,19 +48,25 @@ const isExpired = (post: IPost): boolean =>
 const PAGE_LIMIT = 10;
 
 export default function PostsManagementPage() {
+  const searchParams = useSearchParams();
   const [posts, setPosts] = useState<IPost[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState(
+    searchParams.get('status') ?? 'ALL'
+  );
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const [editPost, setEditPost] = useState<IPost | null>(null);
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkActing, setIsBulkActing] = useState(false);
 
   const loadPosts = useCallback(async () => {
     setIsLoading(true);
@@ -142,6 +151,42 @@ export default function PostsManagementPage() {
     }
   };
 
+  const pendingManualIds = filteredPosts
+    .filter((p) => p.status === 'PENDING_MANUAL')
+    .map((p) => p._id);
+
+  const toggleSelectAll = () => {
+    if (
+      selectedIds.size === pendingManualIds.length &&
+      pendingManualIds.length > 0
+    ) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(pendingManualIds));
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkAction = async (status: 'AVAILABLE' | 'REJECTED') => {
+    if (selectedIds.size === 0) return;
+    setIsBulkActing(true);
+    try {
+      await adminBulkUpdateStatus(Array.from(selectedIds), status);
+      setSelectedIds(new Set());
+      await loadPosts();
+    } finally {
+      setIsBulkActing(false);
+    }
+  };
+
   const buildActions = (post: IPost): DropdownAction[] => {
     const expired = isExpired(post);
     return [
@@ -200,7 +245,35 @@ export default function PostsManagementPage() {
     ];
   };
 
+  const allPendingSelected =
+    pendingManualIds.length > 0 &&
+    pendingManualIds.every((id) => selectedIds.has(id));
+
   const columns: Column<IPost>[] = [
+    {
+      key: 'select',
+      header: (
+        <input
+          type="checkbox"
+          checked={allPendingSelected}
+          onChange={toggleSelectAll}
+          disabled={pendingManualIds.length === 0}
+          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40 disabled:opacity-30"
+          title="Chọn tất cả PENDING_MANUAL"
+        />
+      ) as unknown as string,
+      align: 'center',
+      render: (post) =>
+        post.status === 'PENDING_MANUAL' ? (
+          <input
+            type="checkbox"
+            checked={selectedIds.has(post._id)}
+            onChange={() => toggleSelectOne(post._id)}
+            onClick={(e) => e.stopPropagation()}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40"
+          />
+        ) : null,
+    },
     {
       key: 'post',
       header: 'Bài đăng',
@@ -363,6 +436,7 @@ export default function PostsManagementPage() {
               options: [
                 { value: 'ALL', label: 'Tất cả trạng thái' },
                 { value: 'PENDING_REVIEW', label: 'Chờ duyệt' },
+                { value: 'PENDING_MANUAL', label: 'Chờ duyệt thủ công' },
                 { value: 'AVAILABLE', label: 'Đang hiển thị' },
                 { value: 'OUT_OF_STOCK', label: 'Hết hàng' },
                 { value: 'HIDDEN', label: 'Đã ẩn' },
@@ -389,6 +463,46 @@ export default function PostsManagementPage() {
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
       />
+
+      {/* Bulk action bar — sticky bottom, shown when items selected */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl bg-gray-900 px-5 py-3 shadow-2xl">
+          <span className="text-sm font-semibold text-white">
+            {selectedIds.size} bài được chọn
+          </span>
+          <div className="h-4 w-px bg-gray-600" />
+          <button
+            onClick={() => handleBulkAction('AVAILABLE')}
+            disabled={isBulkActing}
+            className="flex items-center gap-1.5 rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-400 disabled:opacity-60 transition"
+          >
+            {isBulkActing ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <CheckCircle className="w-3.5 h-3.5" />
+            )}
+            Duyệt tất cả
+          </button>
+          <button
+            onClick={() => handleBulkAction('REJECTED')}
+            disabled={isBulkActing}
+            className="flex items-center gap-1.5 rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-400 disabled:opacity-60 transition"
+          >
+            {isBulkActing ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <XCircle className="w-3.5 h-3.5" />
+            )}
+            Từ chối tất cả
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            className="text-xs text-gray-400 hover:text-white transition"
+          >
+            Hủy
+          </button>
+        </div>
+      )}
 
       <PostDetailModal
         post={selectedPost}

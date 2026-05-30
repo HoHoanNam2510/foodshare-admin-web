@@ -44,7 +44,7 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-70 z-40 flex flex-col bg-[#E3E8E3] border-r border-outline-variant/50 transition-all duration-300">
+    <aside className="fixed top-0 left-0 h-screen w-70 z-40 flex flex-col bg-[#E3E8E3] dark:bg-gray-900 border-r border-outline-variant/50 dark:border-gray-700 transition-all duration-300">
       {/* ── 1. Logo & Brand ── */}
       <div className="flex items-center gap-3 px-6 py-6 shrink-0">
         <div className="w-10 h-10 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 flex items-center justify-center overflow-hidden shrink-0">
@@ -60,7 +60,7 @@ export default function Sidebar() {
           <span className="font-sans font-extrabold tracking-tight text-xl text-primary leading-tight">
             FoodShare
           </span>
-          <span className="font-label text-[10px] font-bold tracking-widest text-gray-400 uppercase mt-0.5">
+          <span className="font-label text-[10px] font-bold tracking-widest text-gray-400 dark:text-gray-500 uppercase mt-0.5">
             Admin Website
           </span>
         </div>
@@ -68,21 +68,21 @@ export default function Sidebar() {
 
       {/* ── 2. Search Input (Elevated) ── */}
       <div className="px-5 pb-4 shrink-0">
-        <div className="flex items-center gap-2 px-3 py-2.5 bg-surface-lowest rounded-lg shadow-sm border border-outline-variant/30 focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all duration-200">
+        <div className="flex items-center gap-2 px-3 py-2.5 bg-surface-lowest dark:bg-gray-800 rounded-lg shadow-sm border border-outline-variant/30 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all duration-200">
           <Search size={16} className="text-gray-400 shrink-0" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Tìm kiếm chức năng..."
-            className="bg-transparent text-sm outline-none w-full font-body text-gray-900 placeholder:text-gray-400"
+            className="bg-transparent text-sm outline-none w-full font-body text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
           />
         </div>
       </div>
 
       {/* ── 3. Navigation Menu ── */}
       <div className="px-6 pt-2 pb-1 shrink-0">
-        <p className="font-label text-xs font-semibold uppercase tracking-widest text-gray-400">
+        <p className="font-label text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
           Menu
         </p>
       </div>
@@ -100,7 +100,7 @@ export default function Sidebar() {
                 className={`flex items-center rounded-xl transition-all duration-200 group ${
                   isActive
                     ? 'bg-primary text-white shadow-soft'
-                    : 'hover:bg-primary/5 text-gray-600 hover:text-primary'
+                    : 'hover:bg-primary/5 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'
                 }`}
               >
                 {hasSub ? (
@@ -158,7 +158,7 @@ export default function Sidebar() {
                         className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 ${
                           isSubActive
                             ? 'bg-secondary/10 text-secondary font-bold'
-                            : 'text-gray-500 hover:bg-primary/5 hover:text-primary'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-primary/5 hover:text-primary dark:hover:text-primary'
                         }`}
                       >
                         <SubIcon size={14} className="shrink-0" />
@@ -176,13 +176,13 @@ export default function Sidebar() {
       </nav>
 
       {/* ── 4. Bottom Logout / Profile ── */}
-      <div className="px-4 py-2.5 shrink-0 border-t border-outline-variant/50">
+      <div className="px-4 py-2.5 shrink-0 border-t border-outline-variant/50 dark:border-gray-700">
         <button
           onClick={() => {
             logout();
             router.push('/login');
           }}
-          className="flex items-center justify-center gap-2 w-full py-2 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-error/10 hover:text-error transition-all duration-200"
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-xl font-body text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-error/10 hover:text-error transition-all duration-200"
         >
           <LogOut size={18} />
           Đăng xuất

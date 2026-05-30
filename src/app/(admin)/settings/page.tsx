@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Settings,
   Save,
@@ -11,8 +12,7 @@ import {
   AlertTriangle,
   Brain,
   Play,
-  ChevronLeft,
-  ChevronRight,
+  ExternalLink,
 } from 'lucide-react';
 import {
   fetchSystemConfig,
@@ -27,12 +27,7 @@ import {
   type IBatchStats,
 } from '@/lib/configApi';
 import { triggerCleanupNow } from '@/lib/trashApi';
-import {
-  fetchAIModerationLogs,
-  type IAIModerationLog,
-  type ModerationDecision,
-  type ModerationTrigger,
-} from '@/lib/aiLogApi';
+import { fetchAdminPosts } from '@/lib/postApi';
 
 const DEFAULT_SOFT_DELETE: ISoftDeleteConfig = {
   gracePeriodDays: 30,
@@ -43,13 +38,6 @@ const DEFAULT_AI_MODERATION: IAIModerationConfig = {
   enabled: false,
   intervalHours: 6,
   trustScoreThresholds: { reject: 50, approve: 70 },
-};
-
-const TRIGGER_LABEL: Record<ModerationTrigger, string> = {
-  ON_CREATE: 'Tạo bài',
-  ON_UPDATE: 'Cập nhật',
-  BATCH_SCHEDULER: 'Lịch tự động',
-  MANUAL_ADMIN: 'Thủ công',
 };
 
 export default function SettingsPage() {
@@ -71,21 +59,19 @@ export default function SettingsPage() {
   const [aiError, setAiError] = useState<string | null>(null);
   const [isRunningAI, setIsRunningAI] = useState(false);
   const [aiRunResult, setAiRunResult] = useState<IBatchStats | null>(null);
-  const [aiLogs, setAiLogs] = useState<IAIModerationLog[]>([]);
-  const [aiLogPage, setAiLogPage] = useState(1);
-  const [aiLogTotalPages, setAiLogTotalPages] = useState(0);
-  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
+  const [pendingManualCount, setPendingManualCount] = useState(0);
 
-  const refreshLogs = async (page: number) => {
-    setIsLoadingLogs(true);
+  const refreshPendingCounts = async () => {
     try {
-      const res = await fetchAIModerationLogs(page, 10);
-      setAiLogs(res.data);
-      setAiLogTotalPages(res.pagination.totalPages);
+      const [reviewRes, manualRes] = await Promise.all([
+        fetchAdminPosts({ status: 'PENDING_REVIEW', limit: 1 }),
+        fetchAdminPosts({ status: 'PENDING_MANUAL', limit: 1 }),
+      ]);
+      setPendingReviewCount(reviewRes.pagination.total);
+      setPendingManualCount(manualRes.pagination.total);
     } catch {
-      // silently fail — log table is non-critical
-    } finally {
-      setIsLoadingLogs(false);
+      // ignore
     }
   };
 
@@ -103,11 +89,20 @@ export default function SettingsPage() {
         setIsLoading(false);
       }
     })();
+    refreshPendingCounts();
   }, []);
 
   useEffect(() => {
-    refreshLogs(aiLogPage);
-  }, [aiLogPage]);
+    if (!trashSavedAt) return;
+    const t = setTimeout(() => setTrashSavedAt(null), 3000);
+    return () => clearTimeout(t);
+  }, [trashSavedAt]);
+
+  useEffect(() => {
+    if (!aiSavedAt) return;
+    const t = setTimeout(() => setAiSavedAt(null), 3000);
+    return () => clearTimeout(t);
+  }, [aiSavedAt]);
 
   const handleSaveTrash = async () => {
     setTrashError(null);
@@ -173,11 +168,10 @@ export default function SettingsPage() {
     try {
       const res = await triggerAIModerationNow();
       setAiRunResult(res.data);
-      setAiLogPage(1);
-      await refreshLogs(1);
       const configRes = await fetchSystemConfig();
       if (configRes.data?.aiModeration)
         setAiModeration(configRes.data.aiModeration);
+      await refreshPendingCounts();
     } catch {
       setAiError('Chạy AI thất bại. Vui lòng thử lại.');
     } finally {
@@ -438,22 +432,6 @@ export default function SettingsPage() {
             <p className="text-xs text-gray-400">
               Scheduler kiểm tra mỗi 30 phút và chạy AI khi đến interval đã cài.
             </p>
-            <div className="pt-1">
-              <button
-                onClick={handleRunAI}
-                disabled={isRunningAI}
-                className="flex items-center gap-2 px-4 py-2.5 bg-orange-50 text-orange-600 border border-orange-200 rounded-xl font-semibold text-sm hover:bg-orange-100 active:scale-95 transition disabled:opacity-60"
-              >
-                {isRunningAI ? (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Play className="w-4 h-4" />
-                )}
-                {isRunningAI
-                  ? 'Đang chạy AI...'
-                  : 'Chạy ngay — không cần đợi lịch'}
-              </button>
-            </div>
           </div>
 
           {/* Thresholds */}
@@ -596,118 +574,65 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* Log table */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Lịch sử quyết định AI
-              </label>
-              {isLoadingLogs && (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-gray-400" />
-              )}
-            </div>
-
-            {aiLogs.length === 0 && !isLoadingLogs ? (
-              <div className="text-center py-8 text-sm text-gray-400 border border-gray-100 rounded-xl">
-                Chưa có lịch sử kiểm duyệt
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-2xl border border-gray-100">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100">
-                      <th className="px-3 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wider w-[38%]">
-                        Bài đăng
-                      </th>
-                      <th className="px-3 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wider w-[10%]">
-                        Score
-                      </th>
-                      <th className="px-3 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wider w-[20%]">
-                        Kết quả
-                      </th>
-                      <th className="px-3 py-2.5 text-center font-semibold text-gray-500 uppercase tracking-wider w-[17%]">
-                        Nguồn
-                      </th>
-                      <th className="px-3 py-2.5 text-right font-semibold text-gray-500 uppercase tracking-wider w-[15%]">
-                        Thời gian
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {aiLogs.map((log) => (
-                      <tr
-                        key={log._id}
-                        className="hover:bg-gray-50/50 transition-colors"
-                      >
-                        <td className="px-3 py-2.5 text-gray-700 max-w-0">
-                          <span className="block truncate">
-                            {log.postId?.title ?? log.postTitle}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5 text-center">
-                          <span
-                            className={`font-bold ${
-                              log.trustScore >= 70
-                                ? 'text-green-600'
-                                : log.trustScore < 50
-                                  ? 'text-red-500'
-                                  : 'text-amber-600'
-                            }`}
-                          >
-                            {log.trustScore}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5 text-center">
-                          <DecisionBadge decision={log.decision} />
-                        </td>
-                        <td className="px-3 py-2.5 text-center text-gray-500">
-                          {TRIGGER_LABEL[log.trigger]}
-                        </td>
-                        <td className="px-3 py-2.5 text-right text-gray-400 whitespace-nowrap">
-                          {new Date(log.createdAt).toLocaleDateString('vi-VN', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Pagination */}
-            {aiLogTotalPages > 1 && (
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => setAiLogPage((p) => Math.max(p - 1, 1))}
-                  disabled={aiLogPage === 1 || isLoadingLogs}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                  Trước
-                </button>
-                <span className="text-xs text-gray-500">
-                  Trang {aiLogPage} / {aiLogTotalPages}
+          {/* PENDING_REVIEW callout — bài chưa qua AI */}
+          {pendingReviewCount > 0 && (
+            <Link
+              href="/posts?status=PENDING_REVIEW"
+              className="flex items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 transition hover:bg-blue-100"
+            >
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 shrink-0 text-blue-600" />
+                <span className="text-sm font-semibold text-blue-800">
+                  {pendingReviewCount} bài chờ AI kiểm duyệt
                 </span>
-                <button
-                  onClick={() =>
-                    setAiLogPage((p) => Math.min(p + 1, aiLogTotalPages))
-                  }
-                  disabled={aiLogPage === aiLogTotalPages || isLoadingLogs}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  Sau
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
               </div>
-            )}
-          </div>
+              <span className="text-xs font-semibold text-blue-600">
+                Xem danh sách →
+              </span>
+            </Link>
+          )}
+
+          {/* PENDING_MANUAL callout — bài AI đề nghị duyệt thủ công */}
+          {pendingManualCount > 0 && (
+            <Link
+              href="/posts?status=PENDING_MANUAL"
+              className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 transition hover:bg-amber-100"
+            >
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
+                <span className="text-sm font-semibold text-amber-800">
+                  {pendingManualCount} bài chờ duyệt thủ công
+                </span>
+              </div>
+              <span className="text-xs font-semibold text-amber-600">
+                Duyệt / Từ chối →
+              </span>
+            </Link>
+          )}
+
+          {/* Link to full log page */}
+          <Link
+            href="/moderation-logs"
+            className="flex items-center gap-2 text-xs font-semibold text-primary hover:text-primary/80 transition"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Xem lịch sử kiểm duyệt đầy đủ →
+          </Link>
         </div>
 
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3">
+          <button
+            onClick={handleRunAI}
+            disabled={isRunningAI}
+            className="flex items-center gap-2 px-4 py-2.5 bg-orange-50 text-orange-600 border border-orange-200 rounded-xl font-semibold text-sm hover:bg-orange-100 active:scale-95 transition disabled:opacity-60"
+          >
+            {isRunningAI ? (
+              <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <Play className="w-4 h-4" />
+            )}
+            {isRunningAI ? 'Đang chạy AI...' : 'Chạy ngay'}
+          </button>
           <button
             onClick={handleSaveAI}
             disabled={isSavingAI}
@@ -723,27 +648,5 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function DecisionBadge({ decision }: { decision: ModerationDecision }) {
-  if (decision === 'APPROVED') {
-    return (
-      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
-        Đã duyệt
-      </span>
-    );
-  }
-  if (decision === 'REJECTED') {
-    return (
-      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700">
-        Từ chối
-      </span>
-    );
-  }
-  return (
-    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">
-      Chờ duyệt
-    </span>
   );
 }
