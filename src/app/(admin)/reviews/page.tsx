@@ -41,7 +41,9 @@ const renderStarsInline = (rating: number) => (
         key={star}
         size={14}
         className={
-          star <= rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'
+          star <= rating
+            ? 'text-yellow-500 fill-yellow-500'
+            : 'text-gray-300 dark:text-gray-600'
         }
       />
     ))}
@@ -137,10 +139,10 @@ export default function ReviewsManagementPage() {
       header: 'Mã & Ngày tạo',
       render: (review) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-gray-900 font-mono text-xs">
+          <span className="font-semibold text-gray-900 dark:text-gray-100 font-mono text-xs">
             {review._id.slice(-8).toUpperCase()}
           </span>
-          <span className="text-xs text-gray-500 mt-0.5">
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {formatDateTime(review.createdAt)}
           </span>
         </div>
@@ -157,11 +159,11 @@ export default function ReviewsManagementPage() {
             size="md"
           />
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900 line-clamp-1">
+            <span className="font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
               {review.reviewerId.fullName}
             </span>
             {review.reviewerId.email && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {review.reviewerId.email}
               </span>
             )}
@@ -180,7 +182,7 @@ export default function ReviewsManagementPage() {
             size="md"
           />
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900 line-clamp-1">
+            <span className="font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
               {review.revieweeId.fullName}
             </span>
             {review.revieweeId.email && (
@@ -208,7 +210,7 @@ export default function ReviewsManagementPage() {
       header: 'Nhận xét',
       maxWidth: 'max-w-52',
       render: (review) => (
-        <p className="text-gray-700 text-xs line-clamp-2 italic">
+        <p className="text-gray-700 dark:text-gray-300 text-xs line-clamp-2 italic">
           {review.feedback || 'Không có nhận xét'}
         </p>
       ),
@@ -271,9 +273,9 @@ export default function ReviewsManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

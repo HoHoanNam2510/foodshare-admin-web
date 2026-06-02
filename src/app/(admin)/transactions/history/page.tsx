@@ -70,7 +70,7 @@ export default function TransactionStatusHistoryPage() {
       header: 'Mã giao dịch',
       render: (log) => (
         <div className="flex flex-col gap-0.5">
-          <span className="font-mono text-sm font-semibold text-gray-900">
+          <span className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">
             #{log.transactionId?._id?.slice(-8).toUpperCase() ?? '—'}
           </span>
           <span
@@ -113,10 +113,10 @@ export default function TransactionStatusHistoryPage() {
             size="sm"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-medium text-gray-900 line-clamp-1">
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
               {log.changedBy?.fullName ?? '—'}
             </span>
-            <span className="text-xs text-gray-500 line-clamp-1">
+            <span className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
               {log.changedBy?.email ?? ''}
             </span>
           </div>
@@ -127,7 +127,7 @@ export default function TransactionStatusHistoryPage() {
       key: 'createdAt',
       header: 'Thời gian',
       render: (log) => (
-        <span className="text-sm text-gray-600 whitespace-nowrap">
+        <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
           {formatDateTime(log.createdAt)}
         </span>
       ),
@@ -149,19 +149,19 @@ export default function TransactionStatusHistoryPage() {
 
       {pagination && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-surface-lowest border border-outline-variant/30 rounded-md p-4 shadow-sm">
-            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1">
+          <div className="bg-surface-lowest dark:bg-gray-900 border border-outline-variant/30 dark:border-gray-800 rounded-md p-4 shadow-sm">
+            <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
               Tổng lượt cập nhật
             </p>
-            <p className="text-2xl font-sans font-bold text-gray-900">
+            <p className="text-2xl font-sans font-bold text-gray-900 dark:text-gray-100">
               {pagination.total.toLocaleString('vi-VN')}
             </p>
           </div>
-          <div className="bg-surface-lowest border border-outline-variant/30 rounded-md p-4 shadow-sm">
-            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1">
+          <div className="bg-surface-lowest dark:bg-gray-900 border border-outline-variant/30 dark:border-gray-800 rounded-md p-4 shadow-sm">
+            <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
               Trang hiện tại
             </p>
-            <p className="text-2xl font-sans font-bold text-gray-900">
+            <p className="text-2xl font-sans font-bold text-gray-900 dark:text-gray-100">
               {currentPage} / {pagination.totalPages}
             </p>
           </div>
@@ -182,9 +182,9 @@ export default function TransactionStatusHistoryPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible"
+        className="rounded-2xl"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
       />

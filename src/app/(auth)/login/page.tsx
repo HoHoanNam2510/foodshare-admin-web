@@ -26,7 +26,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-surface">
+    <div className="min-h-screen flex bg-surface dark:bg-gray-950">
       {/* Left Panel — Background Image */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         {/* Full-cover background image */}
@@ -83,17 +83,17 @@ export default function LoginPage() {
           <div className="w-full max-w-md">
             {/* Heading */}
             <div className="mb-8">
-              <h1 className="font-sans font-extrabold text-neutral-T10 text-4xl tracking-tight mb-2">
+              <h1 className="font-sans font-extrabold text-neutral-T10 dark:text-gray-100 text-4xl tracking-tight mb-2">
                 Welcome back!
               </h1>
-              <p className="font-body text-neutral-T40 text-base">
+              <p className="font-body text-neutral-T40 dark:text-gray-400 text-base">
                 Please enter your administrative credentials to manage the
                 harvest.
               </p>
             </div>
 
             {error && (
-              <div className="mb-4 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              <div className="mb-4 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 px-4 py-3 text-sm text-red-700 dark:text-red-400">
                 {error}
               </div>
             )}
@@ -103,7 +103,7 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <label
                   htmlFor="email"
-                  className="font-label font-semibold text-neutral-T20 text-sm"
+                  className="font-label font-semibold text-neutral-T20 dark:text-gray-300 text-sm"
                 >
                   Email address
                 </label>
@@ -115,7 +115,7 @@ export default function LoginPage() {
                     placeholder="admin@foodshare.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-surface-lowest border border-outline-variant rounded-md px-4 py-3 text-neutral-T10 font-body text-sm placeholder:text-neutral-T60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                    className="w-full bg-surface-lowest dark:bg-gray-800 border border-outline-variant dark:border-gray-700 rounded-md px-4 py-3 text-neutral-T10 dark:text-gray-100 font-body text-sm placeholder:text-neutral-T60 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
                   />
                 </div>
               </div>
@@ -125,13 +125,13 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="password"
-                    className="font-label font-semibold text-neutral-T20 text-sm"
+                    className="font-label font-semibold text-neutral-T20 dark:text-gray-300 text-sm"
                   >
                     Password
                   </label>
                   <a
                     href="#"
-                    className="font-body text-sm text-neutral-T40 hover:text-primary hover:underline transition-colors duration-150"
+                    className="font-body text-sm text-neutral-T40 dark:text-gray-400 hover:text-primary hover:underline transition-colors duration-150"
                   >
                     Forgot password?
                   </a>
@@ -144,12 +144,12 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-surface-lowest border border-outline-variant rounded-md px-4 py-3 pr-12 text-neutral-T10 font-body text-sm placeholder:text-neutral-T60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                    className="w-full bg-surface-lowest dark:bg-gray-800 border border-outline-variant dark:border-gray-700 rounded-md px-4 py-3 pr-12 text-neutral-T10 dark:text-gray-100 font-body text-sm placeholder:text-neutral-T60 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-T50 hover:text-primary transition-colors duration-150 p-0.5"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-T50 dark:text-gray-500 hover:text-primary transition-colors duration-150 p-0.5"
                     aria-label={
                       showPassword ? 'Hide password' : 'Show password'
                     }
@@ -175,7 +175,7 @@ export default function LoginPage() {
                   />
                   <div
                     onClick={() => setRememberMe(!rememberMe)}
-                    className="rounded-sm border-2 cursor-pointer flex items-center justify-center transition-all duration-200 border-outline-variant peer-checked:border-primary bg-surface-lowest peer-checked:bg-primary"
+                    className="rounded-sm border-2 cursor-pointer flex items-center justify-center transition-all duration-200 border-outline-variant dark:border-gray-600 peer-checked:border-primary bg-surface-lowest dark:bg-gray-800 peer-checked:bg-primary"
                     style={{ width: '18px', height: '18px' }}
                   >
                     {rememberMe && (
@@ -200,7 +200,7 @@ export default function LoginPage() {
                 <label
                   htmlFor="remember"
                   onClick={() => setRememberMe(!rememberMe)}
-                  className="font-body text-sm text-neutral-T30 cursor-pointer select-none"
+                  className="font-body text-sm text-neutral-T30 dark:text-gray-300 cursor-pointer select-none"
                 >
                   Remember for 30 days
                 </label>
@@ -224,15 +224,17 @@ export default function LoginPage() {
 
               {/* Divider */}
               <div className="relative flex items-center gap-4 py-1">
-                <div className="flex-1 h-px bg-outline-variant" />
-                <span className="font-body text-sm text-neutral-T50">Or</span>
-                <div className="flex-1 h-px bg-outline-variant" />
+                <div className="flex-1 h-px bg-outline-variant dark:bg-gray-700" />
+                <span className="font-body text-sm text-neutral-T50 dark:text-gray-400">
+                  Or
+                </span>
+                <div className="flex-1 h-px bg-outline-variant dark:bg-gray-700" />
               </div>
 
               {/* Google Sign In */}
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 bg-surface-lowest border border-outline-variant rounded-md py-3.5 font-body font-medium text-sm text-neutral-T20 hover:bg-neutral-T95 hover:border-neutral-T70 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2"
+                className="w-full flex items-center justify-center gap-3 bg-surface-lowest dark:bg-gray-800 border border-outline-variant dark:border-gray-700 rounded-md py-3.5 font-body font-medium text-sm text-neutral-T20 dark:text-gray-300 hover:bg-neutral-T95 dark:hover:bg-gray-700 hover:border-neutral-T70 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2"
               >
                 <svg
                   width="18"

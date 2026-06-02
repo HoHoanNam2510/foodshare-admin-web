@@ -136,10 +136,10 @@ export default function ReportsManagementPage() {
       header: 'Mã & Ngày gửi',
       render: (r) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-gray-900 font-mono text-xs">
+          <span className="font-semibold text-gray-900 dark:text-gray-100 font-mono text-xs">
             {r._id.slice(-8).toUpperCase()}
           </span>
-          <span className="text-xs text-gray-500 mt-0.5">
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {formatDateTime(r.createdAt)}
           </span>
         </div>
@@ -156,10 +156,10 @@ export default function ReportsManagementPage() {
             size="md"
           />
           <div className="flex flex-col">
-            <span className="text-gray-900 font-medium">
+            <span className="text-gray-900 dark:text-gray-100 font-medium">
               {r.reporterId.fullName}
             </span>
-            <span className="text-xs text-gray-500 mt-0.5">
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {r.reporterId.email}
             </span>
           </div>
@@ -176,8 +176,10 @@ export default function ReportsManagementPage() {
           >
             {REASON_LABELS[r.reason] || r.reason.replace(/_/g, ' ')}
           </span>
-          <span className="text-xs text-gray-600">
-            <strong className="text-gray-900">{r.targetType}:</strong>{' '}
+          <span className="text-xs text-gray-600 dark:text-gray-400">
+            <strong className="text-gray-900 dark:text-gray-100">
+              {r.targetType}:
+            </strong>{' '}
             {r.targetId.slice(-8).toUpperCase()}
           </span>
         </div>
@@ -236,7 +238,7 @@ export default function ReportsManagementPage() {
       />
 
       {/* Tabs — giữ nguyên vì mỗi tab có màu active riêng */}
-      <div className="flex items-center gap-2 border-b border-outline-variant/30 pb-px">
+      <div className="flex items-center gap-2 border-b border-outline-variant/30 dark:border-gray-800 pb-px">
         {[
           {
             value: 'ALL',
@@ -266,7 +268,7 @@ export default function ReportsManagementPage() {
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === tab.value ? tab.activeClass : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+            className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === tab.value ? tab.activeClass : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}
           >
             {tab.icon} {tab.label}
           </button>
@@ -290,9 +292,9 @@ export default function ReportsManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

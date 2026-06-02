@@ -107,7 +107,7 @@ export default function DateRangePicker({
   return (
     <div className="flex items-center gap-3">
       {/* Range selector */}
-      <div className="flex p-0.5 bg-surface rounded-xl border border-outline-variant/30">
+      <div className="flex p-0.5 bg-surface dark:bg-gray-800 rounded-xl border border-outline-variant/30 dark:border-gray-700">
         {(['day', 'week', 'month'] as TimeRange[]).map((r) => (
           <button
             key={r}
@@ -124,7 +124,7 @@ export default function DateRangePicker({
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center gap-1 bg-surface-lowest rounded-xl border border-outline-variant/30 px-1 py-0.5">
+      <div className="flex items-center gap-1 bg-surface-lowest dark:bg-gray-900 rounded-xl border border-outline-variant/30 dark:border-gray-700 px-1 py-0.5">
         <button
           onClick={() => onDateChange(navigate(date, range, -1))}
           className="p-1.5 rounded-lg text-neutral-T50 hover:bg-primary/10 hover:text-primary transition-all"
@@ -134,7 +134,7 @@ export default function DateRangePicker({
 
         <div className="flex items-center gap-2 px-3 min-w-45 justify-center">
           <Calendar size={14} className="text-primary shrink-0" />
-          <span className="text-sm font-body font-semibold text-neutral-T20 whitespace-nowrap capitalize">
+          <span className="text-sm font-body font-semibold text-neutral-T20 dark:text-gray-100 whitespace-nowrap capitalize">
             {formatLabel(date, range)}
           </span>
         </div>

@@ -67,24 +67,27 @@ function InputField({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-semibold text-neutral-T30 font-body">
+      <label className="text-sm font-semibold text-neutral-T30 dark:text-gray-300 font-body">
         {label}
       </label>
       <div
         className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl border transition-all duration-200 ${
           readOnly
-            ? 'bg-neutral-T95 border-neutral-T90 cursor-not-allowed'
-            : 'bg-white border-neutral-T90 focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary/50'
+            ? 'bg-neutral-T95 dark:bg-gray-700 border-neutral-T90 dark:border-gray-600 cursor-not-allowed'
+            : 'bg-white dark:bg-gray-800 border-neutral-T90 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary/50'
         }`}
       >
-        <Icon size={16} className="text-neutral-T50 shrink-0" />
+        <Icon
+          size={16}
+          className="text-neutral-T50 dark:text-gray-500 shrink-0"
+        />
         <input
           type={type}
           value={value}
           readOnly={readOnly}
           placeholder={placeholder}
           onChange={(e) => onChange?.(e.target.value)}
-          className="flex-1 bg-transparent text-sm font-body text-neutral-T10 placeholder:text-neutral-T70 outline-none disabled:text-neutral-T50"
+          className="flex-1 bg-transparent text-sm font-body text-neutral-T10 dark:text-gray-100 placeholder:text-neutral-T70 dark:placeholder:text-gray-500 outline-none disabled:text-neutral-T50"
         />
         {rightSlot}
       </div>
@@ -283,7 +286,7 @@ export default function ProfilePage() {
       {/* ── Layout grid ── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
         {/* ── Left: Avatar card ── */}
-        <div className="xl:col-span-1 bg-surface-lowest rounded-2xl shadow-soft p-6 flex flex-col items-center gap-4">
+        <div className="xl:col-span-1 bg-surface-lowest dark:bg-gray-900 dark:border dark:border-gray-800 dark:shadow-none rounded-2xl shadow-soft p-6 flex flex-col items-center gap-4">
           {/* Avatar */}
           <div className="relative group">
             <div className="w-24 h-24 rounded-full overflow-hidden shadow-soft">
@@ -293,6 +296,8 @@ export default function ProfilePage() {
                   alt={fullName || 'Avatar'}
                   width={96}
                   height={96}
+                  priority
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -318,7 +323,7 @@ export default function ProfilePage() {
 
           {/* Name & Role */}
           <div className="text-center">
-            <p className="font-sans font-bold text-lg text-neutral-T10 leading-tight">
+            <p className="font-sans font-bold text-lg text-neutral-T10 dark:text-gray-100 leading-tight">
               {fullName || user?.fullName || '—'}
             </p>
             <span className="inline-block mt-1.5 px-3 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold font-label">
@@ -326,19 +331,19 @@ export default function ProfilePage() {
             </span>
           </div>
 
-          <div className="w-full h-px bg-neutral-T90" />
+          <div className="w-full h-px bg-neutral-T90 dark:bg-gray-700" />
 
           {/* Meta info */}
           <div className="w-full flex flex-col gap-3 text-sm font-body">
-            <div className="flex items-center gap-2.5 text-neutral-T50">
+            <div className="flex items-center gap-2.5 text-neutral-T50 dark:text-gray-500">
               <Mail size={15} className="shrink-0" />
-              <span className="truncate text-neutral-T30">
+              <span className="truncate text-neutral-T30 dark:text-gray-300">
                 {user?.email ?? '—'}
               </span>
             </div>
-            <div className="flex items-center gap-2.5 text-neutral-T50">
+            <div className="flex items-center gap-2.5 text-neutral-T50 dark:text-gray-500">
               <User size={15} className="shrink-0" />
-              <span className="text-neutral-T30">
+              <span className="text-neutral-T30 dark:text-gray-300">
                 Tham gia: {formatDate(user?.createdAt)}
               </span>
             </div>
@@ -354,12 +359,12 @@ export default function ProfilePage() {
         {/* ── Right: Forms ── */}
         <div className="xl:col-span-2 flex flex-col gap-6">
           {/* Personal info card */}
-          <div className="bg-surface-lowest rounded-2xl shadow-soft p-6 flex flex-col gap-5">
+          <div className="bg-surface-lowest dark:bg-gray-900 dark:border dark:border-gray-800 dark:shadow-none rounded-2xl shadow-soft p-6 flex flex-col gap-5">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
                 <User size={16} className="text-primary" />
               </div>
-              <h2 className="font-sans font-bold text-base text-neutral-T10">
+              <h2 className="font-sans font-bold text-base text-neutral-T10 dark:text-gray-100">
                 Thông tin cá nhân
               </h2>
             </div>
@@ -411,12 +416,12 @@ export default function ProfilePage() {
           </div>
 
           {/* Security card */}
-          <div className="bg-surface-lowest rounded-2xl shadow-soft p-6 flex flex-col gap-5">
+          <div className="bg-surface-lowest dark:bg-gray-900 dark:border dark:border-gray-800 dark:shadow-none rounded-2xl shadow-soft p-6 flex flex-col gap-5">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Lock size={16} className="text-primary" />
               </div>
-              <h2 className="font-sans font-bold text-base text-neutral-T10">
+              <h2 className="font-sans font-bold text-base text-neutral-T10 dark:text-gray-100">
                 Bảo mật
               </h2>
             </div>

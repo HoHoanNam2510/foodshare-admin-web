@@ -11,13 +11,13 @@ interface UserEditModalProps {
 }
 
 const INPUT_CLASS =
-  'w-full bg-surface border border-outline-variant rounded-md px-3 py-2 text-sm text-neutral-T10 font-body placeholder:text-neutral-T60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 disabled:opacity-60';
+  'w-full bg-surface dark:bg-gray-800 border border-outline-variant dark:border-gray-600 rounded-md px-3 py-2 text-sm text-neutral-T10 dark:text-gray-100 font-body placeholder:text-neutral-T60 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 disabled:opacity-60';
 
 const SELECT_CLASS =
-  'w-full bg-surface border border-outline-variant rounded-md px-3 py-2 text-sm text-neutral-T10 font-body focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer';
+  'w-full bg-surface dark:bg-gray-800 border border-outline-variant dark:border-gray-600 rounded-md px-3 py-2 text-sm text-neutral-T10 dark:text-gray-100 font-body focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer';
 
 const LABEL_CLASS =
-  'block text-xs font-semibold font-label text-gray-500 mb-1 uppercase tracking-wider';
+  'block text-xs font-semibold font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider';
 
 export default function UserEditModal({
   user,
@@ -145,20 +145,20 @@ export default function UserEditModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-surface-lowest w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
+      <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50">
           <div>
-            <h2 className="text-lg font-sans font-bold text-gray-900">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100">
               Chỉnh sửa tài khoản
             </h2>
-            <p className="text-xs font-body text-gray-500 mt-0.5">
+            <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-0.5">
               {user.email}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -171,7 +171,7 @@ export default function UserEditModal({
             <p className={LABEL_CLASS}>Thông tin cơ bản</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="sm:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Họ và tên <span className="text-error">*</span>
                 </label>
                 <input
@@ -183,7 +183,7 @@ export default function UserEditModal({
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Email <span className="text-error">*</span>
                 </label>
                 <input
@@ -195,7 +195,7 @@ export default function UserEditModal({
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Số điện thoại
                 </label>
                 <input
@@ -207,7 +207,7 @@ export default function UserEditModal({
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Địa chỉ mặc định
                 </label>
                 <input
@@ -222,11 +222,11 @@ export default function UserEditModal({
           </section>
 
           {/* ── Cài đặt tài khoản ── */}
-          <section className="border-t border-outline-variant/30 pt-5">
+          <section className="border-t border-outline-variant/30 dark:border-gray-700 pt-5">
             <p className={LABEL_CLASS}>Cài đặt tài khoản</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Vai trò
                 </label>
                 <select
@@ -241,10 +241,10 @@ export default function UserEditModal({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   Trạng thái tài khoản
                   {user.status === 'PENDING_KYC' && (
-                    <span className="ml-1.5 text-[10px] font-normal text-amber-600 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
+                    <span className="ml-1.5 text-[10px] font-normal text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded px-1.5 py-0.5">
                       Hiện: Chờ KYC
                     </span>
                   )}
@@ -262,9 +262,9 @@ export default function UserEditModal({
               {/* KYC Status — read-only; only visible for STORE or PENDING_KYC */}
               {(form.role === 'STORE' || user.status === 'PENDING_KYC') && (
                 <div>
-                  <label className="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-1">
+                  <label className="flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Trạng thái KYC{' '}
-                    <span className="text-[10px] font-normal text-amber-600 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
+                    <span className="text-[10px] font-normal text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded px-1.5 py-0.5">
                       (Chỉ đọc)
                     </span>
                   </label>
@@ -284,13 +284,13 @@ export default function UserEditModal({
 
           {/* ── Thông tin cửa hàng (STORE only) ── */}
           {form.role === 'STORE' && (
-            <section className="border-t border-outline-variant/30 pt-5">
+            <section className="border-t border-outline-variant/30 dark:border-gray-700 pt-5">
               <p className={`${LABEL_CLASS} flex items-center gap-1.5`}>
                 <Store size={12} /> Thông tin cửa hàng
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Tên cửa hàng
                   </label>
                   <input
@@ -302,7 +302,7 @@ export default function UserEditModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Giờ mở cửa
                   </label>
                   <input
@@ -314,7 +314,7 @@ export default function UserEditModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Giờ đóng cửa
                   </label>
                   <input
@@ -326,7 +326,7 @@ export default function UserEditModal({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Địa chỉ cửa hàng
                   </label>
                   <input
@@ -340,7 +340,7 @@ export default function UserEditModal({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Mô tả
                   </label>
                   <textarea
@@ -357,18 +357,18 @@ export default function UserEditModal({
 
           {/* Error */}
           {error && (
-            <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 px-4 py-3 text-sm text-red-700 dark:text-red-400">
               {error}
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 flex justify-end gap-3">
           <button
             onClick={onClose}
             disabled={isSaving}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
             Hủy
           </button>

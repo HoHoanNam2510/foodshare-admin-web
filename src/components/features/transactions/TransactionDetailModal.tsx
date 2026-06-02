@@ -68,23 +68,23 @@ export default function TransactionDetailModal({
         onClick={onClose}
       />
 
-      <div className="relative bg-surface-lowest w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
+      <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50">
           <div>
-            <h2 className="text-lg font-sans font-bold text-gray-900 flex items-center gap-2">
-              <span className="font-mono text-sm text-gray-500">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <span className="font-mono text-sm text-gray-500 dark:text-gray-400">
                 #{transaction._id.slice(-8).toUpperCase()}
               </span>
               {getStatusBadge(transaction.status)}
             </h2>
-            <p className="text-xs font-body text-gray-500 mt-0.5">
+            <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-0.5">
               Thời gian tạo: {formatDate(transaction.createdAt)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -93,7 +93,7 @@ export default function TransactionDetailModal({
         {/* Body */}
         <div className="p-6 max-h-[70vh] overflow-y-auto font-body">
           {/* Admin warning */}
-          <div className="flex items-start gap-3 p-4 mb-6 rounded-md bg-yellow-50 border border-yellow-200 text-yellow-800">
+          <div className="flex items-start gap-3 p-4 mb-6 rounded-md bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/30 text-yellow-800 dark:text-yellow-300">
             <ShieldAlert size={20} className="shrink-0 mt-0.5" />
             <div className="text-sm">
               <p className="font-bold">Khu vực kiểm soát Admin</p>
@@ -106,27 +106,27 @@ export default function TransactionDetailModal({
           </div>
 
           {/* Transaction info grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface rounded-md border border-outline-variant/30">
-            <div className="col-span-2 border-b border-outline-variant/30 pb-3 mb-1">
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface dark:bg-gray-800 rounded-md border border-outline-variant/30 dark:border-gray-700">
+            <div className="col-span-2 border-b border-outline-variant/30 dark:border-gray-700 pb-3 mb-1">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                 Bài đăng tương ứng
               </p>
-              <p className="font-semibold text-gray-900 text-base">
+              <p className="font-semibold text-gray-900 dark:text-gray-100 text-base">
                 {transaction.postId?.title ?? 'Bài đăng đã bị xóa'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                 Loại & Thanh toán
               </p>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-900">
+                <span className="font-bold text-gray-900 dark:text-gray-100">
                   {transaction.type === 'REQUEST'
                     ? 'Xin đồ (P2P)'
                     : 'Mua hàng (B2C)'}
                 </span>
-                <span className="text-gray-300">|</span>
+                <span className="text-gray-300 dark:text-gray-600">|</span>
                 <span className="text-sm font-semibold flex items-center gap-1">
                   <CreditCard size={13} /> {transaction.paymentMethod}
                 </span>
@@ -134,7 +134,7 @@ export default function TransactionDetailModal({
             </div>
 
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                 Tổng tiền (SL: {transaction.quantity})
               </p>
               <p className="font-bold text-lg text-primary">
@@ -147,10 +147,10 @@ export default function TransactionDetailModal({
 
             {transaction.verificationCode && (
               <div className="col-span-2">
-                <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+                <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                   Mã xác minh QR
                 </p>
-                <p className="font-mono text-xs text-gray-700 bg-gray-100 px-3 py-1.5 rounded break-all">
+                <p className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded break-all">
                   {transaction.verificationCode}
                 </p>
               </div>
@@ -159,14 +159,14 @@ export default function TransactionDetailModal({
 
           {/* Parties */}
           <div className="grid grid-cols-2 gap-6 mb-6">
-            <div className="p-4 bg-surface-container/30 rounded-md border border-outline-variant/20">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">
+            <div className="p-4 bg-surface-container/30 dark:bg-gray-800/30 rounded-md border border-outline-variant/20 dark:border-gray-700">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
                 Người Cấp (Owner / Donor)
               </h3>
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold text-gray-800 dark:text-gray-200">
                 {transaction.ownerId?.fullName ?? 'Người dùng đã bị xóa'}
               </p>
-              <p className="text-sm text-gray-600 flex items-center gap-1.5 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-1">
                 <Mail size={13} /> {transaction.ownerId?.email ?? 'N/A'}
               </p>
             </div>
@@ -174,19 +174,19 @@ export default function TransactionDetailModal({
               <h3 className="text-sm font-bold text-primary mb-3 flex items-center gap-2">
                 <Receipt size={16} /> Người Nhận (Requester)
               </h3>
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold text-gray-800 dark:text-gray-200">
                 {transaction.requesterId?.fullName ?? 'Người dùng đã bị xóa'}
               </p>
-              <p className="text-sm text-gray-600 flex items-center gap-1.5 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-1">
                 <Mail size={13} /> {transaction.requesterId?.email ?? 'N/A'}
               </p>
             </div>
           </div>
 
           {/* Force-update status */}
-          <div className="border-t border-outline-variant/30 pt-4 mt-2">
+          <div className="border-t border-outline-variant/30 dark:border-gray-700 pt-4 mt-2">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-label text-gray-500 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Ép đổi trạng thái (Force Update)
               </p>
               <button
@@ -209,7 +209,7 @@ export default function TransactionDetailModal({
                     onChange={(e) =>
                       setNewStatus(e.target.value as ITransaction['status'])
                     }
-                    className="flex-1 p-2 bg-surface rounded-md border border-outline-variant/50 outline-none text-sm font-semibold"
+                    className="flex-1 p-2 bg-surface dark:bg-gray-800 rounded-md border border-outline-variant/50 dark:border-gray-600 outline-none text-sm font-semibold dark:text-gray-100"
                   >
                     {VALID_STATUSES.map((st) => (
                       <option key={st} value={st}>
@@ -233,10 +233,10 @@ export default function TransactionDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest flex justify-end">
+        <div className="px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors"
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
           >
             Đóng
           </button>

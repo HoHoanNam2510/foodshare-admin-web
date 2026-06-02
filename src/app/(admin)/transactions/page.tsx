@@ -121,7 +121,7 @@ export default function TransactionsManagementPage() {
       header: 'Mã GD & Bài đăng',
       render: (tx) => (
         <div className="flex flex-col min-w-50">
-          <span className="font-semibold text-gray-900 flex items-center gap-2 font-mono text-sm">
+          <span className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 font-mono text-sm">
             {tx._id.slice(-8).toUpperCase()}
             {activeTab === 'ALL' && (
               <span
@@ -151,7 +151,7 @@ export default function TransactionsManagementPage() {
               avatar={tx.requesterId?.avatar}
               size="sm"
             />
-            <span className="text-sm text-gray-800">
+            <span className="text-sm text-gray-800 dark:text-gray-200">
               {tx.requesterId?.fullName ?? 'Khách ẩn danh'}
             </span>
           </div>
@@ -164,7 +164,7 @@ export default function TransactionsManagementPage() {
               avatar={tx.ownerId?.avatar}
               size="sm"
             />
-            <span className="text-sm text-gray-800">
+            <span className="text-sm text-gray-800 dark:text-gray-200">
               {tx.ownerId?.fullName ?? 'Khách ẩn danh'}
             </span>
           </div>
@@ -177,7 +177,7 @@ export default function TransactionsManagementPage() {
       align: 'right',
       render: (tx) => (
         <div className="flex flex-col">
-          <span className="text-base text-gray-900 font-semibold">
+          <span className="text-base text-gray-900 dark:text-gray-100 font-semibold">
             {formatTransactionCurrency(
               (tx.postId?.price ?? 0) * tx.quantity,
               tx.paymentMethod
@@ -232,22 +232,22 @@ export default function TransactionsManagementPage() {
       />
 
       {/* Tabs — giữ nguyên vì mỗi tab có màu active riêng (Toolbar không hỗ trợ) */}
-      <div className="flex items-center gap-2 border-b border-outline-variant/30 pb-px">
+      <div className="flex items-center gap-2 border-b border-outline-variant/30 dark:border-gray-800 pb-px">
         <button
           onClick={() => handleTabChange('ALL')}
-          className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'ALL' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'ALL' ? 'border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
         >
           <Layers size={18} /> Tất cả giao dịch
         </button>
         <button
           onClick={() => handleTabChange('REQUEST')}
-          className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'REQUEST' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'REQUEST' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
         >
           <HeartHandshake size={18} /> P2P - Xin đồ miễn phí
         </button>
         <button
           onClick={() => handleTabChange('ORDER')}
-          className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'ORDER' ? 'border-secondary text-secondary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${activeTab === 'ORDER' ? 'border-secondary text-secondary' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
         >
           <ShoppingBag size={18} /> B2C - Mua túi mù
         </button>
@@ -283,9 +283,9 @@ export default function TransactionsManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

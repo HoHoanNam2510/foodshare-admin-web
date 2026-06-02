@@ -92,11 +92,11 @@ export default function ReportDetailModal({
         onClick={onClose}
       />
 
-      <div className="relative bg-surface-lowest w-full max-w-3xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in flex flex-col max-h-[90vh]">
+      <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-3xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50 shrink-0">
           <div>
-            <h2 className="text-lg font-sans font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               Báo cáo vi phạm #{report._id.slice(-8).toUpperCase()}
               <StatusBadge
                 status={report.status}
@@ -109,13 +109,13 @@ export default function ReportDetailModal({
                 }
               />
             </h2>
-            <p className="text-xs font-body text-gray-500 mt-0.5">
+            <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-0.5">
               Gửi lúc: {formatDate(report.createdAt)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -125,22 +125,22 @@ export default function ReportDetailModal({
         <div className="p-6 overflow-y-auto font-body flex-1">
           {/* Reporter & Target */}
           <div className="grid grid-cols-2 gap-6 mb-6">
-            <div className="p-4 bg-error/5 rounded-md border border-error/20">
+            <div className="p-4 bg-error/5 dark:bg-red-900/10 rounded-md border border-error/20 dark:border-red-900/30">
               <h3 className="text-sm font-bold text-error mb-3 flex items-center gap-2">
                 <AlertTriangle size={16} /> Người tố cáo
               </h3>
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold text-gray-800 dark:text-gray-200">
                 {report.reporterId.fullName}
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {report.reporterId.email}
               </p>
             </div>
-            <div className="p-4 bg-surface-container/30 rounded-md border border-outline-variant/30">
-              <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <div className="p-4 bg-surface-container/30 dark:bg-gray-800/30 rounded-md border border-outline-variant/30 dark:border-gray-700">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                 {getTargetIcon(report.targetType)} Đối tượng bị tố cáo
               </h3>
-              <p className="text-sm text-gray-500 mt-1 uppercase tracking-wider font-bold">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider font-bold">
                 {report.targetType}: {report.targetId}
               </p>
             </div>
@@ -149,22 +149,22 @@ export default function ReportDetailModal({
           {/* Reason & Description */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <p className="text-xs font-label text-gray-500 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Lý do & Mô tả
               </p>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider bg-surface text-gray-700 border-outline-variant/50">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider bg-surface dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-outline-variant/50 dark:border-gray-600">
                 {REASON_LABELS[report.reason] ||
                   report.reason.replace(/_/g, ' ')}
               </span>
             </div>
-            <p className="text-sm text-gray-800 leading-relaxed bg-surface/50 p-4 rounded-md border border-outline-variant/20">
+            <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed bg-surface/50 dark:bg-gray-800/50 p-4 rounded-md border border-outline-variant/20 dark:border-gray-700">
               {report.description}
             </p>
           </div>
 
           {/* Evidence images */}
           <div className="mb-8">
-            <p className="text-xs font-label text-gray-500 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+            <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
               <ImageIcon size={14} /> Bằng chứng đính kèm
             </p>
             {report.images && report.images.length > 0 ? (
@@ -172,7 +172,7 @@ export default function ReportDetailModal({
                 {report.images.map((img, idx) => (
                   <div
                     key={idx}
-                    className="w-32 h-32 shrink-0 rounded-md bg-surface border border-outline-variant/30 overflow-hidden"
+                    className="w-32 h-32 shrink-0 rounded-md bg-surface border border-outline-variant/30 dark:border-gray-700 overflow-hidden"
                   >
                     {img.startsWith('http') ? (
                       <Image
@@ -195,15 +195,15 @@ export default function ReportDetailModal({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500 italic bg-surface/50 p-3 rounded-md border border-outline-variant/20 inline-block">
+              <p className="text-sm text-gray-500 italic bg-surface/50 dark:bg-gray-800/50 p-3 rounded-md border border-outline-variant/20 inline-block">
                 Không có hình ảnh đính kèm.
               </p>
             )}
           </div>
 
           {/* Admin judgment */}
-          <div className="border-t-2 border-dashed border-outline-variant/50 pt-6">
-            <h3 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="border-t-2 border-dashed border-outline-variant/50 dark:border-gray-700 pt-6">
+            <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
               <ShieldAlert size={18} className="text-primary" /> Phán xử & Hành
               động
             </h3>
@@ -212,17 +212,17 @@ export default function ReportDetailModal({
               <div className="bg-primary/5 border border-primary/20 rounded-md p-4">
                 <div className="grid grid-cols-2 gap-4 mb-3">
                   <div>
-                    <span className="text-xs text-gray-500 block mb-1">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
                       Kết quả phán xử:
                     </span>
-                    <span className="font-bold text-gray-900">
+                    <span className="font-bold text-gray-900 dark:text-gray-100">
                       {report.status === 'RESOLVED'
                         ? 'Hợp lệ (Đã giải quyết)'
                         : 'Bác bỏ (Không hợp lệ)'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500 block mb-1">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
                       Hình phạt áp dụng:
                     </span>
                     <span className="font-bold text-error">
@@ -231,17 +231,17 @@ export default function ReportDetailModal({
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500 block mb-1">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
                     Ghi chú của Admin:
                   </span>
-                  <p className="text-sm font-medium text-gray-800 bg-surface-lowest p-3 rounded border border-outline-variant/30">
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200 bg-surface-lowest dark:bg-gray-900 p-3 rounded border border-outline-variant/30 dark:border-gray-700">
                     {report.resolutionNote}
                   </p>
                 </div>
-                <div className="mt-3 pt-3 border-t border-primary/10 text-xs text-gray-500 flex justify-between">
+                <div className="mt-3 pt-3 border-t border-primary/10 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
                   <span>
                     Xử lý bởi:{' '}
-                    <strong className="text-gray-900">
+                    <strong className="text-gray-900 dark:text-gray-100">
                       {report.resolvedBy?.fullName}
                     </strong>
                   </span>
@@ -251,10 +251,10 @@ export default function ReportDetailModal({
                 </div>
               </div>
             ) : (
-              <div className="bg-surface rounded-md p-5 border border-outline-variant/50">
+              <div className="bg-surface dark:bg-gray-800 rounded-md p-5 border border-outline-variant/50 dark:border-gray-700">
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
                       Trạng thái quyết định
                     </label>
                     <select
@@ -262,7 +262,7 @@ export default function ReportDetailModal({
                       onChange={(e) =>
                         setStatus(e.target.value as typeof status)
                       }
-                      className="w-full p-2.5 bg-surface-lowest border border-outline-variant/50 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full p-2.5 bg-surface-lowest dark:bg-gray-900 border border-outline-variant/50 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <option value="PENDING">-- Chọn kết luận --</option>
                       <option value="RESOLVED">Report Hợp Lệ (Xử phạt)</option>
@@ -270,7 +270,7 @@ export default function ReportDetailModal({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
                       Hình phạt áp dụng
                     </label>
                     <select
@@ -279,7 +279,7 @@ export default function ReportDetailModal({
                         setActionTaken(e.target.value as ReportAction)
                       }
                       disabled={status !== 'RESOLVED'}
-                      className="w-full p-2.5 bg-surface-lowest border border-outline-variant/50 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full p-2.5 bg-surface-lowest dark:bg-gray-900 border border-outline-variant/50 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <option value="NONE">Không phạt</option>
                       <option value="POST_HIDDEN">Ẩn bài viết</option>
@@ -290,7 +290,7 @@ export default function ReportDetailModal({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
                     Ghi chú giải quyết (Bắt buộc)
                   </label>
                   <textarea
@@ -298,7 +298,7 @@ export default function ReportDetailModal({
                     onChange={(e) => setResolutionNote(e.target.value)}
                     placeholder="Nhập lý do phán xử, bằng chứng xác minh thêm (nếu có)..."
                     rows={3}
-                    className="w-full p-3 bg-surface-lowest border border-outline-variant/50 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                    className="w-full p-3 bg-surface-lowest dark:bg-gray-900 border border-outline-variant/50 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
                 </div>
                 {error && <p className="mt-2 text-xs text-error">{error}</p>}
@@ -308,10 +308,10 @@ export default function ReportDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest shrink-0 flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 shrink-0 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors"
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
           >
             Đóng
           </button>

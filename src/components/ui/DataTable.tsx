@@ -131,14 +131,14 @@ export default function DataTable<T>({
 
   return (
     <div
-      className={`relative bg-surface-lowest rounded-lg shadow-soft border border-outline-variant/30 overflow-hidden ${className}`}
+      className={`relative bg-surface-lowest dark:bg-gray-900 rounded-2xl shadow-soft dark:shadow-none dark:border dark:border-gray-700 border border-outline-variant/30 overflow-hidden ${className}`}
     >
       {/* Overlay spinner — keeps table at its current size during reload */}
       {loading && data.length > 0 && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75 rounded-lg">
-          <div className="flex items-center gap-2.5 bg-white shadow-md rounded-xl px-4 py-2.5 border border-gray-100">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75 dark:bg-gray-950/75 rounded-lg">
+          <div className="flex items-center gap-2.5 bg-white dark:bg-gray-800 shadow-md rounded-xl px-4 py-2.5 border border-gray-100 dark:border-gray-700">
             <Loader2 size={16} className="animate-spin text-primary" />
-            <span className="text-sm font-medium text-gray-500">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Đang tải...
             </span>
           </div>
@@ -148,13 +148,13 @@ export default function DataTable<T>({
         <table className="w-full text-left font-body">
           {/* ── THEAD ── */}
           <thead
-            className={`bg-linear-to-r from-primary/5 to-primary-container/5 border-b border-outline-variant/30 ${headerClassName}`}
+            className={`bg-linear-to-r from-primary/5 to-primary-container/5 dark:from-transparent dark:to-transparent border-b border-outline-variant/30 dark:border-gray-800 ${headerClassName}`}
           >
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-5 py-4 font-label text-[11px] uppercase tracking-wider text-neutral-T40 font-semibold ${alignClass(col.align)} ${
+                  className={`px-5 py-4 font-label text-[11px] uppercase tracking-wider text-neutral-T40 dark:text-gray-400 font-semibold ${alignClass(col.align)} ${
                     col.sortable
                       ? 'cursor-pointer select-none hover:text-primary transition-colors'
                       : ''
@@ -182,7 +182,7 @@ export default function DataTable<T>({
 
           {/* ── TBODY ── */}
           <tbody
-            className={`divide-y divide-outline-variant/15 text-sm ${bodyClassName}`}
+            className={`divide-y divide-outline-variant/15 dark:divide-gray-800 text-sm ${bodyClassName}`}
           >
             {loading && data.length === 0 ? (
               <tr>
@@ -262,7 +262,7 @@ export default function DataTable<T>({
 
       {/* ── PAGINATION ── */}
       {pagination && pagination.totalPages > 1 && onPageChange && (
-        <div className="flex items-center justify-between px-5 py-3 border-t border-outline-variant/20 bg-surface/30">
+        <div className="flex items-center justify-between px-5 py-3 border-t border-outline-variant/20 dark:border-gray-800 bg-surface/30 dark:bg-gray-900/30">
           <p className="text-xs font-body text-neutral-T60">
             Hiển thị{' '}
             <span className="font-semibold text-neutral-T30">

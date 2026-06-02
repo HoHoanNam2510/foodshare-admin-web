@@ -81,7 +81,7 @@ export default function BroadcastHistoryPage() {
       key: 'id',
       header: 'Mã',
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
+        <span className="font-mono text-[11px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-md">
           #{item._id.slice(-8).toUpperCase()}
         </span>
       ),
@@ -90,7 +90,7 @@ export default function BroadcastHistoryPage() {
       key: 'title',
       header: 'Tiêu đề',
       render: (item) => (
-        <span className="font-medium text-gray-900 text-sm line-clamp-1">
+        <span className="font-medium text-gray-900 dark:text-gray-100 text-sm line-clamp-1">
           {item.title}
         </span>
       ),
@@ -100,7 +100,7 @@ export default function BroadcastHistoryPage() {
       header: 'Đối tượng',
       align: 'center',
       render: (item) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           {TARGET_ROLE_LABELS[item.targetRole]}
         </span>
       ),
@@ -110,7 +110,7 @@ export default function BroadcastHistoryPage() {
       header: 'Loại',
       align: 'center',
       render: (item) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           {NOTIFICATION_TYPE_LABELS[item.type]}
         </span>
       ),
@@ -120,7 +120,7 @@ export default function BroadcastHistoryPage() {
       header: 'Số người nhận',
       align: 'center',
       render: (item) => (
-        <span className="font-semibold text-gray-900 text-sm">
+        <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
           {item.recipientCount.toLocaleString('vi-VN')}
         </span>
       ),
@@ -129,7 +129,7 @@ export default function BroadcastHistoryPage() {
       key: 'admin',
       header: 'Người gửi',
       render: (item) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           {item.adminId?.fullName || item.adminId?.email || '—'}
         </span>
       ),
@@ -138,7 +138,7 @@ export default function BroadcastHistoryPage() {
       key: 'sentAt',
       header: 'Ngày gửi',
       render: (item) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           {formatDateTime(item.sentAt)}
         </span>
       ),
@@ -162,9 +162,9 @@ export default function BroadcastHistoryPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible"
+        className="rounded-2xl"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
       />

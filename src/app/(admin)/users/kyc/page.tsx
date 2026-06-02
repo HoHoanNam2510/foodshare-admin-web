@@ -41,7 +41,7 @@ const getKycBadge = (status: string) => {
   switch (status) {
     case 'PENDING':
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-yellow-900/20 text-amber-700 dark:text-yellow-400 border border-amber-200 dark:border-yellow-800/30">
           <Clock size={12} />
           Chờ duyệt
         </span>
@@ -70,7 +70,7 @@ const getPendingKycBadge = (status: string | null) => {
   switch (status) {
     case 'PENDING':
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/30">
           <RefreshCw size={12} />
           Tái duyệt đang chờ
         </span>
@@ -103,7 +103,7 @@ const getGracePeriodBadge = (endsAt: string | null) => {
     (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
   );
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800/30">
       <AlertTriangle size={12} />
       Gia hạn còn {daysLeft} ngày
     </span>
@@ -312,7 +312,7 @@ export default function KycReviewPage() {
       {/* ── CARDS ── */}
       <div className="grid gap-4">
         {loading ? (
-          <div className="flex flex-col items-center gap-3 py-16 text-gray-400">
+          <div className="flex flex-col items-center gap-3 py-16 text-gray-400 dark:text-gray-500">
             <Loader2 size={28} className="animate-spin" />
             <span className="text-sm font-body">Đang tải dữ liệu...</span>
           </div>
@@ -321,7 +321,7 @@ export default function KycReviewPage() {
         ) : users.length === 0 ? (
           <div className="py-16 text-center">
             <ShieldCheck size={48} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500 font-body text-sm">
+            <p className="text-gray-500 dark:text-gray-400 font-body text-sm">
               {kycFilter === 'NEW_REGISTRATION'
                 ? 'Không có đơn đăng ký mới nào đang chờ duyệt.'
                 : kycFilter === 'RESUBMISSION'
@@ -336,10 +336,10 @@ export default function KycReviewPage() {
             return (
               <div
                 key={user._id}
-                className={`bg-surface-lowest rounded-md shadow-sm border p-5 hover:shadow-soft transition-shadow ${
+                className={`bg-surface-lowest dark:bg-gray-900 rounded-md shadow-sm border p-5 hover:shadow-soft transition-shadow ${
                   resubmit
-                    ? 'border-blue-200 bg-blue-50/30'
-                    : 'border-outline-variant/30'
+                    ? 'border-blue-200 dark:border-blue-800/40 bg-blue-50/30 dark:bg-blue-900/10'
+                    : 'border-outline-variant/30 dark:border-gray-800'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -352,7 +352,7 @@ export default function KycReviewPage() {
                     <div className="flex-1 min-w-0">
                       {/* Name + badges */}
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-sans font-bold text-gray-900">
+                        <h3 className="font-sans font-bold text-gray-900 dark:text-gray-100">
                           {user.fullName}
                         </h3>
                         {resubmit ? (
@@ -367,7 +367,7 @@ export default function KycReviewPage() {
                       </div>
 
                       {/* Contact */}
-                      <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-500 font-body">
+                      <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-500 dark:text-gray-400 font-body">
                         <span className="flex items-center gap-1">
                           <Mail size={12} /> {user.email}
                         </span>
@@ -389,21 +389,25 @@ export default function KycReviewPage() {
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs font-body">
                             <div>
-                              <span className="text-gray-500">Tên: </span>
-                              <span className="font-semibold text-gray-900">
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Tên:{' '}
+                              </span>
+                              <span className="font-semibold text-gray-900 dark:text-gray-100">
                                 {user.storeInfo.businessName || 'N/A'}
                               </span>
                             </div>
                             <div>
-                              <span className="text-gray-500">Giờ: </span>
-                              <span className="font-semibold text-gray-900">
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Giờ:{' '}
+                              </span>
+                              <span className="font-semibold text-gray-900 dark:text-gray-100">
                                 {user.storeInfo.openHours || '?'} –{' '}
                                 {user.storeInfo.closeHours || '?'}
                               </span>
                             </div>
                             {user.storeInfo.businessAddress && (
                               <div className="col-span-2">
-                                <span className="text-gray-500 flex items-center gap-1">
+                                <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                   <MapPin size={11} />{' '}
                                   {user.storeInfo.businessAddress}
                                 </span>
@@ -411,7 +415,7 @@ export default function KycReviewPage() {
                             )}
                             {user.storeInfo.description && (
                               <div className="col-span-2">
-                                <span className="text-gray-500 italic">
+                                <span className="text-gray-500 dark:text-gray-400 italic">
                                   &quot;{user.storeInfo.description}&quot;
                                 </span>
                               </div>
@@ -445,7 +449,7 @@ export default function KycReviewPage() {
                         />
                       )}
 
-                      <p className="text-[11px] text-gray-400 font-body mt-2">
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 font-body mt-2">
                         Cập nhật: {formatDateTime(user.updatedAt)}
                       </p>
                     </div>
@@ -489,15 +493,15 @@ export default function KycReviewPage() {
 
       {/* ── PAGINATION ── */}
       {!loading && !error && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between bg-surface-lowest p-4 rounded-md shadow-sm border border-outline-variant/30">
-          <p className="text-xs font-body text-gray-500">
+        <div className="flex items-center justify-between bg-surface-lowest dark:bg-gray-900 p-4 rounded-md shadow-sm border border-outline-variant/30 dark:border-gray-800">
+          <p className="text-xs font-body text-gray-500 dark:text-gray-400">
             Hiển thị{' '}
-            <span className="font-semibold text-gray-700">
+            <span className="font-semibold text-gray-700 dark:text-gray-300">
               {(pagination.page - 1) * pagination.limit + 1}–
               {Math.min(pagination.page * pagination.limit, pagination.total)}
             </span>{' '}
             trong tổng số{' '}
-            <span className="font-semibold text-gray-700">
+            <span className="font-semibold text-gray-700 dark:text-gray-300">
               {pagination.total}
             </span>
           </p>
@@ -506,7 +510,7 @@ export default function KycReviewPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md text-gray-500 hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-surface-container dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
@@ -539,7 +543,7 @@ export default function KycReviewPage() {
                     className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
                       currentPage === p
                         ? 'bg-primary text-white'
-                        : 'text-gray-600 hover:bg-surface-container'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-surface-container dark:hover:bg-gray-800'
                     }`}
                   >
                     {p}
@@ -552,7 +556,7 @@ export default function KycReviewPage() {
                 setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))
               }
               disabled={currentPage === pagination.totalPages}
-              className="p-1.5 rounded-md text-gray-500 hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-surface-container dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight size={16} />
             </button>

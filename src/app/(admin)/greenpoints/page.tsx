@@ -79,10 +79,12 @@ export default function GreenPointsManagementPage() {
             size="md"
           />
           <div className="flex flex-col min-w-0">
-            <span className="font-semibold text-gray-900 line-clamp-1">
+            <span className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
               {log.userId?.fullName || 'N/A'}
             </span>
-            <span className="text-xs text-gray-500">{log.userId?.email}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {log.userId?.email}
+            </span>
           </div>
         </div>
       ),
@@ -97,7 +99,9 @@ export default function GreenPointsManagementPage() {
       header: 'Lý do',
       maxWidth: 'max-w-xs',
       render: (log) => (
-        <span className="text-gray-800 line-clamp-2">{log.reason}</span>
+        <span className="text-gray-800 dark:text-gray-200 line-clamp-2">
+          {log.reason}
+        </span>
       ),
     },
     {
@@ -116,7 +120,7 @@ export default function GreenPointsManagementPage() {
       key: 'createdAt',
       header: 'Thời gian',
       render: (log) => (
-        <span className="text-sm text-gray-600 whitespace-nowrap">
+        <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
           {formatDateTime(log.createdAt)}
         </span>
       ),
@@ -138,31 +142,35 @@ export default function GreenPointsManagementPage() {
 
       {pagination && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-surface-lowest border border-outline-variant/30 rounded-md p-4 shadow-sm">
-            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1">
+          <div className="bg-surface-lowest dark:bg-gray-900 border border-outline-variant/30 dark:border-gray-800 rounded-md p-4 shadow-sm">
+            <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
               Tổng giao dịch
             </p>
-            <p className="text-2xl font-sans font-bold text-gray-900">
+            <p className="text-2xl font-sans font-bold text-gray-900 dark:text-gray-100">
               {pagination.total.toLocaleString('vi-VN')}
             </p>
           </div>
-          <div className="bg-surface-lowest border border-primary/20 rounded-md p-4 shadow-sm">
+          <div className="bg-surface-lowest dark:bg-gray-900 border border-primary/20 dark:border-primary/30 rounded-md p-4 shadow-sm">
             <p className="text-xs font-label text-primary uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <TrendingUp size={12} /> Cộng điểm
             </p>
             <p className="text-2xl font-sans font-bold text-primary">
               {logs.filter((l) => l.amount > 0).length}
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">trên trang này</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              trên trang này
+            </p>
           </div>
-          <div className="bg-surface-lowest border border-error/20 rounded-md p-4 shadow-sm">
+          <div className="bg-surface-lowest dark:bg-gray-900 border border-error/20 dark:border-error/30 rounded-md p-4 shadow-sm">
             <p className="text-xs font-label text-error uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <TrendingDown size={12} /> Trừ điểm
             </p>
             <p className="text-2xl font-sans font-bold text-error">
               {logs.filter((l) => l.amount < 0).length}
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">trên trang này</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              trên trang này
+            </p>
           </div>
         </div>
       )}
@@ -182,9 +190,9 @@ export default function GreenPointsManagementPage() {
         currentPage={currentPage}
         onPageChange={setCurrentPage}
         onRowClick={setSelectedLog}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors cursor-pointer"
       />

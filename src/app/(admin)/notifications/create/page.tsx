@@ -72,29 +72,29 @@ export default function CreateNotificationPage() {
       />
 
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-green-800 text-sm">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-xl p-4 text-green-800 dark:text-green-400 text-sm">
           Gửi broadcast thông báo thành công!
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800 text-sm">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-xl p-4 text-red-800 dark:text-red-400 text-sm">
           {error}
         </div>
       )}
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl border border-gray-200 p-6 space-y-6"
+        className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-6"
       >
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Đối tượng nhận <span className="text-error">*</span>
           </label>
           <select
             value={targetRole}
             onChange={(e) => setTargetRole(e.target.value as TargetRole)}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             required
           >
             {TARGET_ROLE_OPTIONS.map((option) => (
@@ -106,7 +106,7 @@ export default function CreateNotificationPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Loại thông báo <span className="text-error">*</span>
           </label>
           <select
@@ -114,7 +114,7 @@ export default function CreateNotificationPage() {
             onChange={(e) =>
               setNotificationType(e.target.value as NotificationType)
             }
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             required
           >
             {NOTIFICATION_TYPE_OPTIONS.map((option) => (
@@ -126,7 +126,7 @@ export default function CreateNotificationPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Tiêu đề <span className="text-error">*</span>
           </label>
           <input
@@ -134,14 +134,14 @@ export default function CreateNotificationPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Nhập tiêu đề thông báo"
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             required
             maxLength={255}
           />
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Nội dung <span className="text-error">*</span>
           </label>
           <textarea
@@ -149,7 +149,7 @@ export default function CreateNotificationPage() {
             onChange={(e) => setBody(e.target.value)}
             placeholder="Nhập nội dung thông báo"
             rows={4}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-y"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-y"
             required
             maxLength={1000}
           />

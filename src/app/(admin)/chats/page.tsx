@@ -80,13 +80,13 @@ export default function ChatsManagementPage() {
       header: 'Mã Chat & Giao dịch',
       render: (chat) => (
         <div className="flex flex-col min-w-37.5">
-          <span className="font-semibold text-gray-900 flex items-center gap-1.5">
+          <span className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1.5">
             <MessageSquare size={14} className="text-primary" />
             <span className="font-mono text-xs">
               {chat._id.slice(-10).toUpperCase()}
             </span>
           </span>
-          <span className="text-xs text-gray-500 mt-0.5">
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             Ref:{' '}
             {chat.transactionId
               ? chat.transactionId.toString().slice(-8).toUpperCase()
@@ -104,11 +104,13 @@ export default function ChatsManagementPage() {
             <div key={p._id} className="flex items-center gap-2">
               <UserAvatar fullName={p.fullName} avatar={p.avatar} size="sm" />
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-800 line-clamp-1">
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-1">
                   {p.fullName}
                 </span>
                 {p.email && (
-                  <span className="text-[10px] text-gray-400">{p.email}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                    {p.email}
+                  </span>
                 )}
               </div>
             </div>
@@ -122,7 +124,7 @@ export default function ChatsManagementPage() {
       maxWidth: 'max-w-[250px]',
       render: (chat) =>
         chat.lastMessage ? (
-          <span className="text-gray-900 text-sm line-clamp-2 italic">
+          <span className="text-gray-900 dark:text-gray-200 text-sm line-clamp-2 italic">
             &quot;
             {chat.lastMessage.messageType === 'IMAGE'
               ? '[Hình ảnh]'
@@ -132,7 +134,9 @@ export default function ChatsManagementPage() {
             &quot;
           </span>
         ) : (
-          <span className="text-gray-400 italic text-sm">Chưa có tin nhắn</span>
+          <span className="text-gray-400 dark:text-gray-500 italic text-sm">
+            Chưa có tin nhắn
+          </span>
         ),
     },
     {
@@ -150,7 +154,7 @@ export default function ChatsManagementPage() {
       key: 'updatedAt',
       header: 'Cập nhật',
       render: (chat) => (
-        <span className="text-gray-500 text-xs">
+        <span className="text-gray-500 dark:text-gray-400 text-xs">
           {formatDateTime(chat.updatedAt)}
         </span>
       ),
@@ -221,9 +225,9 @@ export default function ChatsManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

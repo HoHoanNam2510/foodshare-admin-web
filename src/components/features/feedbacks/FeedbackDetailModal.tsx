@@ -40,10 +40,12 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
-  CRITICAL: 'bg-red-100 text-red-800 border-red-300',
-  HIGH: 'bg-orange-50 text-orange-700 border-orange-200',
-  MEDIUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  LOW: 'bg-gray-100 text-gray-600 border-gray-200',
+  CRITICAL:
+    'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-300 dark:border-red-800/50',
+  HIGH: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/30',
+  MEDIUM:
+    'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/30',
+  LOW: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700',
 };
 
 export default function FeedbackDetailModal({
@@ -104,11 +106,11 @@ export default function FeedbackDetailModal({
           onClick={onClose}
         />
 
-        <div className="relative bg-surface-lowest w-full max-w-4xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in flex flex-col max-h-[90vh]">
+        <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-4xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in flex flex-col max-h-[90vh]">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50 shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50 shrink-0">
             <div>
-              <h2 className="text-lg font-sans font-bold text-gray-900 flex items-center gap-2">
+              <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <MessageSquare size={18} className="text-primary" />
                 Ticket #{feedback._id.slice(-8).toUpperCase()}
                 <StatusBadge
@@ -116,13 +118,13 @@ export default function FeedbackDetailModal({
                   label={STATUS_LABELS[feedback.status] ?? feedback.status}
                 />
               </h2>
-              <p className="text-xs font-body text-gray-500 mt-0.5">
+              <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-0.5">
                 Gửi lúc: {formatDateTime(feedback.createdAt)}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
             >
               <X size={20} />
             </button>
@@ -133,8 +135,8 @@ export default function FeedbackDetailModal({
             {/* ── Left column: Info ── */}
             <div className="flex-1 overflow-y-auto p-6 border-r border-outline-variant/20 flex flex-col gap-5">
               {/* User info */}
-              <div className="p-4 bg-surface-container/30 rounded-md border border-outline-variant/30">
-                <h3 className="text-xs font-label font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <div className="p-4 bg-surface-container/30 dark:bg-gray-800/30 rounded-md border border-outline-variant/30 dark:border-gray-700">
+                <h3 className="text-xs font-label font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                   <User size={13} /> Người gửi
                 </h3>
                 <div className="flex items-center gap-3">
@@ -144,10 +146,10 @@ export default function FeedbackDetailModal({
                     size="lg"
                   />
                   <div className="flex flex-col gap-0.5">
-                    <span className="font-sans font-bold text-gray-900">
+                    <span className="font-sans font-bold text-gray-900 dark:text-gray-100">
                       {feedback.userId.fullName}
                     </span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {feedback.userId.email}
                     </span>
                     {feedback.userId.phoneNumber && (
@@ -168,7 +170,7 @@ export default function FeedbackDetailModal({
               <div className="flex items-center gap-3">
                 <div>
                   <span className="text-xs text-gray-400 block mb-1">Loại</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider bg-gray-100 text-gray-700 border-gray-200">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700">
                     {TYPE_LABELS[feedback.type] ?? feedback.type}
                   </span>
                 </div>
@@ -186,25 +188,25 @@ export default function FeedbackDetailModal({
 
               {/* Title + Content */}
               <div>
-                <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1.5">
+                <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                   Tiêu đề
                 </p>
-                <p className="font-sans font-bold text-gray-900 text-base">
+                <p className="font-sans font-bold text-gray-900 dark:text-gray-100 text-base">
                   {feedback.title}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1.5">
+                <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                   Nội dung
                 </p>
-                <p className="text-sm text-gray-700 leading-relaxed bg-surface/50 p-4 rounded-md border border-outline-variant/20 whitespace-pre-wrap">
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-surface/50 dark:bg-gray-800/50 p-4 rounded-md border border-outline-variant/20 whitespace-pre-wrap">
                   {feedback.content}
                 </p>
               </div>
 
               {/* Attachments */}
               <div>
-                <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                   <Paperclip size={13} /> Ảnh đính kèm (
                   {feedback.attachments.length})
                 </p>
@@ -214,7 +216,7 @@ export default function FeedbackDetailModal({
                       <button
                         key={`${url}-${idx}`}
                         onClick={() => setLightboxUrl(url)}
-                        className="w-24 h-24 rounded-md overflow-hidden border border-outline-variant/30 hover:border-primary/50 hover:ring-2 hover:ring-primary/20 transition-all"
+                        className="w-24 h-24 rounded-md overflow-hidden border border-outline-variant/30 dark:border-gray-700 hover:border-primary/50 hover:ring-2 hover:ring-primary/20 transition-all"
                       >
                         <Image
                           src={url}
@@ -252,11 +254,11 @@ export default function FeedbackDetailModal({
               {/* Context metadata */}
               {(feedback.contextMetadata?.appVersion ||
                 feedback.contextMetadata?.os) && (
-                <div className="bg-surface/50 rounded-md border border-outline-variant/20 p-3 text-xs text-gray-500 flex flex-wrap gap-4">
+                <div className="bg-surface/50 dark:bg-gray-800/50 rounded-md border border-outline-variant/20 p-3 text-xs text-gray-500 dark:text-gray-400 flex flex-wrap gap-4">
                   {feedback.contextMetadata.os && (
                     <span>
                       Hệ điều hành:{' '}
-                      <strong className="text-gray-700 uppercase">
+                      <strong className="text-gray-700 dark:text-gray-300 uppercase">
                         {feedback.contextMetadata.os}
                       </strong>
                     </span>
@@ -264,7 +266,7 @@ export default function FeedbackDetailModal({
                   {feedback.contextMetadata.appVersion && (
                     <span>
                       Phiên bản app:{' '}
-                      <strong className="text-gray-700">
+                      <strong className="text-gray-700 dark:text-gray-300">
                         {feedback.contextMetadata.appVersion}
                       </strong>
                     </span>
@@ -276,7 +278,7 @@ export default function FeedbackDetailModal({
             {/* ── Right column: Action form ── */}
             <div className="w-80 shrink-0 p-6 flex flex-col gap-5 overflow-y-auto">
               <div>
-                <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-2">
+                <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                   Trạng thái hiện tại
                 </p>
                 <StatusBadge
@@ -288,7 +290,7 @@ export default function FeedbackDetailModal({
               {/* PENDING: assign button */}
               {feedback.status === 'PENDING' && (
                 <div className="flex flex-col gap-3">
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                     Tiếp nhận ticket để bắt đầu xử lý phản hồi này.
                   </p>
                   <button
@@ -310,7 +312,7 @@ export default function FeedbackDetailModal({
               {feedback.status === 'PROCESSING' && (
                 <div className="flex flex-col gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
                       Phản hồi cho người dùng{' '}
                       <span className="text-error">*</span>
                     </label>
@@ -322,7 +324,7 @@ export default function FeedbackDetailModal({
                       }}
                       placeholder="Nhập nội dung phản hồi (tối thiểu 10 ký tự)..."
                       rows={6}
-                      className="w-full p-3 bg-surface-lowest border border-outline-variant/50 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                      className="w-full p-3 bg-surface-lowest dark:bg-gray-900 border border-outline-variant/50 dark:border-gray-600 rounded-md text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                     <p className="text-right text-xs text-gray-400 mt-1">
                       {adminReply.length} ký tự
@@ -347,25 +349,25 @@ export default function FeedbackDetailModal({
               {feedback.status === 'CLOSED' && (
                 <div className="flex flex-col gap-3">
                   <div>
-                    <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-1.5">
+                    <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                       Phản hồi của Admin
                     </p>
-                    <p className="text-sm text-gray-800 leading-relaxed bg-green-50 p-4 rounded-md border border-green-200 whitespace-pre-wrap">
+                    <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed bg-green-50 dark:bg-green-900/20 p-4 rounded-md border border-green-200 dark:border-green-800/30 whitespace-pre-wrap">
                       {feedback.adminReply ?? '—'}
                     </p>
                   </div>
                   {feedback.resolvedAt && (
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
                       Đóng lúc:{' '}
-                      <strong className="text-gray-600">
+                      <strong className="text-gray-600 dark:text-gray-300">
                         {formatDateTime(feedback.resolvedAt)}
                       </strong>
                     </p>
                   )}
                   {feedback.adminId && (
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
                       Xử lý bởi:{' '}
-                      <strong className="text-gray-600">
+                      <strong className="text-gray-600 dark:text-gray-300">
                         {feedback.adminId.fullName}
                       </strong>
                     </p>
@@ -382,10 +384,10 @@ export default function FeedbackDetailModal({
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-3 border-t border-outline-variant/30 bg-surface-lowest shrink-0 flex justify-end">
+          <div className="px-6 py-3 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 shrink-0 flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors"
+              className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
             >
               Đóng
             </button>
@@ -396,7 +398,7 @@ export default function FeedbackDetailModal({
       {/* Lightbox */}
       {lightboxUrl && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/80"
           onClick={() => setLightboxUrl(null)}
         >
           <button

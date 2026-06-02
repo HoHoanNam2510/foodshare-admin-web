@@ -81,7 +81,7 @@ export default function EditPostModal({
 
   const field = (label: string, children: React.ReactNode) => (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-label text-gray-500 uppercase tracking-wider">
+      <label className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider">
         {label}
       </label>
       {children}
@@ -89,7 +89,7 @@ export default function EditPostModal({
   );
 
   const inputClass =
-    'w-full px-3 py-2 text-sm border border-outline-variant/50 rounded-md bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30 text-gray-900';
+    'w-full px-3 py-2 text-sm border border-outline-variant/50 dark:border-gray-600 rounded-md bg-surface dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 text-gray-900 dark:text-gray-100';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -101,22 +101,22 @@ export default function EditPostModal({
       <form
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-surface-lowest w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in"
+        className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50">
           <div>
-            <h2 className="text-lg font-sans font-bold text-gray-900">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100">
               Chỉnh sửa bài đăng
             </h2>
-            <p className="text-xs font-body text-gray-500 mt-0.5 truncate max-w-xs">
+            <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-xs">
               {post.title}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -253,11 +253,11 @@ export default function EditPostModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors"
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
           >
             Hủy
           </button>

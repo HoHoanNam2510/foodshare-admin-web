@@ -136,7 +136,9 @@ export default function CategoriesPage() {
           />
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-gray-900">{cat.name}</span>
+              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                {cat.name}
+              </span>
               {cat.isSystem && (
                 <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold font-label text-primary">
                   Hệ thống
@@ -264,8 +266,8 @@ export default function CategoriesPage() {
         loading={loading}
         error={error}
         emptyMessage="Chưa có danh mục nào."
-        className="rounded-md overflow-visible relative"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        className="rounded-2xl relative"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

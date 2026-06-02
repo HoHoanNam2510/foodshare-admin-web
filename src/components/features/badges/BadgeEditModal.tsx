@@ -121,18 +121,18 @@ export default function BadgeEditModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-surface-lowest w-full max-w-lg rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
+      <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-lg rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50">
           <div className="flex items-center gap-2">
             <Award size={18} className="text-primary" />
-            <h2 className="text-lg font-sans font-bold text-gray-900">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100">
               {isNew ? 'Tạo huy hiệu mới' : 'Chỉnh sửa huy hiệu'}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-surface-container text-gray-500 hover:text-gray-700 transition-colors"
+            className="p-1.5 rounded-md hover:bg-surface-container dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:hover:text-gray-100 transition-colors"
           >
             <X size={18} />
           </button>
@@ -146,7 +146,7 @@ export default function BadgeEditModal({
           {/* Image preview */}
           {form.imageUrl && (
             <div className="flex justify-center">
-              <div className="w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center overflow-hidden border border-outline-variant/30">
+              <div className="w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center overflow-hidden border border-outline-variant/30 dark:border-gray-700">
                 <Image
                   src={form.imageUrl}
                   alt={form.name}
@@ -229,7 +229,7 @@ export default function BadgeEditModal({
                 </select>
               ) : (
                 <p
-                  className={`${inputCls} bg-surface-container text-gray-500 cursor-not-allowed`}
+                  className={`${inputCls} bg-surface-container dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed`}
                 >
                   {TARGET_ROLE_LABELS[form.targetRole]}
                 </p>
@@ -255,7 +255,7 @@ export default function BadgeEditModal({
                 </select>
               ) : (
                 <p
-                  className={`${inputCls} bg-surface-container text-gray-500 cursor-not-allowed`}
+                  className={`${inputCls} bg-surface-container dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed`}
                 >
                   {TRIGGER_EVENT_LABELS[form.triggerEvent]}
                 </p>
@@ -298,11 +298,11 @@ export default function BadgeEditModal({
         </form>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant/30 bg-surface/50">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-body text-gray-600 border border-outline-variant/50 rounded-md hover:bg-surface-container transition-colors"
+            className="px-4 py-2 text-sm font-body text-gray-600 border border-outline-variant/50 rounded-md hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
           >
             Hủy
           </button>
@@ -336,7 +336,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-label font-semibold text-gray-600 uppercase tracking-wide">
+      <label className="text-xs font-label font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
         {label}
         {required && <span className="text-error ml-0.5">*</span>}
       </label>
@@ -346,4 +346,4 @@ function Field({
 }
 
 const inputCls =
-  'w-full px-3 py-2 text-sm font-body rounded-md border border-outline-variant/50 bg-surface outline-none focus:ring-2 focus:ring-primary/40 focus:-translate-y-0.5 transition-all';
+  'w-full px-3 py-2 text-sm font-body rounded-md border border-outline-variant/50 dark:border-gray-600 bg-surface dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-primary/40 focus:-translate-y-0.5 transition-all';

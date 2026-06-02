@@ -1,6 +1,7 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { useTheme } from 'next-themes';
 import {
   ResponsiveContainer,
   BarChart,
@@ -32,8 +33,10 @@ interface TooltipProps {
 function CustomTooltip({ active, payload, label }: TooltipProps) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-surface-lowest border border-outline-variant/50 p-3 rounded-2xl shadow-hover">
-        <p className="font-label text-xs text-gray-500 mb-1">{label}</p>
+      <div className="bg-surface-lowest dark:bg-gray-900 border border-outline-variant/50 dark:border-gray-700 p-3 rounded-2xl shadow-hover">
+        <p className="font-label text-xs text-gray-500 dark:text-gray-400 mb-1">
+          {label}
+        </p>
         <p className="font-body text-sm font-bold text-primary">
           Số lượng: {payload[0].value}
         </p>
@@ -43,9 +46,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps) {
   return null;
 }
 
-// Màu primary từ hệ thống: #296C24
 const PRIMARY_COLOR = '#296C24';
-
 const subscribe = () => () => {};
 
 export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
@@ -54,10 +55,16 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
     () => true,
     () => false
   );
+  const { resolvedTheme } = useTheme();
 
   if (!isClient) {
     return <div className="w-full h-75" />;
   }
+
+  const isDark = resolvedTheme === 'dark';
+  const gridColor = isDark ? '#374151' : '#e5e7eb';
+  const cursorColor = isDark ? '#1f2937' : '#f9fafb';
+  const tickColor = '#9ca3af';
 
   return (
     <div className="w-full">
@@ -70,21 +77,24 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
-              stroke="#E1E3E2"
+              stroke={gridColor}
             />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#8F9190' }}
+              tick={{ fontSize: 12, fill: tickColor }}
               dy={10}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#8F9190' }}
+              tick={{ fontSize: 12, fill: tickColor }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F8F9F8' }} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: cursorColor }}
+            />
             <Bar
               dataKey="total"
               fill={PRIMARY_COLOR}
@@ -100,19 +110,19 @@ export default function GrowthChart({ data, type = 'bar' }: GrowthChartProps) {
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
-              stroke="#E1E3E2"
+              stroke={gridColor}
             />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#8F9190' }}
+              tick={{ fontSize: 12, fill: tickColor }}
               dy={10}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#8F9190' }}
+              tick={{ fontSize: 12, fill: tickColor }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line

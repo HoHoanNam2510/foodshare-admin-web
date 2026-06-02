@@ -305,7 +305,7 @@ export default function TrashPage() {
       key: 'id',
       header: 'ID',
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
+        <span className="font-mono text-[11px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-md">
           #{item._id.slice(-8).toUpperCase()}
         </span>
       ),
@@ -325,11 +325,11 @@ export default function TrashPage() {
               size="md"
             />
             <div className="flex flex-col min-w-0">
-              <span className="font-medium text-gray-900 text-sm line-clamp-1">
+              <span className="font-medium text-gray-900 dark:text-gray-100 text-sm line-clamp-1">
                 {primary}
               </span>
               {secondary && (
-                <span className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                <span className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
                   {secondary}
                 </span>
               )}
@@ -342,7 +342,7 @@ export default function TrashPage() {
       key: 'deletedAt',
       header: 'Ngày xóa',
       render: (item) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           {item.deletedAt ? formatDateTime(item.deletedAt) : '—'}
         </span>
       ),
@@ -351,7 +351,7 @@ export default function TrashPage() {
       key: 'deletedBy',
       header: 'Người xóa',
       render: (item) => (
-        <span className="font-mono text-[11px] text-gray-400">
+        <span className="font-mono text-[11px] text-gray-400 dark:text-gray-500">
           {item.deletedBy
             ? String(item.deletedBy).slice(-8).toUpperCase()
             : '—'}
@@ -431,7 +431,7 @@ export default function TrashPage() {
         action={
           <button
             onClick={loadItems}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:border-primary hover:text-primary transition"
+            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-400 hover:border-primary hover:text-primary transition"
           >
             <RefreshCw size={14} />
             Làm mới
@@ -440,7 +440,7 @@ export default function TrashPage() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
         {TABS.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -450,8 +450,8 @@ export default function TrashPage() {
             }}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold transition ${
               activeTab === key
-                ? 'bg-white text-primary shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
             <Icon size={14} />
@@ -462,24 +462,28 @@ export default function TrashPage() {
 
       {/* Filters + count row */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2">
+        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-2">
           <Calendar size={14} className="text-gray-400 shrink-0" />
-          <span className="text-xs text-gray-400 shrink-0">Từ</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
+            Từ
+          </span>
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="text-sm text-gray-700 bg-transparent outline-none w-32"
+            className="text-sm text-gray-700 dark:text-gray-300 bg-transparent outline-none w-32"
           />
         </div>
-        <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2">
+        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-2">
           <Calendar size={14} className="text-gray-400 shrink-0" />
-          <span className="text-xs text-gray-400 shrink-0">Đến</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
+            Đến
+          </span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="text-sm text-gray-700 bg-transparent outline-none w-32"
+            className="text-sm text-gray-700 dark:text-gray-300 bg-transparent outline-none w-32"
           />
         </div>
         {(dateFrom || dateTo) && (
@@ -494,9 +498,9 @@ export default function TrashPage() {
           </button>
         )}
         {pagination && (
-          <span className="ml-auto text-sm text-gray-500">
+          <span className="ml-auto text-sm text-gray-500 dark:text-gray-400">
             Tổng:{' '}
-            <span className="font-semibold text-gray-800">
+            <span className="font-semibold text-gray-800 dark:text-gray-200">
               {pagination.total.toLocaleString('vi-VN')}
             </span>{' '}
             bản ghi
@@ -505,9 +509,12 @@ export default function TrashPage() {
       </div>
 
       {/* Warning */}
-      <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-        <AlertTriangle size={15} className="text-amber-600 shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-800 leading-relaxed">
+      <div className="flex items-start gap-3 bg-amber-50 dark:bg-yellow-900/20 border border-amber-200 dark:border-yellow-800/30 rounded-xl px-4 py-3">
+        <AlertTriangle
+          size={15}
+          className="text-amber-600 dark:text-yellow-400 shrink-0 mt-0.5"
+        />
+        <p className="text-xs text-amber-800 dark:text-yellow-300 leading-relaxed">
           Dữ liệu trong thùng rác sẽ tự động bị xóa vĩnh viễn sau thời gian lưu
           trữ đã cấu hình.{' '}
           <a

@@ -18,6 +18,7 @@ import {
   type IConversation,
   type IMessage,
 } from '@/lib/chatApi';
+import UserAvatar from '@/components/ui/UserAvatar';
 
 interface ChatDetailModalProps {
   chat: IConversation | null;
@@ -85,11 +86,11 @@ export default function ChatDetailModal({
                 alt="Hình ảnh"
                 width={192}
                 height={128}
-                className="object-cover rounded-md border border-outline-variant/30"
+                className="object-cover rounded-md border border-outline-variant/30 dark:border-gray-700"
                 unoptimized
               />
             ) : (
-              <div className="w-48 h-32 bg-surface-container rounded-md flex items-center justify-center border border-outline-variant/30">
+              <div className="w-48 h-32 bg-surface-container rounded-md flex items-center justify-center border border-outline-variant/30 dark:border-gray-700">
                 <ImageIcon size={24} className="text-gray-400" />
               </div>
             )}
@@ -98,12 +99,12 @@ export default function ChatDetailModal({
         );
       case 'LOCATION':
         return (
-          <div className="flex items-center gap-2 p-2 bg-surface rounded border border-outline-variant/30">
+          <div className="flex items-center gap-2 p-2 bg-surface rounded border border-outline-variant/30 dark:border-gray-700">
             <MapPin size={20} className="text-error" />
-            <div className="flex flex-col text-sm text-gray-800">
+            <div className="flex flex-col text-sm text-gray-800 dark:text-gray-200">
               <span className="font-semibold">{msg.content}</span>
               {msg.location && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   {msg.location.latitude}, {msg.location.longitude}
                 </span>
               )}
@@ -122,11 +123,11 @@ export default function ChatDetailModal({
         onClick={onClose}
       />
 
-      <div className="relative bg-surface-lowest w-full max-w-3xl h-[85vh] rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in flex flex-col">
+      <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-3xl h-[85vh] rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50 shrink-0">
           <div>
-            <h2 className="text-lg font-sans font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <MessageSquare size={20} className="text-primary" />
               Hội thoại #{chat._id.slice(-10).toUpperCase()}
               {isLocked && (
@@ -135,9 +136,9 @@ export default function ChatDetailModal({
                 </span>
               )}
             </h2>
-            <p className="text-xs font-body text-gray-500 mt-1">
+            <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-1">
               Giao dịch liên quan:{' '}
-              <span className="font-semibold text-gray-800">
+              <span className="font-semibold text-gray-800 dark:text-gray-200">
                 {chat.transactionId
                   ? chat.transactionId.toString().slice(-8).toUpperCase()
                   : 'Không có'}
@@ -146,24 +147,22 @@ export default function ChatDetailModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Participants */}
-        <div className="px-6 py-3 bg-surface-container/20 border-b border-outline-variant/30 shrink-0 flex items-center gap-6">
-          <span className="text-xs font-label text-gray-500 uppercase tracking-wider">
+        <div className="px-6 py-3 bg-surface-container/20 dark:bg-gray-800/20 border-b border-outline-variant/30 dark:border-gray-700 shrink-0 flex items-center gap-6">
+          <span className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             Thành viên:
           </span>
           {chat.participants.map((p, idx) => (
             <div key={p._id} className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">
-                {p.fullName.charAt(0)}
-              </div>
+              <UserAvatar fullName={p.fullName} avatar={p.avatar} size="sm" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-gray-800">
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                   {p.fullName}
                 </span>
                 {p.email && (
@@ -171,14 +170,14 @@ export default function ChatDetailModal({
                 )}
               </div>
               {idx < chat.participants.length - 1 && (
-                <span className="text-gray-300 ml-4">|</span>
+                <span className="text-gray-300 dark:text-gray-600 ml-4">|</span>
               )}
             </div>
           ))}
         </div>
 
         {/* Admin warning */}
-        <div className="px-6 py-2 bg-yellow-50 border-b border-yellow-200 text-yellow-800 text-xs flex items-center gap-2 shrink-0">
+        <div className="px-6 py-2 bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800/30 text-yellow-800 dark:text-yellow-300 text-xs flex items-center gap-2 shrink-0">
           <AlertTriangle size={14} className="shrink-0" />
           <span>
             Bạn đang xem lịch sử trò chuyện dưới tư cách Quản trị viên để kiểm
@@ -187,7 +186,7 @@ export default function ChatDetailModal({
         </div>
 
         {/* Message Body */}
-        <div className="flex-1 overflow-y-auto p-6 bg-surface space-y-4 font-body">
+        <div className="flex-1 overflow-y-auto p-6 bg-surface dark:bg-gray-800/50 space-y-4 font-body">
           {isLoadingMessages ? (
             <div className="flex items-center justify-center h-full text-gray-400 gap-2">
               <Loader2 size={20} className="animate-spin" />
@@ -208,7 +207,7 @@ export default function ChatDetailModal({
                   key={msg._id}
                   className={`flex flex-col ${isLeft ? 'items-start' : 'items-end'}`}
                 >
-                  <span className="text-[11px] text-gray-500 mb-1 px-1">
+                  <span className="text-[11px] text-gray-500 dark:text-gray-400 mb-1 px-1">
                     {senderName} •{' '}
                     {new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
                       hour: '2-digit',
@@ -218,8 +217,8 @@ export default function ChatDetailModal({
                   <div
                     className={`max-w-[70%] px-4 py-2.5 rounded-2xl ${
                       isLeft
-                        ? 'bg-surface-lowest border border-outline-variant/30 text-gray-800 rounded-tl-sm'
-                        : 'bg-primary/10 text-gray-900 border border-primary/20 rounded-tr-sm'
+                        ? 'bg-surface-lowest dark:bg-gray-900 border border-outline-variant/30 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-sm'
+                        : 'bg-primary/10 dark:bg-primary/20 text-gray-900 dark:text-gray-100 border border-primary/20 rounded-tr-sm'
                     }`}
                   >
                     {renderMessageContent(msg)}
@@ -231,10 +230,10 @@ export default function ChatDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest shrink-0 flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 shrink-0 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors"
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
           >
             Đóng
           </button>

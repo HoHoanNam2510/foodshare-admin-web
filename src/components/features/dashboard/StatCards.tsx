@@ -39,21 +39,21 @@ function buildCards(stats: OverviewStats, tab: TabId): StatCardDef[] {
         value: stats.users.active,
         icon: ShieldCheck,
         gradient: 'from-primary-T50 to-primary-T70',
-        iconBg: 'bg-primary-T90',
+        iconBg: 'bg-primary-T90 dark:bg-primary/15',
       },
       {
         label: 'Bị khóa',
         value: stats.users.banned,
         icon: Ban,
         gradient: 'from-error to-red-400',
-        iconBg: 'bg-red-50',
+        iconBg: 'bg-red-50 dark:bg-red-900/20',
       },
       {
         label: 'Chờ duyệt KYC',
         value: stats.users.pendingKyc,
         icon: Clock,
         gradient: 'from-secondary to-secondary-container',
-        iconBg: 'bg-secondary-T95',
+        iconBg: 'bg-secondary-T95 dark:bg-secondary/15',
       },
     ],
     posts: [
@@ -69,21 +69,21 @@ function buildCards(stats: OverviewStats, tab: TabId): StatCardDef[] {
         value: stats.posts.available,
         icon: Eye,
         gradient: 'from-primary-T50 to-primary-T70',
-        iconBg: 'bg-primary-T90',
+        iconBg: 'bg-primary-T90 dark:bg-primary/15',
       },
       {
         label: 'Chờ duyệt',
         value: stats.posts.pendingReview,
         icon: Clock,
         gradient: 'from-secondary to-secondary-container',
-        iconBg: 'bg-secondary-T95',
+        iconBg: 'bg-secondary-T95 dark:bg-secondary/15',
       },
       {
         label: 'Đã ẩn',
         value: stats.posts.hidden,
         icon: EyeOff,
         gradient: 'from-error to-red-400',
-        iconBg: 'bg-red-50',
+        iconBg: 'bg-red-50 dark:bg-red-900/20',
       },
     ],
     transactions: [
@@ -99,21 +99,21 @@ function buildCards(stats: OverviewStats, tab: TabId): StatCardDef[] {
         value: stats.transactions.completed,
         icon: CheckCircle,
         gradient: 'from-primary-T50 to-primary-T70',
-        iconBg: 'bg-primary-T90',
+        iconBg: 'bg-primary-T90 dark:bg-primary/15',
       },
       {
         label: 'Đang chờ',
         value: stats.transactions.pending,
         icon: Clock,
         gradient: 'from-secondary to-secondary-container',
-        iconBg: 'bg-secondary-T95',
+        iconBg: 'bg-secondary-T95 dark:bg-secondary/15',
       },
       {
         label: 'Tranh chấp',
         value: stats.transactions.disputed,
         icon: AlertOctagon,
         gradient: 'from-error to-red-400',
-        iconBg: 'bg-red-50',
+        iconBg: 'bg-red-50 dark:bg-red-900/20',
       },
     ],
     reports: [
@@ -129,21 +129,21 @@ function buildCards(stats: OverviewStats, tab: TabId): StatCardDef[] {
         value: stats.reports.pending,
         icon: Clock,
         gradient: 'from-secondary to-secondary-container',
-        iconBg: 'bg-secondary-T95',
+        iconBg: 'bg-secondary-T95 dark:bg-secondary/15',
       },
       {
         label: 'Đã giải quyết',
         value: stats.reports.resolved,
         icon: CheckCircle,
         gradient: 'from-primary-T50 to-primary-T70',
-        iconBg: 'bg-primary-T90',
+        iconBg: 'bg-primary-T90 dark:bg-primary/15',
       },
       {
         label: 'Đã bác bỏ',
         value: stats.reports.dismissed,
         icon: XCircle,
         gradient: 'from-neutral-T50 to-neutral-T70',
-        iconBg: 'bg-neutral-T95',
+        iconBg: 'bg-neutral-T95 dark:bg-gray-800',
       },
     ],
     audits: [
@@ -159,21 +159,21 @@ function buildCards(stats: OverviewStats, tab: TabId): StatCardDef[] {
         value: stats.posts.total,
         icon: FileText,
         gradient: 'from-primary-T50 to-primary-T70',
-        iconBg: 'bg-primary-T90',
+        iconBg: 'bg-primary-T90 dark:bg-primary/15',
       },
       {
         label: 'Giao dịch',
         value: stats.transactions.total,
         icon: CreditCard,
         gradient: 'from-secondary to-secondary-container',
-        iconBg: 'bg-secondary-T95',
+        iconBg: 'bg-secondary-T95 dark:bg-secondary/15',
       },
       {
         label: 'Báo cáo',
         value: stats.reports.total,
         icon: AlertTriangle,
         gradient: 'from-error to-red-400',
-        iconBg: 'bg-red-50',
+        iconBg: 'bg-red-50 dark:bg-red-900/20',
       },
     ],
   };
@@ -195,7 +195,7 @@ export default function StatCards({ stats, activeTab }: StatCardsProps) {
         return (
           <div
             key={card.label}
-            className="group relative bg-surface-lowest rounded-lg border border-outline-variant/30 p-5 shadow-soft hover:shadow-hover hover:-translate-y-0.5 transition-all overflow-hidden"
+            className="group relative bg-surface-lowest dark:bg-gray-900 rounded-lg border border-outline-variant/30 dark:border-gray-800 p-5 shadow-soft dark:shadow-none hover:shadow-hover hover:-translate-y-0.5 transition-all overflow-hidden"
           >
             {/* Atmospheric blob */}
             <div
@@ -204,10 +204,10 @@ export default function StatCards({ stats, activeTab }: StatCardsProps) {
 
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-[11px] font-label uppercase tracking-wider text-neutral-T50 mb-2">
+                <p className="text-[11px] font-label uppercase tracking-wider text-neutral-T50 dark:text-gray-400 mb-2">
                   {card.label}
                 </p>
-                <p className="text-3xl font-sans font-extrabold tracking-tight text-neutral-T10">
+                <p className="text-3xl font-sans font-extrabold tracking-tight text-neutral-T10 dark:text-gray-100">
                   {card.value.toLocaleString('vi-VN')}
                 </p>
               </div>

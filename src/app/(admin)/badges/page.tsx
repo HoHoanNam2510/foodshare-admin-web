@@ -171,8 +171,12 @@ export default function BadgesManagementPage() {
             />
           </div>
           <div>
-            <p className="font-semibold text-gray-900">{badge.name}</p>
-            <p className="text-xs font-mono text-gray-400">{badge.code}</p>
+            <p className="font-semibold text-gray-900 dark:text-gray-100">
+              {badge.name}
+            </p>
+            <p className="text-xs font-mono text-gray-400 dark:text-gray-500">
+              {badge.code}
+            </p>
           </div>
         </div>
       ),
@@ -190,7 +194,7 @@ export default function BadgesManagementPage() {
       key: 'triggerEvent',
       header: 'Trigger',
       render: (badge) => (
-        <span className="text-xs text-gray-600">
+        <span className="text-xs text-gray-600 dark:text-gray-400">
           {TRIGGER_LABELS[badge.triggerEvent] ?? badge.triggerEvent}
         </span>
       ),
@@ -210,7 +214,7 @@ export default function BadgesManagementPage() {
       header: 'Đã mở',
       align: 'center',
       render: (badge) => (
-        <span className="text-sm font-semibold text-gray-700">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           {badge.unlockedCount ?? 0}
         </span>
       ),
@@ -242,7 +246,7 @@ export default function BadgesManagementPage() {
           <button
             onClick={() => handleToggle(badge)}
             disabled={togglingId === badge._id}
-            className={`p-1.5 rounded-md transition-colors ${badge.isActive ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-100'} disabled:opacity-50`}
+            className={`p-1.5 rounded-md transition-colors ${badge.isActive ? 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20' : 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'} disabled:opacity-50`}
             title={badge.isActive ? 'Tắt' : 'Bật'}
           >
             {togglingId === badge._id ? (
@@ -285,50 +289,42 @@ export default function BadgesManagementPage() {
           icon={<ToggleRight size={18} className="text-green-600" />}
           label="Đang hoạt động"
           value={activeBadges}
-          bg="bg-green-50 border-green-200/60"
+          bg="bg-green-50 dark:bg-green-900/20 border-green-200/60 dark:border-green-800/30"
         />
-        <div className="bg-surface-lowest border border-outline-variant/30 rounded-md p-4 shadow-sm flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0">
-            <TrendingUp size={18} className="text-secondary" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-0.5">
-              Phổ biến nhất
-            </p>
-            {topBadge ? (
-              <div className="flex items-center gap-2">
-                <Image
-                  src={topBadge.badge.imageUrl}
-                  alt={topBadge.badge.name}
-                  width={24}
-                  height={24}
-                  className="object-contain"
-                  unoptimized
-                />
-                <span className="text-sm font-semibold text-gray-900 truncate">
-                  {topBadge.badge.name}
-                </span>
-                <span className="text-xs text-gray-500 shrink-0">
-                  ({topBadge.unlockedCount} lượt)
-                </span>
-              </div>
+        <StatCard
+          icon={
+            topBadge ? (
+              <Image
+                src={topBadge.badge.imageUrl}
+                alt={topBadge.badge.name}
+                width={28}
+                height={28}
+                className="object-contain"
+                unoptimized
+              />
             ) : (
-              <span className="text-sm text-gray-400">—</span>
-            )}
-          </div>
-        </div>
+              <TrendingUp size={18} className="text-secondary" />
+            )
+          }
+          label="Phổ biến nhất"
+          value={topBadge?.unlockedCount ?? 0}
+          bg="bg-secondary/5 dark:bg-secondary/10 border-secondary/20"
+          subtitle={topBadge?.badge.name}
+        />
       </div>
 
       {/* Toolbar — filter-only, không có search nên giữ custom */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-surface-lowest p-4 rounded-md shadow-sm border border-outline-variant/30">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-surface-lowest dark:bg-gray-900 p-4 rounded-md shadow-sm border border-outline-variant/30 dark:border-gray-800">
         <Filter size={15} className="text-gray-400 shrink-0 hidden sm:block" />
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-xs font-label text-gray-500 mr-1">Role:</span>
+          <span className="text-xs font-label text-gray-500 dark:text-gray-400 mr-1">
+            Role:
+          </span>
           {ROLE_FILTER_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setRoleFilter(opt.value)}
-              className={`px-3 py-1 text-xs font-semibold rounded-md border transition-colors ${roleFilter === opt.value ? 'bg-primary text-white border-primary' : 'border-outline-variant/50 text-gray-600 hover:bg-primary/5'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md border transition-colors ${roleFilter === opt.value ? 'bg-primary text-white border-primary' : 'border-outline-variant/50 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-primary/5'}`}
             >
               {opt.label}
             </button>
@@ -336,14 +332,14 @@ export default function BadgesManagementPage() {
         </div>
         <div className="w-px h-5 bg-outline-variant/40 hidden sm:block" />
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-xs font-label text-gray-500 mr-1">
+          <span className="text-xs font-label text-gray-500 dark:text-gray-400 mr-1">
             Trạng thái:
           </span>
           {ACTIVE_FILTER_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setActiveFilter(opt.value)}
-              className={`px-3 py-1 text-xs font-semibold rounded-md border transition-colors ${activeFilter === opt.value ? 'bg-primary text-white border-primary' : 'border-outline-variant/50 text-gray-600 hover:bg-primary/5'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md border transition-colors ${activeFilter === opt.value ? 'bg-primary text-white border-primary' : 'border-outline-variant/50 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-primary/5'}`}
             >
               {opt.label}
             </button>
@@ -368,9 +364,9 @@ export default function BadgesManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-80"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
@@ -378,15 +374,15 @@ export default function BadgesManagementPage() {
 
       {/* Top badges stats */}
       {stats.length > 0 && (
-        <div className="bg-surface-lowest rounded-md shadow-soft border border-outline-variant/30 p-5">
-          <h3 className="font-sans font-bold text-base text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-surface-lowest dark:bg-gray-900 rounded-md shadow-soft dark:shadow-none border border-outline-variant/30 dark:border-gray-800 p-5">
+          <h3 className="font-sans font-bold text-base text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
             <TrendingUp size={16} className="text-primary" />
             Top huy hiệu được mở khóa nhiều nhất
           </h3>
           <div className="flex flex-col gap-3">
             {stats.slice(0, 5).map((stat, idx) => (
               <div key={stat.badge._id} className="flex items-center gap-3">
-                <span className="text-sm font-bold text-gray-400 w-5 text-right shrink-0">
+                <span className="text-sm font-bold text-gray-400 dark:text-gray-500 w-5 text-right shrink-0">
                   {idx + 1}
                 </span>
                 <Image
@@ -397,16 +393,16 @@ export default function BadgesManagementPage() {
                   className="object-contain shrink-0"
                   unoptimized
                 />
-                <span className="text-sm font-semibold text-gray-800 w-40 truncate shrink-0">
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 w-40 truncate shrink-0">
                   {stat.badge.name}
                 </span>
-                <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-surface-container dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-primary rounded-full transition-all"
                     style={{ width: `${stat.percentage}%` }}
                   />
                 </div>
-                <span className="text-xs font-label text-gray-500 w-20 text-right shrink-0">
+                <span className="text-xs font-label text-gray-500 dark:text-gray-400 w-20 text-right shrink-0">
                   {stat.unlockedCount} ({stat.percentage}%)
                 </span>
               </div>
@@ -431,24 +427,33 @@ function StatCard({
   label,
   value,
   bg,
+  subtitle,
 }: {
   icon: React.ReactNode;
   label: string;
-  value: number;
+  value: number | string;
   bg: string;
+  subtitle?: string;
 }) {
   return (
     <div
-      className={`bg-surface-lowest border rounded-md p-4 shadow-sm flex items-center gap-4 ${bg}`}
+      className={`bg-surface-lowest dark:bg-gray-900 border rounded-md p-4 shadow-sm flex items-center gap-4 ${bg}`}
     >
-      <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shrink-0">
+      <div className="w-10 h-10 rounded-xl bg-white/60 dark:bg-gray-700/60 flex items-center justify-center shrink-0 overflow-hidden">
         {icon}
       </div>
-      <div>
-        <p className="text-xs font-label text-gray-500 uppercase tracking-wider mb-0.5">
+      <div className="min-w-0">
+        <p className="text-xs font-label text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">
           {label}
         </p>
-        <p className="text-2xl font-sans font-bold text-gray-900">{value}</p>
+        <p className="text-2xl font-sans font-bold text-gray-900 dark:text-gray-100">
+          {value}
+        </p>
+        {subtitle && (
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+            {subtitle}
+          </p>
+        )}
       </div>
     </div>
   );

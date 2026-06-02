@@ -56,10 +56,10 @@ const TABS: {
 ];
 
 const INPUT_CLASS =
-  'w-full bg-surface border border-outline-variant rounded-md px-4 py-2.5 text-sm text-neutral-T10 font-body placeholder:text-neutral-T60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed';
+  'w-full bg-surface dark:bg-gray-800 border border-outline-variant dark:border-gray-700 rounded-md px-4 py-2.5 text-sm text-neutral-T10 dark:text-gray-100 font-body placeholder:text-neutral-T60 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed';
 
 const LABEL_CLASS =
-  'block text-sm font-semibold font-label text-neutral-T20 mb-1';
+  'block text-sm font-semibold font-label text-neutral-T20 dark:text-gray-300 mb-1';
 
 function PasswordInput({
   id,
@@ -300,12 +300,12 @@ export default function CreateUserPage() {
           <CheckCircle2 size={36} className="text-primary" />
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-sans font-bold text-gray-900">
+          <h2 className="text-xl font-sans font-bold text-gray-900 dark:text-gray-100">
             Tạo tài khoản thành công!
           </h2>
-          <p className="text-sm font-body text-gray-500 mt-2">
+          <p className="text-sm font-body text-gray-500 dark:text-gray-400 mt-2">
             Tài khoản{' '}
-            <span className="font-semibold text-gray-800">
+            <span className="font-semibold text-gray-800 dark:text-gray-200">
               {successInfo.email}
             </span>{' '}
             ({roleLabel}) đã được tạo.
@@ -320,7 +320,7 @@ export default function CreateUserPage() {
           </button>
           <button
             onClick={handleReset}
-            className="px-5 py-2.5 rounded-md border border-outline-variant text-sm font-semibold text-gray-700 hover:bg-surface-container transition-colors"
+            className="px-5 py-2.5 rounded-md border border-outline-variant dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
           >
             Tạo tài khoản mới
           </button>
@@ -335,7 +335,7 @@ export default function CreateUserPage() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.push('/users')}
-          className="p-2 rounded-md text-gray-500 hover:bg-surface-container transition-colors"
+          className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
         >
           <ArrowLeft size={20} />
         </button>
@@ -353,9 +353,9 @@ export default function CreateUserPage() {
           <span>1</span>
           <span>Điền thông tin</span>
         </div>
-        <div className="h-px flex-1 bg-outline-variant/50" />
+        <div className="h-px flex-1 bg-outline-variant/50 dark:bg-gray-700" />
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${step === 2 ? 'bg-primary text-white' : 'bg-surface-container text-gray-400'}`}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${step === 2 ? 'bg-primary text-white' : 'bg-surface-container dark:bg-gray-800 text-gray-400'}`}
         >
           <span>2</span>
           <span>Xác nhận email</span>
@@ -363,7 +363,7 @@ export default function CreateUserPage() {
       </div>
 
       {/* Role tab bar */}
-      <div className="bg-surface-lowest rounded-md shadow-soft border border-outline-variant/30 p-1 flex gap-1">
+      <div className="bg-surface-lowest dark:bg-gray-900 rounded-md shadow-soft border border-outline-variant/30 dark:border-gray-800 p-1 flex gap-1">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -375,6 +375,22 @@ export default function CreateUserPage() {
                 setStep(1);
                 setError(null);
                 setOtpCode('');
+                setBase({
+                  fullName: '',
+                  email: '',
+                  password: '',
+                  confirmPassword: '',
+                  phoneNumber: '',
+                  defaultAddress: '',
+                });
+                setStore({
+                  businessName: '',
+                  openHours: '',
+                  closeHours: '',
+                  description: '',
+                  businessAddress: '',
+                  autoApprove: true,
+                });
               }}
               disabled={step === 2}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-semibold transition-all ${
@@ -391,10 +407,10 @@ export default function CreateUserPage() {
       </div>
 
       {/* Form card */}
-      <div className="bg-surface-lowest rounded-md shadow-soft border border-outline-variant/30 p-6 flex flex-col gap-5">
+      <div className="bg-surface-lowest dark:bg-gray-900 rounded-md shadow-soft border border-outline-variant/30 dark:border-gray-800 p-6 flex flex-col gap-5">
         {/* Role description */}
         {activeTab === 'USER' && (
-          <div className="rounded-md bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-600 font-body">
+          <div className="rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 font-body">
             Tài khoản <strong>Người dùng</strong> — dùng để chia sẻ thực phẩm
             P2P. Email sẽ được xác nhận bằng mã OTP.
           </div>
@@ -406,7 +422,7 @@ export default function CreateUserPage() {
           </div>
         )}
         {activeTab === 'ADMIN' && (
-          <div className="rounded-md bg-purple-50 border border-purple-200 px-4 py-3 text-sm text-purple-700 font-body">
+          <div className="rounded-md bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/30 px-4 py-3 text-sm text-purple-700 dark:text-purple-400 font-body">
             Tài khoản <strong>Quản trị viên</strong> — quyền truy cập toàn hệ
             thống. Chỉ tạo khi thực sự cần thiết.
           </div>
@@ -414,7 +430,7 @@ export default function CreateUserPage() {
 
         {/* ── Thông tin cơ bản ── */}
         <div>
-          <h3 className="text-xs font-label font-bold uppercase tracking-wider text-gray-400 mb-4">
+          <h3 className="text-xs font-label font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-4">
             Thông tin cơ bản
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -521,8 +537,8 @@ export default function CreateUserPage() {
 
         {/* ── Thông tin cửa hàng (STORE tab only) ── */}
         {activeTab === 'STORE' && (
-          <div className="border-t border-outline-variant/30 pt-5">
-            <h3 className="text-xs font-label font-bold uppercase tracking-wider text-gray-400 mb-4">
+          <div className="border-t border-outline-variant/30 dark:border-gray-700 pt-5">
+            <h3 className="text-xs font-label font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-4">
               Thông tin cửa hàng
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -611,8 +627,8 @@ export default function CreateUserPage() {
                 <label
                   className={`flex items-start gap-3 cursor-pointer rounded-md p-3 border transition-colors ${
                     store.autoApprove && canAutoApprove
-                      ? 'border-primary/30 bg-primary/5'
-                      : 'border-outline-variant/40 bg-surface/50'
+                      ? 'border-primary/40 dark:border-primary/60 bg-primary/10 dark:bg-primary/20'
+                      : 'border-outline-variant/40 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/30'
                   } ${step === 2 ? 'opacity-60 cursor-not-allowed' : ''}`}
                 >
                   <div className="relative flex items-center mt-0.5">
@@ -633,7 +649,7 @@ export default function CreateUserPage() {
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                         store.autoApprove
                           ? 'bg-primary border-primary'
-                          : 'bg-surface-lowest border-outline-variant'
+                          : 'bg-surface-lowest dark:bg-gray-800 border-outline-variant dark:border-gray-600'
                       }`}
                     >
                       {store.autoApprove && (
@@ -655,10 +671,10 @@ export default function CreateUserPage() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                       Tự động phê duyệt KYC
                     </p>
-                    <p className="text-xs text-gray-500 font-body mt-0.5">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-body mt-0.5">
                       {canAutoApprove
                         ? 'Tài khoản sẽ được tạo với vai trò STORE và KYC đã duyệt ngay lập tức.'
                         : 'Cần điền Tên cửa hàng và Địa chỉ cửa hàng để bật tính năng này.'}
@@ -672,7 +688,7 @@ export default function CreateUserPage() {
 
         {/* ── Error message ── */}
         {error && (
-          <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 font-body">
+          <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 px-4 py-3 text-sm text-red-700 dark:text-red-400 font-body">
             {error}
           </div>
         )}
@@ -701,7 +717,7 @@ export default function CreateUserPage() {
         {/* ── Step 2: OTP input + create button ── */}
         {step === 2 && (
           <div className="flex flex-col gap-4">
-            <div className="rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 font-body">
+            <div className="rounded-md bg-amber-50 dark:bg-yellow-900/20 border border-amber-200 dark:border-yellow-800/30 px-4 py-3 text-sm text-amber-800 dark:text-yellow-300 font-body">
               Mã xác nhận (6 chữ số) đã được gửi đến{' '}
               <strong>{base.email}</strong>. Mã có hiệu lực trong{' '}
               <strong>10 phút</strong>.
@@ -735,7 +751,7 @@ export default function CreateUserPage() {
                   setError(null);
                 }}
                 disabled={isCreating}
-                className="px-5 py-2.5 rounded-md border border-outline-variant text-sm font-semibold text-gray-700 hover:bg-surface-container transition-colors disabled:opacity-50"
+                className="px-5 py-2.5 rounded-md border border-outline-variant dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
               >
                 Quay lại
               </button>
@@ -763,8 +779,10 @@ export default function CreateUserPage() {
 
       {/* Summary card (STORE auto-approve info) */}
       {activeTab === 'STORE' && step === 1 && (
-        <div className="bg-surface-lowest rounded-md border border-outline-variant/30 px-5 py-4 text-sm font-body text-gray-600">
-          <p className="font-semibold text-gray-800 mb-1">Sau khi tạo:</p>
+        <div className="bg-surface-lowest dark:bg-gray-900 rounded-md border border-outline-variant/30 dark:border-gray-800 px-5 py-4 text-sm font-body text-gray-600 dark:text-gray-400">
+          <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1">
+            Sau khi tạo:
+          </p>
           {store.autoApprove && canAutoApprove ? (
             <ul className="list-disc list-inside space-y-0.5 text-gray-600">
               <li>

@@ -81,7 +81,7 @@ export default function Toolbar({
 
   const searchInput = (
     <div
-      className={`flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50 ${hasFilters ? 'w-full sm:w-80' : 'w-full'} focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all`}
+      className={`flex items-center gap-2 px-3 py-2 bg-surface dark:bg-gray-800 rounded-md border border-outline-variant/50 dark:border-gray-700 ${hasFilters ? 'w-full sm:w-80' : 'w-full'} focus-within:ring-2 focus-within:ring-primary/50 focus-within:-translate-y-0.5 transition-all`}
     >
       <Search size={16} className="text-gray-400 shrink-0" />
       <input
@@ -89,12 +89,12 @@ export default function Toolbar({
         placeholder={placeholder}
         value={value}
         onChange={(e) => handleChange(e.target.value)}
-        className="bg-transparent text-sm outline-none w-full font-body text-gray-900 placeholder:text-gray-400"
+        className="bg-transparent text-sm outline-none w-full font-body text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
       />
       {value && (
         <button
           onClick={handleClear}
-          className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+          className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0"
         >
           <X size={14} />
         </button>
@@ -104,7 +104,7 @@ export default function Toolbar({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row gap-4 justify-between items-center bg-surface-lowest p-4 rounded-md shadow-sm border border-outline-variant/30 ${className}`}
+      className={`flex flex-col sm:flex-row gap-4 justify-between items-center bg-surface-lowest dark:bg-gray-900 p-4 rounded-md shadow-sm dark:shadow-none dark:border border border-outline-variant/30 dark:border-gray-800 ${className}`}
     >
       {searchInput}
 
@@ -115,13 +115,13 @@ export default function Toolbar({
               return (
                 <div
                   key={i}
-                  className="flex items-center gap-2 px-3 py-2 bg-surface rounded-md border border-outline-variant/50"
+                  className="flex items-center gap-2 px-3 py-2 bg-surface dark:bg-gray-800 rounded-md border border-outline-variant/50 dark:border-gray-700"
                 >
                   <Filter size={16} className="text-gray-400" />
                   <select
                     value={filter.value}
                     onChange={(e) => filter.onChange(e.target.value)}
-                    className="bg-transparent text-sm outline-none font-body text-gray-700 cursor-pointer"
+                    className="bg-transparent text-sm outline-none font-body text-gray-700 dark:text-gray-300 cursor-pointer"
                   >
                     {filter.options.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -137,7 +137,7 @@ export default function Toolbar({
             return (
               <div
                 key={i}
-                className="flex items-center gap-1 bg-surface rounded-lg border border-outline-variant/50 p-1"
+                className="flex items-center gap-1 bg-surface dark:bg-gray-800 rounded-lg border border-outline-variant/50 dark:border-gray-700 p-1"
               >
                 {filter.options.map((tab) => {
                   const isActive = filter.value === tab.value;
@@ -148,7 +148,7 @@ export default function Toolbar({
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                         isActive
                           ? 'bg-primary text-white shadow-sm'
-                          : 'text-gray-500 hover:bg-primary/5 hover:text-primary'
+                          : 'text-gray-500 dark:text-gray-400 hover:bg-primary/5 hover:text-primary'
                       }`}
                     >
                       {tab.icon}

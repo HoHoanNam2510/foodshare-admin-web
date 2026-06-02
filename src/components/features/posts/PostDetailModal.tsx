@@ -60,20 +60,20 @@ export default function PostDetailModal({
       />
 
       {/* Nội dung modal */}
-      <div className="relative bg-surface-lowest w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
+      <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50">
           <div>
-            <h2 className="text-lg font-sans font-bold text-gray-900">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100">
               Chi tiết bài đăng
             </h2>
-            <p className="text-xs font-body text-gray-500 mt-0.5">
+            <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-0.5">
               Tạo lúc: {formatDate(post.createdAt)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -84,10 +84,10 @@ export default function PostDetailModal({
           {/* Tiêu đề & trạng thái */}
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-gray-900 leading-tight">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
                 {post.title}
               </h3>
-              <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
+              <div className="flex items-center gap-3 mt-2 text-sm text-gray-600 dark:text-gray-400">
                 <span className="flex items-center gap-1">
                   <Tag size={14} /> {post.category}
                 </span>
@@ -101,48 +101,50 @@ export default function PostDetailModal({
           </div>
 
           {/* Thông tin tổng quan */}
-          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface rounded-md border border-outline-variant/30">
+          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface dark:bg-gray-800 rounded-md border border-outline-variant/30 dark:border-gray-700">
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                 Người đăng
               </p>
               <div className="flex items-center gap-2">
                 <User size={14} className="text-primary" />
                 <div>
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">
                     {owner?.fullName || 'N/A'}
                   </p>
                   {owner?.email && (
-                    <p className="text-xs text-gray-500">{owner.email}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {owner.email}
+                    </p>
                   )}
                 </div>
               </div>
             </div>
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                 Giá & Số lượng
               </p>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-gray-900 dark:text-gray-100">
                 {formatCurrency(post.price, post.type)}{' '}
-                <span className="text-gray-500 font-normal">
+                <span className="text-gray-500 dark:text-gray-400 font-normal">
                   ({post.remainingQuantity}/{post.totalQuantity} còn lại)
                 </span>
               </p>
             </div>
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                 Hạn sử dụng
               </p>
-              <p className="font-semibold text-gray-900 flex items-center gap-1.5">
+              <p className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1.5">
                 <Calendar size={14} className="text-primary" />{' '}
                 {formatDate(post.expiryDate)}
               </p>
             </div>
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
                 Khung giờ nhận
               </p>
-              <p className="font-semibold text-gray-900 flex items-center gap-1.5">
+              <p className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1.5">
                 <Clock size={14} className="text-primary" />{' '}
                 {formatPickupTime()}
               </p>
@@ -152,10 +154,10 @@ export default function PostDetailModal({
           {/* Mô tả */}
           {post.description && (
             <div className="mb-6">
-              <p className="text-xs font-label text-gray-500 mb-2 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
                 Mô tả chi tiết
               </p>
-              <p className="text-sm text-gray-700 leading-relaxed bg-surface/50 p-4 rounded-md border border-outline-variant/20">
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-surface/50 dark:bg-gray-800/50 p-4 rounded-md border border-outline-variant/20 dark:border-gray-700">
                 {post.description}
               </p>
             </div>
@@ -164,10 +166,10 @@ export default function PostDetailModal({
           {/* Tọa độ */}
           {post.location?.coordinates && (
             <div className="mb-6">
-              <p className="text-xs font-label text-gray-500 mb-2 uppercase tracking-wider">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
                 Tọa độ lấy hàng
               </p>
-              <div className="flex items-center gap-2 text-sm text-gray-700 bg-surface/50 p-3 rounded-md border border-outline-variant/20">
+              <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 bg-surface/50 dark:bg-gray-800/50 p-3 rounded-md border border-outline-variant/20 dark:border-gray-700">
                 <MapPin size={16} className="text-error" />
                 <span>
                   Kinh độ: {post.location.coordinates[0]} – Vĩ độ:{' '}
@@ -179,7 +181,7 @@ export default function PostDetailModal({
 
           {/* Hình ảnh */}
           <div>
-            <p className="text-xs font-label text-gray-500 mb-2 uppercase tracking-wider">
+            <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Hình ảnh đính kèm
             </p>
             {post.images.length > 0 ? (
@@ -187,7 +189,7 @@ export default function PostDetailModal({
                 {post.images.map((img, idx) => (
                   <div
                     key={idx}
-                    className="w-24 h-24 rounded-md bg-surface border border-outline-variant/30 overflow-hidden"
+                    className="w-24 h-24 rounded-md bg-surface border border-outline-variant/30 dark:border-gray-700 overflow-hidden"
                   >
                     <Image
                       src={img}
@@ -201,7 +203,7 @@ export default function PostDetailModal({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500 italic">
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
                 Không có hình ảnh đính kèm.
               </p>
             )}
@@ -209,10 +211,10 @@ export default function PostDetailModal({
         </div>
 
         {/* Footer – Hành động */}
-        <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors"
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors"
           >
             Đóng
           </button>
@@ -224,7 +226,7 @@ export default function PostDetailModal({
                   onReject(post._id);
                   onClose();
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-red-50 text-error hover:bg-error hover:text-white transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-red-50 dark:bg-red-900/20 text-error hover:bg-error hover:text-white transition-colors"
               >
                 <XCircle size={16} />
                 Từ chối
@@ -234,7 +236,7 @@ export default function PostDetailModal({
                   onApprove(post._id);
                   onClose();
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-green-50 text-green-700 hover:bg-primary hover:text-white transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-md font-body text-sm font-semibold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-primary hover:text-white transition-colors"
               >
                 <CheckCircle size={16} />
                 Duyệt bài đăng

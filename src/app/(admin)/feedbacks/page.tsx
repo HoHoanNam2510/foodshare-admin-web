@@ -147,7 +147,7 @@ export default function FeedbacksManagementPage() {
       key: 'id',
       header: 'Mã ticket',
       render: (fb) => (
-        <span className="font-mono text-xs font-semibold text-gray-900">
+        <span className="font-mono text-xs font-semibold text-gray-900 dark:text-gray-100">
           #{fb._id.slice(-8).toUpperCase()}
         </span>
       ),
@@ -163,10 +163,12 @@ export default function FeedbacksManagementPage() {
             size="md"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-medium text-gray-900 truncate">
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
               {fb.userId.fullName}
             </span>
-            <span className="text-xs text-gray-500">{fb.userId.email}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {fb.userId.email}
+            </span>
           </div>
         </div>
       ),
@@ -194,7 +196,7 @@ export default function FeedbacksManagementPage() {
       header: 'Tiêu đề',
       render: (fb) => (
         <span
-          className="text-sm text-gray-800 line-clamp-1 max-w-50"
+          className="text-sm text-gray-800 dark:text-gray-200 line-clamp-1 max-w-50"
           title={fb.title}
         >
           {fb.title.length > 40 ? `${fb.title.slice(0, 40)}…` : fb.title}
@@ -205,7 +207,7 @@ export default function FeedbacksManagementPage() {
       key: 'createdAt',
       header: 'Ngày tạo',
       render: (fb) => (
-        <span className="text-xs text-gray-500 whitespace-nowrap">
+        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
           {formatDateTime(fb.createdAt)}
         </span>
       ),
@@ -276,7 +278,7 @@ export default function FeedbacksManagementPage() {
       />
 
       {/* Status tabs */}
-      <div className="flex items-center gap-2 border-b border-outline-variant/30 pb-px">
+      <div className="flex items-center gap-2 border-b border-outline-variant/30 dark:border-gray-800 pb-px">
         {[
           {
             value: 'ALL',
@@ -309,7 +311,7 @@ export default function FeedbacksManagementPage() {
             className={`flex items-center gap-2 px-4 py-2.5 font-sans font-bold text-sm border-b-2 transition-all ${
               activeTab === tab.value
                 ? tab.activeClass
-                : 'border-transparent text-gray-500 hover:text-gray-800'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
           >
             {tab.icon} {tab.label}
@@ -334,13 +336,13 @@ export default function FeedbacksManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName={(fb) =>
           isHighlightRow(fb)
-            ? 'bg-red-50 hover:bg-red-100/70 transition-colors'
+            ? 'bg-red-50 dark:bg-red-900/20 hover:bg-red-100/70 dark:hover:bg-red-900/30 transition-colors'
             : 'hover:bg-primary/5 transition-colors'
         }
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

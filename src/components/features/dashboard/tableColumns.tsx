@@ -100,14 +100,18 @@ const userColumns: Column<UserRow>[] = [
           avatar={row.avatar}
           size="md"
         />
-        <span className="font-semibold text-neutral-T10">{row.fullName}</span>
+        <span className="font-semibold text-neutral-T10 dark:text-gray-100">
+          {row.fullName}
+        </span>
       </div>
     ),
   },
   {
     key: 'email',
     header: 'Email',
-    render: (row) => <span className="text-neutral-T50">{row.email}</span>,
+    render: (row) => (
+      <span className="text-neutral-T50 dark:text-gray-400">{row.email}</span>
+    ),
   },
   {
     key: 'role',
@@ -133,7 +137,9 @@ const userColumns: Column<UserRow>[] = [
     align: 'right',
     sortable: true,
     render: (row) => (
-      <span className="text-neutral-T50">{formatDate(row.createdAt)}</span>
+      <span className="text-neutral-T50 dark:text-gray-400">
+        {formatDate(row.createdAt)}
+      </span>
     ),
   },
 ];
@@ -145,7 +151,9 @@ const postColumns: Column<PostRow>[] = [
     maxWidth: 'max-w-[220px]',
     truncate: true,
     render: (row) => (
-      <span className="font-semibold text-neutral-T10">{row.title}</span>
+      <span className="font-semibold text-neutral-T10 dark:text-gray-100">
+        {row.title}
+      </span>
     ),
   },
   {
@@ -159,10 +167,12 @@ const postColumns: Column<PostRow>[] = [
             avatar={row.ownerId.avatar}
             size="sm"
           />
-          <span className="text-neutral-T50">{row.ownerId.fullName}</span>
+          <span className="text-neutral-T50 dark:text-gray-400">
+            {row.ownerId.fullName}
+          </span>
         </div>
       ) : (
-        <span className="text-neutral-T60">—</span>
+        <span className="text-neutral-T60 dark:text-gray-500">—</span>
       ),
   },
   {
@@ -192,7 +202,7 @@ const postColumns: Column<PostRow>[] = [
     header: 'Số lượng',
     align: 'center',
     render: (row) => (
-      <span className="font-semibold text-neutral-T30">
+      <span className="font-semibold text-neutral-T30 dark:text-gray-300">
         {row.remainingQuantity}/{row.totalQuantity}
       </span>
     ),
@@ -203,7 +213,9 @@ const postColumns: Column<PostRow>[] = [
     align: 'right',
     sortable: true,
     render: (row) => (
-      <span className="text-neutral-T50">{formatDate(row.createdAt)}</span>
+      <span className="text-neutral-T50 dark:text-gray-400">
+        {formatDate(row.createdAt)}
+      </span>
     ),
   },
 ];
@@ -215,7 +227,7 @@ const transactionColumns: Column<TransactionRow>[] = [
     maxWidth: 'max-w-[180px]',
     truncate: true,
     render: (row) => (
-      <span className="font-semibold text-neutral-T10">
+      <span className="font-semibold text-neutral-T10 dark:text-gray-100">
         {row.postId?.title || '—'}
       </span>
     ),
@@ -231,10 +243,12 @@ const transactionColumns: Column<TransactionRow>[] = [
             avatar={row.requesterId.avatar}
             size="sm"
           />
-          <span className="text-neutral-T50">{row.requesterId.fullName}</span>
+          <span className="text-neutral-T50 dark:text-gray-400">
+            {row.requesterId.fullName}
+          </span>
         </div>
       ) : (
-        <span className="text-neutral-T60">—</span>
+        <span className="text-neutral-T60 dark:text-gray-500">—</span>
       ),
   },
   {
@@ -248,10 +262,12 @@ const transactionColumns: Column<TransactionRow>[] = [
             avatar={row.ownerId.avatar}
             size="sm"
           />
-          <span className="text-neutral-T50">{row.ownerId.fullName}</span>
+          <span className="text-neutral-T50 dark:text-gray-400">
+            {row.ownerId.fullName}
+          </span>
         </div>
       ) : (
-        <span className="text-neutral-T60">—</span>
+        <span className="text-neutral-T60 dark:text-gray-500">—</span>
       ),
   },
   {
@@ -281,7 +297,7 @@ const transactionColumns: Column<TransactionRow>[] = [
     header: 'Số tiền',
     align: 'right',
     render: (row) => (
-      <span className="font-semibold text-neutral-T30">
+      <span className="font-semibold text-neutral-T30 dark:text-gray-300">
         {row.totalAmount
           ? `${row.totalAmount.toLocaleString('vi-VN')}đ`
           : 'Miễn phí'}
@@ -294,7 +310,9 @@ const transactionColumns: Column<TransactionRow>[] = [
     align: 'right',
     sortable: true,
     render: (row) => (
-      <span className="text-neutral-T50">{formatDate(row.createdAt)}</span>
+      <span className="text-neutral-T50 dark:text-gray-400">
+        {formatDate(row.createdAt)}
+      </span>
     ),
   },
 ];
@@ -311,12 +329,12 @@ const reportColumns: Column<ReportRow>[] = [
             avatar={row.reporterId.avatar}
             size="sm"
           />
-          <span className="font-semibold text-neutral-T10">
+          <span className="font-semibold text-neutral-T10 dark:text-gray-100">
             {row.reporterId.fullName}
           </span>
         </div>
       ) : (
-        <span className="text-neutral-T60">—</span>
+        <span className="text-neutral-T60 dark:text-gray-500">—</span>
       ),
   },
   {
@@ -329,7 +347,9 @@ const reportColumns: Column<ReportRow>[] = [
     key: 'reason',
     header: 'Lý do',
     render: (row) => (
-      <span className="text-neutral-T50 text-xs">{row.reason}</span>
+      <span className="text-neutral-T50 dark:text-gray-400 text-xs">
+        {row.reason}
+      </span>
     ),
   },
   {
@@ -350,7 +370,9 @@ const reportColumns: Column<ReportRow>[] = [
     align: 'right',
     sortable: true,
     render: (row) => (
-      <span className="text-neutral-T50">{formatDate(row.createdAt)}</span>
+      <span className="text-neutral-T50 dark:text-gray-400">
+        {formatDate(row.createdAt)}
+      </span>
     ),
   },
 ];
@@ -369,10 +391,12 @@ const auditColumns: Column<AuditRow>[] = [
       row.fullName ? (
         <div className="flex items-center gap-2">
           <UserAvatar fullName={row.fullName} avatar={row.avatar} size="sm" />
-          <span className="font-semibold text-neutral-T10">{row.fullName}</span>
+          <span className="font-semibold text-neutral-T10 dark:text-gray-100">
+            {row.fullName}
+          </span>
         </div>
       ) : (
-        <span className="font-semibold text-neutral-T10">
+        <span className="font-semibold text-neutral-T10 dark:text-gray-100">
           {row.title || row.targetType || `${row.type} — ${row.status}`}
         </span>
       ),
@@ -385,7 +409,7 @@ const auditColumns: Column<AuditRow>[] = [
       row.status ? (
         <StatusBadge status={row.status} />
       ) : (
-        <span className="text-neutral-T60">—</span>
+        <span className="text-neutral-T60 dark:text-gray-500">—</span>
       ),
   },
   {
@@ -394,7 +418,9 @@ const auditColumns: Column<AuditRow>[] = [
     align: 'right',
     sortable: true,
     render: (row) => (
-      <span className="text-neutral-T50">{formatDateTime(row.updatedAt)}</span>
+      <span className="text-neutral-T50 dark:text-gray-400">
+        {formatDateTime(row.updatedAt)}
+      </span>
     ),
   },
 ];

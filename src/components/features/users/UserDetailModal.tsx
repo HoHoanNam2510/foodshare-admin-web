@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { IUser } from '@/lib/userApi';
+import UserAvatar from '@/components/ui/UserAvatar';
 
 interface UserDetailModalProps {
   user: IUser | null;
@@ -37,8 +38,6 @@ export default function UserDetailModal({
 
   if (!user) return null;
 
-  const initial = user.fullName ? user.fullName.charAt(0).toUpperCase() : '?';
-
   const handleBanToggle = async () => {
     setToggling(true);
     try {
@@ -58,20 +57,20 @@ export default function UserDetailModal({
       ></div>
 
       {/* Modal Content */}
-      <div className="relative bg-surface-lowest w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
+      <div className="relative bg-surface-lowest dark:bg-gray-900 w-full max-w-2xl rounded-md shadow-floating overflow-hidden animate-in slide-in-from-bottom-4 fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 dark:border-gray-700 bg-surface/50 dark:bg-gray-800/50">
           <div>
-            <h2 className="text-lg font-sans font-bold text-gray-900">
+            <h2 className="text-lg font-sans font-bold text-gray-900 dark:text-gray-100">
               Hồ sơ người dùng #{user._id}
             </h2>
-            <p className="text-xs font-body text-gray-500 mt-0.5">
+            <p className="text-xs font-body text-gray-500 dark:text-gray-400 mt-0.5">
               Tham gia: {formatDate(user.createdAt)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -82,11 +81,13 @@ export default function UserDetailModal({
           {/* Top Info: Avatar & Tên */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-2xl font-bold shadow-sm shrink-0">
-                {initial}
-              </div>
+              <UserAvatar
+                fullName={user.fullName || '?'}
+                avatar={user.avatar}
+                size="xl"
+              />
               <div>
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                   {user.fullName}
                   {user.kycStatus === 'VERIFIED' && (
                     <ShieldCheck size={18} className="text-primary" />
@@ -114,26 +115,28 @@ export default function UserDetailModal({
           </div>
 
           {/* Grid Thông tin liên hệ */}
-          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface rounded-md border border-outline-variant/30">
+          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface dark:bg-gray-800 rounded-md border border-outline-variant/30 dark:border-gray-700">
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider flex items-center gap-1.5">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider flex items-center gap-1.5">
                 <Mail size={12} /> Email
               </p>
-              <p className="font-semibold text-gray-900">{user.email}</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">
+                {user.email}
+              </p>
             </div>
             <div>
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider flex items-center gap-1.5">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider flex items-center gap-1.5">
                 <Phone size={12} /> Số điện thoại
               </p>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-gray-900 dark:text-gray-100">
                 {user.phoneNumber || 'Chưa cập nhật'}
               </p>
             </div>
             <div className="col-span-2">
-              <p className="text-xs font-label text-gray-500 mb-1 uppercase tracking-wider flex items-center gap-1.5">
+              <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin size={12} /> Địa chỉ mặc định
               </p>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-gray-900 dark:text-gray-100">
                 {user.defaultAddress || 'Chưa cập nhật'}
               </p>
             </div>
@@ -147,22 +150,22 @@ export default function UserDetailModal({
               </h4>
               <div className="grid grid-cols-1 gap-3 text-sm">
                 <p>
-                  <span className="text-gray-500 w-24 inline-block">
+                  <span className="text-gray-500 dark:text-gray-400 w-24 inline-block">
                     Giờ mở cửa:
                   </span>{' '}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {user.storeInfo.openHours}
                   </span>
                 </p>
                 <p>
-                  <span className="text-gray-500 w-24 inline-block">
+                  <span className="text-gray-500 dark:text-gray-400 w-24 inline-block">
                     Đ/C Kinh doanh:
                   </span>{' '}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {user.storeInfo.businessAddress}
                   </span>
                 </p>
-                <p className="text-gray-700 italic">
+                <p className="text-gray-700 dark:text-gray-300 italic">
                   &quot;{user.storeInfo.description}&quot;
                 </p>
               </div>
@@ -171,16 +174,18 @@ export default function UserDetailModal({
 
           {/* Chỉ số hệ thống */}
           <div>
-            <p className="text-xs font-label text-gray-500 mb-2 uppercase tracking-wider">
+            <p className="text-xs font-label text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Chỉ số hệ thống
             </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <Star size={16} className="text-yellow-500 fill-yellow-500" />
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
                   {user.averageRating} / 5.0
                 </span>
-                <span className="text-gray-500">Đánh giá</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  Đánh giá
+                </span>
               </div>
 
               {/* KYC Status — only shown for STORE or PENDING_KYC accounts */}
@@ -194,10 +199,12 @@ export default function UserDetailModal({
                         : 'text-gray-400'
                     }
                   />
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {user.kycStatus}
                   </span>
-                  <span className="text-gray-500">Trạng thái KYC</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    Trạng thái KYC
+                  </span>
                 </div>
               )}
             </div>
@@ -205,11 +212,11 @@ export default function UserDetailModal({
         </div>
 
         {/* Footer (Actions) */}
-        <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-lowest flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-outline-variant/30 dark:border-gray-700 bg-surface-lowest dark:bg-gray-900 flex justify-end gap-3">
           <button
             onClick={onClose}
             disabled={toggling}
-            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-md font-body text-sm font-semibold text-gray-600 hover:bg-surface-container dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
             Đóng
           </button>

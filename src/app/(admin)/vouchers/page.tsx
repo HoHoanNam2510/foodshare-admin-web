@@ -167,7 +167,7 @@ export default function VouchersManagementPage() {
             <span className="font-bold text-secondary tracking-wider text-xs mb-0.5">
               {voucher.code}
             </span>
-            <span className="font-semibold text-gray-900 text-sm line-clamp-1">
+            <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm line-clamp-1">
               {voucher.title}
             </span>
           </div>
@@ -185,7 +185,7 @@ export default function VouchersManagementPage() {
               avatar={voucher.creatorId.avatar}
               size="sm"
             />
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-gray-900 dark:text-gray-100">
               {voucher.creatorId.fullName}
             </span>
           </div>
@@ -239,7 +239,7 @@ export default function VouchersManagementPage() {
       key: 'validUntil',
       header: 'Hết hạn',
       render: (voucher) => (
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-gray-600 dark:text-gray-400">
           {formatDate(voucher.validUntil)}
         </span>
       ),
@@ -317,9 +317,9 @@ export default function VouchersManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

@@ -6,7 +6,7 @@ import Image from 'next/image';
 interface UserAvatarProps {
   fullName: string;
   avatar?: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
@@ -15,6 +15,7 @@ const SIZE_CLASSES = {
   sm: { wrapper: 'w-7 h-7', text: 'text-[11px]' },
   md: { wrapper: 'w-8 h-8', text: 'text-xs' },
   lg: { wrapper: 'w-10 h-10', text: 'text-sm' },
+  xl: { wrapper: 'w-16 h-16', text: 'text-xl' },
 };
 
 export default function UserAvatar({

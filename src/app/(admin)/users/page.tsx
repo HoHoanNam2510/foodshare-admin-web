@@ -207,10 +207,12 @@ export default function UsersManagementPage() {
         <div className="flex items-center gap-3">
           <UserAvatar fullName={user.fullName} avatar={user.avatar} size="md" />
           <div className="flex flex-col min-w-37.5">
-            <span className="font-semibold text-gray-900 line-clamp-1">
+            <span className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
               {user.fullName}
             </span>
-            <span className="text-xs text-gray-500 mt-0.5">{user.email}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {user.email}
+            </span>
           </div>
         </div>
       ),
@@ -226,11 +228,11 @@ export default function UsersManagementPage() {
       header: 'Liên hệ & Địa chỉ',
       render: (user) => (
         <div className="flex flex-col">
-          <span className="text-gray-900 font-medium">
+          <span className="text-gray-900 dark:text-gray-100 font-medium">
             {user.phoneNumber || 'N/A'}
           </span>
           <span
-            className="text-xs text-gray-500 mt-0.5 truncate"
+            className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate"
             title={user.defaultAddress}
           >
             {user.defaultAddress || 'Chưa cập nhật'}
@@ -334,9 +336,9 @@ export default function UsersManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}

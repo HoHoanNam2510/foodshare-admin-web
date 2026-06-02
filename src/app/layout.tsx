@@ -37,7 +37,7 @@ export default function RootLayout({
     >
       {/* Thêm suppressHydrationWarning vào body */}
       <body
-        className="font-body antialiased bg-surface dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+        className="font-body antialiased bg-surface dark:bg-gray-950 text-gray-900 dark:text-gray-100"
         suppressHydrationWarning
       >
         <ThemeProvider

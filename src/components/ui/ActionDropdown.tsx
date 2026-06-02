@@ -28,7 +28,8 @@ interface ActionDropdownProps {
 }
 
 const VARIANT_CLASS: Record<string, string> = {
-  default: 'text-gray-700 hover:bg-primary/5 hover:text-primary',
+  default:
+    'text-gray-700 dark:text-gray-300 hover:bg-primary/5 hover:text-primary',
   danger: 'text-error hover:bg-error/10',
   primary: 'text-primary hover:bg-primary/10',
   secondary: 'text-secondary hover:bg-secondary/10',
@@ -76,12 +77,12 @@ export default function ActionDropdown({
   const menu = (
     <div
       style={menuStyle}
-      className={`${width} bg-surface-lowest border border-outline-variant/30 rounded-2xl shadow-hover z-9999 py-1 overflow-hidden animate-in fade-in zoom-in-95`}
+      className={`${width} bg-surface-lowest dark:bg-gray-900 border border-outline-variant/30 dark:border-gray-700 rounded-2xl shadow-hover z-9999 py-1 overflow-hidden animate-in fade-in zoom-in-95`}
     >
       {visibleActions.map((action) => (
         <div key={action.label}>
           {action.dividerBefore && (
-            <div className="h-px bg-outline-variant/20 my-1" />
+            <div className="h-px bg-outline-variant/20 dark:bg-gray-800 my-1" />
           )}
           <button
             onClick={(e) => {
@@ -104,7 +105,7 @@ export default function ActionDropdown({
         ref={triggerRef}
         onClick={handleToggle}
         disabled={loading}
-        className="p-2 text-gray-400 hover:text-gray-800 hover:bg-surface-container rounded-md transition-colors disabled:opacity-50"
+        className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors disabled:opacity-50"
       >
         {loading ? (
           <Loader2 size={18} className="animate-spin" />

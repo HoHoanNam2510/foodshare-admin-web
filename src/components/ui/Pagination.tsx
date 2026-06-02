@@ -12,12 +12,17 @@ export default function Pagination({
   onPageChange,
 }: PaginationProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-surface-lowest border-t border-outline-variant/30 sm:px-6">
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between font-body text-sm text-gray-500">
+    <div className="flex items-center justify-between px-4 py-3 bg-surface-lowest dark:bg-gray-900 border-t border-outline-variant/30 dark:border-gray-800 sm:px-6">
+      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between font-body text-sm text-gray-500 dark:text-gray-400">
         <p>
           Hiển thị trang{' '}
-          <span className="font-bold text-gray-900">{currentPage}</span> trên
-          tổng số <span className="font-bold text-gray-900">{totalPages}</span>{' '}
+          <span className="font-bold text-gray-900 dark:text-gray-100">
+            {currentPage}
+          </span>{' '}
+          trên tổng số{' '}
+          <span className="font-bold text-gray-900 dark:text-gray-100">
+            {totalPages}
+          </span>{' '}
           trang
         </p>
       </div>
@@ -25,7 +30,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center p-2 rounded-lg border border-outline-variant/50 bg-surface-lowest text-gray-500 hover:bg-surface-container hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="relative inline-flex items-center p-2 rounded-lg border border-outline-variant/50 dark:border-gray-700 bg-surface-lowest dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-surface-container dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           <span className="sr-only">Previous</span>
           <ChevronLeft size={16} />
@@ -39,7 +44,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="relative inline-flex items-center p-2 rounded-lg border border-outline-variant/50 bg-surface-lowest text-gray-500 hover:bg-surface-container hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="relative inline-flex items-center p-2 rounded-lg border border-outline-variant/50 dark:border-gray-700 bg-surface-lowest dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-surface-container dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           <span className="sr-only">Next</span>
           <ChevronRight size={16} />

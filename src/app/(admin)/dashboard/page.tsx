@@ -187,10 +187,10 @@ export default function DashboardPage() {
             <LayoutDashboard size={24} className="text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-sans font-extrabold text-neutral-T10 tracking-tight">
+            <h1 className="text-2xl font-sans font-extrabold text-neutral-T10 dark:text-gray-100 tracking-tight">
               Tổng quan hệ thống
             </h1>
-            <p className="text-sm font-body text-neutral-T60 mt-0.5">
+            <p className="text-sm font-body text-neutral-T60 dark:text-gray-400 mt-0.5">
               Theo dõi các chỉ số tăng trưởng và hoạt động
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function DashboardPage() {
       ) : null}
 
       {/* ── TABS ── */}
-      <div className="flex items-center gap-1 bg-surface-lowest p-1.5 rounded-xl border border-outline-variant/30 shadow-sm overflow-x-auto">
+      <div className="flex items-center gap-1 bg-surface-lowest dark:bg-gray-900 p-1.5 rounded-xl border border-outline-variant/30 dark:border-gray-800 shadow-sm overflow-x-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -227,7 +227,7 @@ export default function DashboardPage() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all ${
                 isActive
                   ? 'bg-primary text-white shadow-soft'
-                  : 'text-neutral-T60 hover:bg-primary/5 hover:text-primary'
+                  : 'text-neutral-T60 dark:text-gray-400 hover:bg-primary/5 hover:text-primary'
               }`}
             >
               <tab.icon size={16} />

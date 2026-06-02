@@ -39,15 +39,15 @@ export default function ChartSection({
   onTimeRangeChange,
 }: ChartSectionProps) {
   return (
-    <div className="bg-surface-lowest rounded-lg shadow-soft border border-outline-variant/30 overflow-hidden">
+    <div className="bg-surface-lowest dark:bg-gray-900 rounded-lg shadow-soft dark:shadow-none border border-outline-variant/30 dark:border-gray-800 overflow-hidden">
       {/* Header with gradient accent */}
-      <div className="px-6 py-5 border-b border-outline-variant/20 bg-linear-to-r from-primary/3 to-transparent">
+      <div className="px-6 py-5 border-b border-outline-variant/20 dark:border-gray-800 bg-linear-to-r from-primary/3 to-transparent">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h2 className="font-sans font-bold text-lg text-neutral-T10 tracking-tight">
+            <h2 className="font-sans font-bold text-lg text-neutral-T10 dark:text-gray-100 tracking-tight">
               Biểu đồ tăng trưởng
             </h2>
-            <p className="text-xs font-body text-neutral-T60 mt-0.5">
+            <p className="text-xs font-body text-neutral-T60 dark:text-gray-400 mt-0.5">
               {tabLabels[activeTab]} — theo{' '}
               {timeRange === 'day'
                 ? 'giờ'
@@ -67,13 +67,13 @@ export default function ChartSection({
             />
 
             {/* Chart type toggle */}
-            <div className="flex items-center gap-0.5 p-0.5 bg-surface rounded-xl border border-outline-variant/30">
+            <div className="flex items-center gap-0.5 p-0.5 bg-surface dark:bg-gray-800 rounded-xl border border-outline-variant/30 dark:border-gray-700">
               <button
                 onClick={() => onChartTypeChange('bar')}
                 className={`p-2 rounded-lg transition-all ${
                   chartType === 'bar'
                     ? 'bg-linear-to-br from-primary to-primary-container text-white shadow-soft'
-                    : 'text-neutral-T60 hover:text-primary hover:bg-primary/5'
+                    : 'text-neutral-T60 dark:text-gray-400 hover:text-primary hover:bg-primary/5'
                 }`}
               >
                 <BarChart2 size={16} />
@@ -83,7 +83,7 @@ export default function ChartSection({
                 className={`p-2 rounded-lg transition-all ${
                   chartType === 'line'
                     ? 'bg-linear-to-br from-primary to-primary-container text-white shadow-soft'
-                    : 'text-neutral-T60 hover:text-primary hover:bg-primary/5'
+                    : 'text-neutral-T60 dark:text-gray-400 hover:text-primary hover:bg-primary/5'
                 }`}
               >
                 <TrendingUp size={16} />
@@ -101,7 +101,7 @@ export default function ChartSection({
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Loader2 size={24} className="animate-spin text-primary" />
               </div>
-              <span className="text-sm font-body text-neutral-T60">
+              <span className="text-sm font-body text-neutral-T60 dark:text-gray-400">
                 Đang tải biểu đồ...
               </span>
             </div>

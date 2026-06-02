@@ -9,7 +9,6 @@ import {
   XCircle,
   Trash2,
   Pencil,
-  RefreshCw,
 } from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
@@ -24,7 +23,6 @@ import {
   adminUpdatePost,
   adminToggleHidePost,
   adminSoftDeletePost,
-  adminBulkUpdateStatus,
   type IPost,
   type PaginationMeta,
   type AdminUpdatePostBody,
@@ -64,9 +62,6 @@ export default function PostsManagementPage() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const [editPost, setEditPost] = useState<IPost | null>(null);
-
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkActing, setIsBulkActing] = useState(false);
 
   const loadPosts = useCallback(async () => {
     setIsLoading(true);
@@ -151,42 +146,6 @@ export default function PostsManagementPage() {
     }
   };
 
-  const pendingManualIds = filteredPosts
-    .filter((p) => p.status === 'PENDING_MANUAL')
-    .map((p) => p._id);
-
-  const toggleSelectAll = () => {
-    if (
-      selectedIds.size === pendingManualIds.length &&
-      pendingManualIds.length > 0
-    ) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(pendingManualIds));
-    }
-  };
-
-  const toggleSelectOne = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const handleBulkAction = async (status: 'AVAILABLE' | 'REJECTED') => {
-    if (selectedIds.size === 0) return;
-    setIsBulkActing(true);
-    try {
-      await adminBulkUpdateStatus(Array.from(selectedIds), status);
-      setSelectedIds(new Set());
-      await loadPosts();
-    } finally {
-      setIsBulkActing(false);
-    }
-  };
-
   const buildActions = (post: IPost): DropdownAction[] => {
     const expired = isExpired(post);
     return [
@@ -245,41 +204,13 @@ export default function PostsManagementPage() {
     ];
   };
 
-  const allPendingSelected =
-    pendingManualIds.length > 0 &&
-    pendingManualIds.every((id) => selectedIds.has(id));
-
   const columns: Column<IPost>[] = [
-    {
-      key: 'select',
-      header: (
-        <input
-          type="checkbox"
-          checked={allPendingSelected}
-          onChange={toggleSelectAll}
-          disabled={pendingManualIds.length === 0}
-          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40 disabled:opacity-30"
-          title="Chọn tất cả PENDING_MANUAL"
-        />
-      ) as unknown as string,
-      align: 'center',
-      render: (post) =>
-        post.status === 'PENDING_MANUAL' ? (
-          <input
-            type="checkbox"
-            checked={selectedIds.has(post._id)}
-            onChange={() => toggleSelectOne(post._id)}
-            onClick={(e) => e.stopPropagation()}
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40"
-          />
-        ) : null,
-    },
     {
       key: 'post',
       header: 'Bài đăng',
       render: (post) => (
         <div className="flex flex-col min-w-50 gap-1">
-          <span className="font-semibold text-gray-900 line-clamp-1">
+          <span className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
             {post.title}
           </span>
           <div className="flex items-center gap-1.5">
@@ -307,7 +238,7 @@ export default function PostsManagementPage() {
       header: 'Loại hình & Giá',
       render: (post) => (
         <div className="flex flex-col">
-          <span className="text-gray-900 font-medium">
+          <span className="text-gray-900 dark:text-gray-100 font-medium">
             {post.type === 'P2P_FREE' ? 'P2P – Tặng' : 'B2C – Túi mù'}
           </span>
           <span className="text-xs mt-0.5">
@@ -322,7 +253,7 @@ export default function PostsManagementPage() {
       align: 'center',
       render: (post) => (
         <>
-          <span className="font-semibold text-gray-900">
+          <span className="font-semibold text-gray-900 dark:text-gray-100">
             {post.remainingQuantity}
           </span>
           <span className="text-gray-500"> / {post.totalQuantity}</span>
@@ -351,7 +282,7 @@ export default function PostsManagementPage() {
       header: 'Ngày tạo',
       render: (post) => (
         <div className="flex flex-col text-xs">
-          <span className="text-gray-700 font-medium">
+          <span className="text-gray-700 dark:text-gray-300 font-medium">
             {formatTime(post.createdAt)}
           </span>
           <span className="text-gray-400">{formatDate(post.createdAt)}</span>
@@ -367,7 +298,9 @@ export default function PostsManagementPage() {
           <div className="flex flex-col text-xs">
             <span
               className={
-                expired ? 'text-error font-medium' : 'text-gray-700 font-medium'
+                expired
+                  ? 'text-error dark:text-red-400 font-medium'
+                  : 'text-gray-700 dark:text-gray-300 font-medium'
               }
             >
               {formatTime(post.expiryDate)}
@@ -456,53 +389,13 @@ export default function PostsManagementPage() {
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        className="rounded-md overflow-visible relative"
+        className="rounded-2xl relative"
         tableClassName="min-h-100"
-        headerClassName="bg-surface/50 font-label text-xs uppercase text-gray-500"
+        headerClassName="bg-surface/50 dark:bg-gray-800/50 font-label text-xs uppercase text-gray-500"
         bodyClassName="divide-outline-variant/20 text-sm"
         rowClassName="hover:bg-primary/5 transition-colors"
         cellClassName={(col) => (col.key === 'actions' ? 'px-3' : '')}
       />
-
-      {/* Bulk action bar — sticky bottom, shown when items selected */}
-      {selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl bg-gray-900 px-5 py-3 shadow-2xl">
-          <span className="text-sm font-semibold text-white">
-            {selectedIds.size} bài được chọn
-          </span>
-          <div className="h-4 w-px bg-gray-600" />
-          <button
-            onClick={() => handleBulkAction('AVAILABLE')}
-            disabled={isBulkActing}
-            className="flex items-center gap-1.5 rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-400 disabled:opacity-60 transition"
-          >
-            {isBulkActing ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <CheckCircle className="w-3.5 h-3.5" />
-            )}
-            Duyệt tất cả
-          </button>
-          <button
-            onClick={() => handleBulkAction('REJECTED')}
-            disabled={isBulkActing}
-            className="flex items-center gap-1.5 rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-400 disabled:opacity-60 transition"
-          >
-            {isBulkActing ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <XCircle className="w-3.5 h-3.5" />
-            )}
-            Từ chối tất cả
-          </button>
-          <button
-            onClick={() => setSelectedIds(new Set())}
-            className="text-xs text-gray-400 hover:text-white transition"
-          >
-            Hủy
-          </button>
-        </div>
-      )}
 
       <PostDetailModal
         post={selectedPost}

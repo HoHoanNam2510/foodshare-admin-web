@@ -15,11 +15,13 @@ export default function PageHeader({
   return (
     <div className="flex items-start justify-between">
       <div>
-        <h1 className="text-2xl font-sans font-bold text-gray-900 leading-tight">
+        <h1 className="text-2xl font-sans font-bold text-gray-900 dark:text-gray-100 leading-tight">
           {title}
         </h1>
         {subtitle && (
-          <p className="text-sm font-body text-gray-500 mt-1">{subtitle}</p>
+          <p className="text-sm font-body text-gray-500 dark:text-gray-400 mt-1">
+            {subtitle}
+          </p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}
