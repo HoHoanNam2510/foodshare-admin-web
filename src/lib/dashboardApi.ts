@@ -79,3 +79,15 @@ export async function fetchDashboardTable(
   );
   return { data: res.data.data, pagination: res.data.pagination };
 }
+
+export async function fetchDashboardTableAll(
+  tab: TabId,
+  sortOrder: SortOrder = 'desc'
+): Promise<unknown[]> {
+  const res = await axiosInstance.get<{
+    success: boolean;
+    data: unknown[];
+    pagination: PaginationMeta;
+  }>(`/dashboard/table?tab=${tab}&page=1&limit=10000&sortOrder=${sortOrder}`);
+  return res.data.data;
+}

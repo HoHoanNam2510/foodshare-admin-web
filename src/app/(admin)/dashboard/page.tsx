@@ -24,6 +24,7 @@ import {
   fetchDashboardStats,
   fetchDashboardChart,
   fetchDashboardTable,
+  fetchDashboardTableAll,
   type OverviewStats,
   type ChartPoint,
   type PaginationMeta,
@@ -39,12 +40,6 @@ const TAB_FILENAME_LABELS: Record<TabId, string> = {
   transactions: 'GiaoDich',
   reports: 'BaoCao',
   audits: 'AuditLog',
-};
-
-const TIME_RANGE_FILENAME_LABELS: Record<TimeRange, string> = {
-  day: 'Ngay',
-  week: 'Tuan',
-  month: 'Thang',
 };
 
 const tabs: { id: TabId; label: string; icon: typeof Users }[] = [
@@ -78,6 +73,7 @@ export default function DashboardPage() {
   const [loadingStats, setLoadingStats] = useState(false);
   const [loadingChart, setLoadingChart] = useState(false);
   const [loadingTable, setLoadingTable] = useState(false);
+  const [loadingExport, setLoadingExport] = useState(false);
 
   // ── Fetch stats ──
   useEffect(() => {
@@ -133,37 +129,42 @@ export default function DashboardPage() {
     setCurrentPage(1);
   };
 
-  const handleExportCSV = () => {
-    const csvCols = getCsvColumnsForTab(activeTab);
-    const headerRow = csvCols.map((c) => c.header).join(',');
-    const rows = filteredData.map((row) =>
-      csvCols
-        .map((c) => {
-          const val = c.getValue(row);
-          const escaped = val.replace(/"/g, '""');
-          return escaped.includes(',') ||
-            escaped.includes('"') ||
-            escaped.includes('\n')
-            ? `"${escaped}"`
-            : escaped;
-        })
-        .join(',')
-    );
-    const csv = [headerRow, ...rows].join('\n');
-    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+  const handleExportCSV = async () => {
+    setLoadingExport(true);
+    try {
+      const allData = await fetchDashboardTableAll(activeTab, tableSortOrder);
+      const csvCols = getCsvColumnsForTab(activeTab);
+      const headerRow = csvCols.map((c) => c.header).join(',');
+      const rows = allData.map((row) =>
+        csvCols
+          .map((c) => {
+            const val = c.getValue(row);
+            const escaped = val.replace(/"/g, '""');
+            return escaped.includes(',') ||
+              escaped.includes('"') ||
+              escaped.includes('\n')
+              ? `"${escaped}"`
+              : escaped;
+          })
+          .join(',')
+      );
+      const csv = [headerRow, ...rows].join('\n');
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
 
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const d = chartDate;
-    const datePart = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
-    const tabLabel = TAB_FILENAME_LABELS[activeTab];
-    const rangeLabel = TIME_RANGE_FILENAME_LABELS[timeRange];
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const datePart = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}`;
+      const tabLabel = TAB_FILENAME_LABELS[activeTab];
 
-    a.download = `FoodShare_${tabLabel}_${rangeLabel}_${datePart}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+      a.download = `FoodShare_${tabLabel}_${datePart}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setLoadingExport(false);
+    }
   };
 
   // Client-side search filter (server already paginated)
@@ -216,10 +217,14 @@ export default function DashboardPage() {
         </div>
         <button
           onClick={handleExportCSV}
-          disabled={filteredData.length === 0}
+          disabled={loadingExport}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-primary text-white hover:bg-primary-T30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-soft"
         >
-          <Download size={16} />
+          {loadingExport ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Download size={16} />
+          )}
           Xuất CSV
         </button>
       </div>

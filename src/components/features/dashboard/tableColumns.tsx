@@ -43,6 +43,7 @@ export interface TransactionRow {
   totalAmount?: number;
   createdAt: string;
   postId?: PostRef;
+  postSnapshot?: { title: string };
   requesterId?: UserRef;
   ownerId?: UserRef;
 }
@@ -71,24 +72,22 @@ export interface AuditRow {
 
 // ─── Helpers ─────────────────────────────────────────────────
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string): string {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}/${d.getFullYear()}`;
 }
 
-function formatDateTime(dateStr: string) {
+function formatDateTime(dateStr: string): string {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const hour = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${d.getFullYear()} ${hour}:${min}`;
 }
 
 const userColumns: Column<UserRow>[] = [
@@ -228,11 +227,18 @@ const transactionColumns: Column<TransactionRow>[] = [
     header: 'Bài đăng',
     maxWidth: 'max-w-[180px]',
     truncate: true,
-    render: (row) => (
-      <span className="font-semibold text-neutral-T10 dark:text-gray-100">
-        {row.postId?.title || '—'}
-      </span>
-    ),
+    render: (row) => {
+      const title = row.postId?.title || row.postSnapshot?.title;
+      return title ? (
+        <span className="font-semibold text-neutral-T10 dark:text-gray-100">
+          {title}
+        </span>
+      ) : (
+        <span className="text-neutral-T60 dark:text-gray-500 italic text-xs">
+          [Đã xóa]
+        </span>
+      );
+    },
   },
   {
     key: 'requester',
@@ -399,7 +405,11 @@ const auditColumns: Column<AuditRow>[] = [
         </div>
       ) : (
         <span className="font-semibold text-neutral-T10 dark:text-gray-100">
-          {row.title || row.targetType || `${row.type} — ${row.status}`}
+          {row.title ||
+            row.targetType ||
+            (row.type || row.status
+              ? `${row.type ?? ''} — ${row.status ?? ''}`
+              : '—')}
         </span>
       ),
   },
@@ -459,11 +469,12 @@ const postCsvColumns: CsvColumn[] = [
   },
   { header: 'Trạng thái', getValue: (row) => (row as PostRow).status || '' },
   {
-    header: 'Còn lại / Tổng',
-    getValue: (row) => {
-      const r = row as PostRow;
-      return `${r.remainingQuantity}/${r.totalQuantity}`;
-    },
+    header: 'Còn lại',
+    getValue: (row) => String((row as PostRow).remainingQuantity ?? ''),
+  },
+  {
+    header: 'Tổng số',
+    getValue: (row) => String((row as PostRow).totalQuantity ?? ''),
   },
   {
     header: 'Ngày tạo',
@@ -474,7 +485,10 @@ const postCsvColumns: CsvColumn[] = [
 const transactionCsvColumns: CsvColumn[] = [
   {
     header: 'Bài đăng',
-    getValue: (row) => (row as TransactionRow).postId?.title || '',
+    getValue: (row) => {
+      const r = row as TransactionRow;
+      return r.postId?.title || r.postSnapshot?.title || '[Đã xóa]';
+    },
   },
   {
     header: 'Người yêu cầu',
@@ -541,7 +555,7 @@ const auditCsvColumns: CsvColumn[] = [
       );
     },
   },
-  { header: 'Trạng thái', getValue: (row) => (row as AuditRow).status || '' },
+  { header: 'Trạng thái', getValue: (row) => (row as AuditRow).status || '—' },
   {
     header: 'Cập nhật lúc',
     getValue: (row) => formatDateTime((row as AuditRow).updatedAt),

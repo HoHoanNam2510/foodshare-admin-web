@@ -439,7 +439,7 @@ function StatCard({
     <div
       className={`bg-surface-lowest dark:bg-gray-900 border rounded-md p-4 shadow-sm flex items-center gap-4 ${bg}`}
     >
-      <div className="w-10 h-10 rounded-xl bg-white/60 dark:bg-gray-700/60 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="w-10 h-10 rounded-xl bg-surface-container dark:bg-gray-700/60 flex items-center justify-center shrink-0 overflow-hidden">
         {icon}
       </div>
       <div className="min-w-0">
