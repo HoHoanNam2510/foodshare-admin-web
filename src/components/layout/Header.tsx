@@ -132,7 +132,7 @@ export default function Header() {
               {user?.avatar ? (
                 <Image
                   src={user.avatar}
-                  alt={user.fullName}
+                  alt={user.fullName ?? ''}
                   width={32}
                   height={32}
                   className="w-full h-full object-cover"
@@ -145,7 +145,7 @@ export default function Header() {
             </div>
 
             <div className="flex flex-col items-start min-w-0">
-              <span className="font-body text-xs font-semibold text-gray-900 truncate max-w-28">
+              <span className="font-body text-xs font-semibold text-gray-900 dark:text-gray-100 truncate max-w-28">
                 {user?.fullName ?? '—'}
               </span>
               <span className="font-body text-[10px] text-gray-500 -mt-0.5">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Users,
   Loader2,
@@ -16,6 +16,7 @@ import ChartSection from '@/components/features/dashboard/ChartSection';
 import {
   getColumnsForTab,
   getRowKey,
+  getCsvColumnsForTab,
 } from '@/components/features/dashboard/tableColumns';
 import DataTable, { type SortOrder } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
@@ -31,6 +32,20 @@ import {
 } from '@/lib/dashboardApi';
 
 // ─── Tab config ──────────────────────────────────────────────
+
+const TAB_FILENAME_LABELS: Record<TabId, string> = {
+  users: 'NguoiDung',
+  posts: 'BaiDang',
+  transactions: 'GiaoDich',
+  reports: 'BaoCao',
+  audits: 'AuditLog',
+};
+
+const TIME_RANGE_FILENAME_LABELS: Record<TimeRange, string> = {
+  day: 'Ngay',
+  week: 'Tuan',
+  month: 'Thang',
+};
 
 const tabs: { id: TabId; label: string; icon: typeof Users }[] = [
   { id: 'users', label: 'Người dùng', icon: Users },
@@ -60,43 +75,42 @@ export default function DashboardPage() {
   const [tableData, setTableData] = useState<unknown[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
 
-  // Loading via useTransition (avoids setState-in-effect cascades)
-  const [loadingStats, startStatsTransition] = useTransition();
-  const [loadingChart, startChartTransition] = useTransition();
-  const [loadingTable, startTableTransition] = useTransition();
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [loadingChart, setLoadingChart] = useState(false);
+  const [loadingTable, setLoadingTable] = useState(false);
 
   // ── Fetch stats ──
   useEffect(() => {
-    startStatsTransition(() => {
-      void fetchDashboardStats()
-        .then(setStats)
-        .catch(() => setStats(null));
-    });
+    setLoadingStats(true);
+    fetchDashboardStats()
+      .then(setStats)
+      .catch(() => setStats(null))
+      .finally(() => setLoadingStats(false));
   }, []);
 
   // ── Fetch chart ──
   useEffect(() => {
     const dateStr = chartDate.toISOString().split('T')[0];
-    startChartTransition(() => {
-      void fetchDashboardChart(activeTab, timeRange, dateStr)
-        .then(setChartData)
-        .catch(() => setChartData([]));
-    });
+    setLoadingChart(true);
+    fetchDashboardChart(activeTab, timeRange, dateStr)
+      .then(setChartData)
+      .catch(() => setChartData([]))
+      .finally(() => setLoadingChart(false));
   }, [activeTab, timeRange, chartDate]);
 
   // ── Fetch table ──
   const loadTable = useCallback(() => {
-    startTableTransition(() => {
-      void fetchDashboardTable(activeTab, currentPage, 10, tableSortOrder)
-        .then(({ data, pagination: pg }) => {
-          setTableData(data);
-          setPagination(pg);
-        })
-        .catch(() => {
-          setTableData([]);
-          setPagination(null);
-        });
-    });
+    setLoadingTable(true);
+    fetchDashboardTable(activeTab, currentPage, 10, tableSortOrder)
+      .then(({ data, pagination: pg }) => {
+        setTableData(data);
+        setPagination(pg);
+      })
+      .catch(() => {
+        setTableData([]);
+        setPagination(null);
+      })
+      .finally(() => setLoadingTable(false));
   }, [activeTab, currentPage, tableSortOrder]);
 
   useEffect(() => {
@@ -120,29 +134,34 @@ export default function DashboardPage() {
   };
 
   const handleExportCSV = () => {
-    const cols = getColumnsForTab(activeTab);
-    const headerRow = cols.map((c) => c.header).join(',');
-    const rows = filteredData.map((row) => {
-      const r = row as Record<string, unknown>;
-      return cols
+    const csvCols = getCsvColumnsForTab(activeTab);
+    const headerRow = csvCols.map((c) => c.header).join(',');
+    const rows = filteredData.map((row) =>
+      csvCols
         .map((c) => {
-          const val = r[c.key];
-          if (val === null || val === undefined) return '';
-          if (typeof val === 'object') {
-            const o = val as Record<string, unknown>;
-            return `"${o.fullName ?? o.title ?? JSON.stringify(val)}"`;
-          }
-          const str = String(val).replace(/"/g, '""');
-          return str.includes(',') || str.includes('\n') ? `"${str}"` : str;
+          const val = c.getValue(row);
+          const escaped = val.replace(/"/g, '""');
+          return escaped.includes(',') ||
+            escaped.includes('"') ||
+            escaped.includes('\n')
+            ? `"${escaped}"`
+            : escaped;
         })
-        .join(',');
-    });
+        .join(',')
+    );
     const csv = [headerRow, ...rows].join('\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `foodshare_${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const d = chartDate;
+    const datePart = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+    const tabLabel = TAB_FILENAME_LABELS[activeTab];
+    const rangeLabel = TIME_RANGE_FILENAME_LABELS[timeRange];
+
+    a.download = `FoodShare_${tabLabel}_${rangeLabel}_${datePart}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

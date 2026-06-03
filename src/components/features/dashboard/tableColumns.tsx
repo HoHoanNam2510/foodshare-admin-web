@@ -72,6 +72,7 @@ export interface AuditRow {
 // ─── Helpers ─────────────────────────────────────────────────
 
 function formatDate(dateStr: string) {
+  if (!dateStr) return '—';
   return new Date(dateStr).toLocaleDateString('vi-VN', {
     day: '2-digit',
     month: '2-digit',
@@ -80,6 +81,7 @@ function formatDate(dateStr: string) {
 }
 
 function formatDateTime(dateStr: string) {
+  if (!dateStr) return '—';
   return new Date(dateStr).toLocaleString('vi-VN', {
     day: '2-digit',
     month: '2-digit',
@@ -424,6 +426,138 @@ const auditColumns: Column<AuditRow>[] = [
     ),
   },
 ];
+
+// ─── CSV column definitions ──────────────────────────────────
+
+export interface CsvColumn {
+  header: string;
+  getValue: (row: unknown) => string;
+}
+
+const userCsvColumns: CsvColumn[] = [
+  { header: 'Họ tên', getValue: (row) => (row as UserRow).fullName || '' },
+  { header: 'Email', getValue: (row) => (row as UserRow).email || '' },
+  { header: 'Vai trò', getValue: (row) => (row as UserRow).role || '' },
+  { header: 'Trạng thái', getValue: (row) => (row as UserRow).status || '' },
+  { header: 'KYC', getValue: (row) => (row as UserRow).kycStatus || '' },
+  {
+    header: 'Ngày tạo',
+    getValue: (row) => formatDate((row as UserRow).createdAt),
+  },
+];
+
+const postCsvColumns: CsvColumn[] = [
+  { header: 'Tiêu đề', getValue: (row) => (row as PostRow).title || '' },
+  {
+    header: 'Người đăng',
+    getValue: (row) => (row as PostRow).ownerId?.fullName || '',
+  },
+  {
+    header: 'Loại bài',
+    getValue: (row) =>
+      (row as PostRow).type === 'P2P_FREE' ? 'P2P Miễn phí' : 'B2C Mystery Bag',
+  },
+  { header: 'Trạng thái', getValue: (row) => (row as PostRow).status || '' },
+  {
+    header: 'Còn lại / Tổng',
+    getValue: (row) => {
+      const r = row as PostRow;
+      return `${r.remainingQuantity}/${r.totalQuantity}`;
+    },
+  },
+  {
+    header: 'Ngày tạo',
+    getValue: (row) => formatDate((row as PostRow).createdAt),
+  },
+];
+
+const transactionCsvColumns: CsvColumn[] = [
+  {
+    header: 'Bài đăng',
+    getValue: (row) => (row as TransactionRow).postId?.title || '',
+  },
+  {
+    header: 'Người yêu cầu',
+    getValue: (row) => (row as TransactionRow).requesterId?.fullName || '',
+  },
+  {
+    header: 'Chủ bài',
+    getValue: (row) => (row as TransactionRow).ownerId?.fullName || '',
+  },
+  {
+    header: 'Loại GD',
+    getValue: (row) =>
+      (row as TransactionRow).type === 'REQUEST' ? 'Xin (P2P)' : 'Mua (B2C)',
+  },
+  {
+    header: 'Trạng thái',
+    getValue: (row) => (row as TransactionRow).status || '',
+  },
+  {
+    header: 'Số tiền (VNĐ)',
+    getValue: (row) => {
+      const r = row as TransactionRow;
+      return r.totalAmount ? String(r.totalAmount) : '0';
+    },
+  },
+  {
+    header: 'Ngày tạo',
+    getValue: (row) => formatDate((row as TransactionRow).createdAt),
+  },
+];
+
+const reportCsvColumns: CsvColumn[] = [
+  {
+    header: 'Người báo cáo',
+    getValue: (row) => (row as ReportRow).reporterId?.fullName || '',
+  },
+  {
+    header: 'Loại mục tiêu',
+    getValue: (row) => (row as ReportRow).targetType || '',
+  },
+  { header: 'Lý do', getValue: (row) => (row as ReportRow).reason || '' },
+  { header: 'Trạng thái', getValue: (row) => (row as ReportRow).status || '' },
+  {
+    header: 'Hành động',
+    getValue: (row) => (row as ReportRow).actionTaken || '',
+  },
+  {
+    header: 'Ngày tạo',
+    getValue: (row) => formatDate((row as ReportRow).createdAt),
+  },
+];
+
+const auditCsvColumns: CsvColumn[] = [
+  { header: 'Loại', getValue: (row) => (row as AuditRow)._type || '' },
+  {
+    header: 'Thông tin',
+    getValue: (row) => {
+      const r = row as AuditRow;
+      return (
+        r.fullName ??
+        r.title ??
+        r.targetType ??
+        (r.type || r.status ? `${r.type ?? ''} - ${r.status ?? ''}` : '')
+      );
+    },
+  },
+  { header: 'Trạng thái', getValue: (row) => (row as AuditRow).status || '' },
+  {
+    header: 'Cập nhật lúc',
+    getValue: (row) => formatDateTime((row as AuditRow).updatedAt),
+  },
+];
+
+export function getCsvColumnsForTab(tab: TabId): CsvColumn[] {
+  const map: Record<TabId, CsvColumn[]> = {
+    users: userCsvColumns,
+    posts: postCsvColumns,
+    transactions: transactionCsvColumns,
+    reports: reportCsvColumns,
+    audits: auditCsvColumns,
+  };
+  return map[tab];
+}
 
 export function getColumnsForTab(tab: TabId): Column<unknown>[] {
   const map: Record<TabId, Column<unknown>[]> = {
