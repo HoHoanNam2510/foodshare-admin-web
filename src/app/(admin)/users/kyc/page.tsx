@@ -345,8 +345,18 @@ export default function KycReviewPage() {
                 <div className="flex items-start justify-between gap-4">
                   {/* ── Left: User info ── */}
                   <div className="flex items-start gap-4 flex-1 min-w-0">
-                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-lg font-bold shrink-0">
-                      {user.fullName.charAt(0).toUpperCase()}
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary-container to-secondary-container flex items-center justify-center text-white font-sans text-lg font-bold shrink-0 overflow-hidden">
+                      {user.avatar ? (
+                        <Image
+                          src={user.avatar}
+                          alt={user.fullName}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        user.fullName.charAt(0).toUpperCase()
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-0">

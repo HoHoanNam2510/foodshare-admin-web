@@ -113,7 +113,7 @@ export default function Sidebar() {
                       className={`shrink-0 transition-colors ${isActive ? 'text-white' : ''}`}
                     />
                     <span
-                      className={`flex-1 font-body text-sm whitespace-nowrap transition-colors ${isActive ? 'font-bold' : 'font-medium'}`}
+                      className={`flex-1 font-body text-sm whitespace-nowrap ${isActive ? 'font-bold' : 'font-medium'}`}
                     >
                       {item.label}
                     </span>
@@ -133,7 +133,7 @@ export default function Sidebar() {
                       className={`shrink-0 transition-colors ${isActive ? 'text-white' : ''}`}
                     />
                     <span
-                      className={`flex-1 font-body text-sm whitespace-nowrap transition-colors ${isActive ? 'font-bold' : 'font-medium'}`}
+                      className={`flex-1 font-body text-sm whitespace-nowrap ${isActive ? 'font-bold' : 'font-medium'}`}
                     >
                       {item.label}
                     </span>
