@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Eye, HeartHandshake, ShoppingBag, Layers } from 'lucide-react';
-import TransactionDetailModal from '@/components/features/transactions/TransactionDetailModal';
+import dynamic from 'next/dynamic';
+const TransactionDetailModal = dynamic(
+  () => import('@/components/features/transactions/TransactionDetailModal'),
+  { loading: () => null }
+);
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
 import StatusBadge from '@/components/ui/StatusBadge';

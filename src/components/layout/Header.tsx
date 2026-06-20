@@ -104,14 +104,21 @@ export default function Header() {
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-primary/5 hover:text-primary dark:hover:text-primary transition-colors duration-200"
-            title={theme === 'dark' ? 'Chuyển sang sáng' : 'Chuyển sang tối'}
+            aria-label={
+              theme === 'dark'
+                ? 'Chuyển sang chế độ sáng'
+                : 'Chuyển sang chế độ tối'
+            }
           >
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         )}
 
         {/* Notifications Bell */}
-        <button className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-primary/5 hover:text-primary transition-colors duration-200">
+        <button
+          className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-primary/5 hover:text-primary transition-colors duration-200"
+          aria-label="Thông báo"
+        >
           <Bell size={20} />
         </button>
 

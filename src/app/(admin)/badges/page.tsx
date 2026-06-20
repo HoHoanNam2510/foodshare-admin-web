@@ -12,7 +12,11 @@ import {
   TrendingUp,
   Filter,
 } from 'lucide-react';
-import BadgeEditModal from '@/components/features/badges/BadgeEditModal';
+import dynamic from 'next/dynamic';
+const BadgeEditModal = dynamic(
+  () => import('@/components/features/badges/BadgeEditModal'),
+  { loading: () => null }
+);
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import PageHeader from '@/components/ui/PageHeader';

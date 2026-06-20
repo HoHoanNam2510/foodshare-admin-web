@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import {
   Trash2,
   RotateCcw,
@@ -274,7 +275,7 @@ export default function TrashPage() {
       await restoreTrashItem(activeTab, item._id);
       await loadItems();
     } catch {
-      alert('Khôi phục thất bại. Vui lòng thử lại.');
+      toast.error('Khôi phục thất bại. Vui lòng thử lại.');
     } finally {
       setRestoringId(null);
     }
@@ -292,7 +293,7 @@ export default function TrashPage() {
       await purgeTrashItem(activeTab, item._id);
       await loadItems();
     } catch {
-      alert('Xóa vĩnh viễn thất bại. Vui lòng thử lại.');
+      toast.error('Xóa vĩnh viễn thất bại. Vui lòng thử lại.');
     } finally {
       setPurgingId(null);
     }

@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 // Tự động đính kèm Admin Token vào mỗi request
 axiosInstance.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('admin_token');
+    const token = sessionStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,8 +28,8 @@ axiosInstance.interceptors.response.use(
     ) {
       // Chỉ redirect nếu đang ở trang admin (không phải trang login)
       if (!window.location.pathname.startsWith('/login')) {
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_user');
+        sessionStorage.removeItem('admin_token');
+        sessionStorage.removeItem('admin_user');
         window.location.replace('/login');
       }
     }

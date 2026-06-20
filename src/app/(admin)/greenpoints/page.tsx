@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import PointLogDetailModal from '@/components/features/greenpoints/PointLogDetailModal';
+import dynamic from 'next/dynamic';
+const PointLogDetailModal = dynamic(
+  () => import('@/components/features/greenpoints/PointLogDetailModal'),
+  { loading: () => null }
+);
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
 import PageHeader from '@/components/ui/PageHeader';

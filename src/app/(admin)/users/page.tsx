@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import {
   Eye,
@@ -19,8 +20,15 @@ import ActionDropdown, {
 } from '@/components/ui/ActionDropdown';
 import StatusBadge from '@/components/ui/StatusBadge';
 import UserAvatar from '@/components/ui/UserAvatar';
-import UserDetailModal from '@/components/features/users/UserDetailModal';
-import UserEditModal from '@/components/features/users/UserEditModal';
+import dynamic from 'next/dynamic';
+const UserDetailModal = dynamic(
+  () => import('@/components/features/users/UserDetailModal'),
+  { loading: () => null }
+);
+const UserEditModal = dynamic(
+  () => import('@/components/features/users/UserEditModal'),
+  { loading: () => null }
+);
 import { formatDate } from '@/lib/formatters';
 import {
   fetchUsers,
@@ -116,7 +124,7 @@ export default function UsersManagementPage() {
         );
       }
     } catch {
-      alert('Thao tác thất bại. Vui lòng thử lại.');
+      toast.error('Thao tác thất bại. Vui lòng thử lại.');
     } finally {
       setTogglingId(null);
     }
@@ -126,7 +134,7 @@ export default function UsersManagementPage() {
     setOpenDropdownId(null);
 
     if (adminUser && user._id === adminUser._id) {
-      alert('Bạn không thể xóa tài khoản của chính mình.');
+      toast.error('Bạn không thể xóa tài khoản của chính mình.');
       return;
     }
 
@@ -143,7 +151,7 @@ export default function UsersManagementPage() {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
           ?.message ?? 'Xóa tài khoản thất bại. Vui lòng thử lại.';
-      alert(msg);
+      toast.error(msg);
     } finally {
       setDeletingId(null);
     }

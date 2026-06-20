@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import Image from 'next/image';
 import {
   X,
@@ -58,7 +59,7 @@ export default function ChatDetailModal({
       onToggleLock();
       onClose();
     } catch {
-      alert('Không thể thực hiện thao tác. Vui lòng thử lại.');
+      toast.error('Không thể thực hiện thao tác. Vui lòng thử lại.');
     } finally {
       setIsLocking(false);
     }

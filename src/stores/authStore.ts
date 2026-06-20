@@ -52,8 +52,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
-      localStorage.setItem(TOKEN_KEY, data.token);
-      localStorage.setItem(USER_KEY, JSON.stringify(data.data));
+      sessionStorage.setItem(TOKEN_KEY, data.token);
+      sessionStorage.setItem(USER_KEY, JSON.stringify(data.data));
 
       set({
         token: data.token,
@@ -70,22 +70,22 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
     set({ token: null, user: null, error: null });
   },
 
   hydrate: () => {
     if (typeof window === 'undefined') return;
-    const token = localStorage.getItem(TOKEN_KEY);
-    const userJson = localStorage.getItem(USER_KEY);
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const userJson = sessionStorage.getItem(USER_KEY);
     if (token && userJson) {
       try {
         const user = JSON.parse(userJson) as AdminUser;
         set({ token, user });
       } catch {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(USER_KEY);
       }
     }
   },
@@ -94,7 +94,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set((state) => {
       if (!state.user) return state;
       const updated = { ...state.user, ...patch };
-      localStorage.setItem(USER_KEY, JSON.stringify(updated));
+      sessionStorage.setItem(USER_KEY, JSON.stringify(updated));
       return { user: updated };
     });
   },

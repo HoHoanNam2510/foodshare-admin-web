@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Epilogue, Be_Vietnam_Pro } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
+import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 // 1. Cấu hình font Epilogue (dùng cho Heading/Display)
@@ -42,11 +43,13 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
+          storageKey="foodshare-admin-theme"
           defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >
           {children}
+          <Toaster position="top-right" />
         </ThemeProvider>
       </body>
     </html>

@@ -2,8 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-import CategoryFormModal from '@/components/features/categories/CategoryFormModal';
+import dynamic from 'next/dynamic';
+const CategoryFormModal = dynamic(
+  () => import('@/components/features/categories/CategoryFormModal'),
+  { loading: () => null }
+);
 import ActionDropdown, {
   type DropdownAction,
 } from '@/components/ui/ActionDropdown';
@@ -68,7 +73,7 @@ export default function CategoriesPage() {
       await updateCategory(cat._id, { isActive: !cat.isActive });
       await loadCategories();
     } catch {
-      alert('Thao tác thất bại. Vui lòng thử lại.');
+      toast.error('Thao tác thất bại. Vui lòng thử lại.');
     } finally {
       setTogglingId(null);
     }
@@ -89,7 +94,7 @@ export default function CategoriesPage() {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
           ?.message ?? 'Xóa thất bại. Vui lòng thử lại.';
-      alert(msg);
+      toast.error(msg);
     } finally {
       setDeletingId(null);
     }

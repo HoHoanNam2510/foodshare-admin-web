@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { Layers, Clock, CheckCircle, XCircle, Eye, Trash2 } from 'lucide-react';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
@@ -9,7 +10,11 @@ import PageHeader from '@/components/ui/PageHeader';
 import ActionDropdown, {
   type DropdownAction,
 } from '@/components/ui/ActionDropdown';
-import ReportDetailModal from '@/components/features/reports/ReportDetailModal';
+import dynamic from 'next/dynamic';
+const ReportDetailModal = dynamic(
+  () => import('@/components/features/reports/ReportDetailModal'),
+  { loading: () => null }
+);
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
 import {
@@ -106,7 +111,7 @@ export default function ReportsManagementPage() {
       await adminSoftDeleteReport(r._id);
       setReports((prev) => prev.filter((x) => x._id !== r._id));
     } catch {
-      alert('Không thể xóa báo cáo. Vui lòng thử lại.');
+      toast.error('Không thể xóa báo cáo. Vui lòng thử lại.');
     }
   }, []);
 

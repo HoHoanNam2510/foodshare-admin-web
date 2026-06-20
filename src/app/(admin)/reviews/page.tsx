@@ -2,13 +2,18 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Eye, Trash2, Star } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import PageHeader from '@/components/ui/PageHeader';
 import ActionDropdown, {
   type DropdownAction,
 } from '@/components/ui/ActionDropdown';
-import ReviewDetailModal from '@/components/features/reviews/ReviewDetailModal';
+import dynamic from 'next/dynamic';
+const ReviewDetailModal = dynamic(
+  () => import('@/components/features/reviews/ReviewDetailModal'),
+  { loading: () => null }
+);
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
 import { fetchAdminReviews, type IReview } from '@/lib/reviewApi';
@@ -109,7 +114,7 @@ export default function ReviewsManagementPage() {
       if (selectedReview?._id === reviewId) setSelectedReview(null);
       await loadReviews();
     } catch {
-      alert('Xóa đánh giá thất bại. Vui lòng thử lại.');
+      toast.error('Xóa đánh giá thất bại. Vui lòng thử lại.');
     } finally {
       setDeletingId(null);
     }

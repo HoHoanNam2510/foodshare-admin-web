@@ -105,6 +105,8 @@ export default function ActionDropdown({
         ref={triggerRef}
         onClick={handleToggle}
         disabled={loading}
+        aria-label="Thao tác"
+        aria-expanded={isOpen}
         className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-surface-container dark:hover:bg-gray-800 rounded-md transition-colors disabled:opacity-50"
       >
         {loading ? (

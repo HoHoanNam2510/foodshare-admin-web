@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import {
   ShieldCheck,
   ShieldX,
@@ -247,7 +248,7 @@ export default function KycReviewPage() {
       await reviewKyc(user._id, action);
       await loadUsers();
     } catch {
-      alert('Thao tác thất bại. Vui lòng thử lại.');
+      toast.error('Thao tác thất bại. Vui lòng thử lại.');
     } finally {
       setReviewingId(null);
     }

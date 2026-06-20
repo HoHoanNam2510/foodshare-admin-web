@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
 import {
   Eye,
@@ -16,8 +17,15 @@ import PageHeader from '@/components/ui/PageHeader';
 import ActionDropdown, {
   type DropdownAction,
 } from '@/components/ui/ActionDropdown';
-import PostDetailModal from '@/components/features/posts/PostDetailModal';
-import EditPostModal from '@/components/features/posts/EditPostModal';
+import dynamic from 'next/dynamic';
+const PostDetailModal = dynamic(
+  () => import('@/components/features/posts/PostDetailModal'),
+  { loading: () => null }
+);
+const EditPostModal = dynamic(
+  () => import('@/components/features/posts/EditPostModal'),
+  { loading: () => null }
+);
 import {
   fetchAdminPosts,
   adminUpdatePost,
@@ -77,7 +85,7 @@ export default function PostsManagementPage() {
       setPosts(res.data);
       setPagination(res.pagination);
     } catch {
-      // error swallowed intentionally — table shows empty state
+      toast.error('Không thể tải danh sách bài đăng. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +113,7 @@ export default function PostsManagementPage() {
       await action();
       await loadPosts();
     } catch {
-      // error swallowed intentionally — action loading state resets
+      toast.error('Thao tác thất bại. Vui lòng thử lại.');
     } finally {
       setActionLoading(null);
     }

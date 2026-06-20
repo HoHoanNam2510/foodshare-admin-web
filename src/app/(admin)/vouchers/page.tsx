@@ -2,7 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Eye, ToggleLeft, ToggleRight, Ticket, Trash2 } from 'lucide-react';
-import VoucherDetailModal from '@/components/features/vouchers/VoucherDetailModal';
+import toast from 'react-hot-toast';
+import dynamic from 'next/dynamic';
+const VoucherDetailModal = dynamic(
+  () => import('@/components/features/vouchers/VoucherDetailModal'),
+  { loading: () => null }
+);
 import DataTable, { type Column } from '@/components/ui/DataTable';
 import Toolbar from '@/components/ui/Toolbar';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -86,7 +91,7 @@ export default function VouchersManagementPage() {
           prev ? { ...prev, isActive: res.data.isActive } : prev
         );
     } catch {
-      alert('Thao tác thất bại. Vui lòng thử lại.');
+      toast.error('Thao tác thất bại. Vui lòng thử lại.');
     } finally {
       setTogglingId(null);
     }
@@ -106,7 +111,7 @@ export default function VouchersManagementPage() {
         statusFilter === 'ALL' ? undefined : statusFilter === 'true';
       await loadVouchers(currentPage, isActive);
     } catch {
-      alert('Xóa voucher thất bại. Vui lòng thử lại.');
+      toast.error('Xóa voucher thất bại. Vui lòng thử lại.');
     } finally {
       setDeletingId(null);
     }

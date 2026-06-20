@@ -88,6 +88,6 @@ export async function fetchDashboardTableAll(
     success: boolean;
     data: unknown[];
     pagination: PaginationMeta;
-  }>(`/dashboard/table?tab=${tab}&page=1&limit=10000&sortOrder=${sortOrder}`);
+  }>(`/dashboard/table?tab=${tab}&page=1&limit=1000&sortOrder=${sortOrder}`);
   return res.data.data;
 }

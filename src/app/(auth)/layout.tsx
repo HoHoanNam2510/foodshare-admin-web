@@ -13,7 +13,7 @@ export default function AuthLayout({
   const [, startTransition] = useTransition();
 
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
+    const token = sessionStorage.getItem('admin_token');
     if (token) {
       router.replace('/dashboard');
     } else {

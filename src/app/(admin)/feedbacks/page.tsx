@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import {
   Layers,
   Clock,
@@ -16,7 +17,11 @@ import PageHeader from '@/components/ui/PageHeader';
 import ActionDropdown, {
   type DropdownAction,
 } from '@/components/ui/ActionDropdown';
-import FeedbackDetailModal from '@/components/features/feedbacks/FeedbackDetailModal';
+import dynamic from 'next/dynamic';
+const FeedbackDetailModal = dynamic(
+  () => import('@/components/features/feedbacks/FeedbackDetailModal'),
+  { loading: () => null }
+);
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatDateTime } from '@/lib/formatters';
 import {
@@ -116,7 +121,7 @@ export default function FeedbacksManagementPage() {
         await assignFeedback(fb._id);
         await loadFeedbacks();
       } catch {
-        alert('Tiếp nhận thất bại. Vui lòng thử lại.');
+        toast.error('Tiếp nhận thất bại. Vui lòng thử lại.');
       } finally {
         setLoadingActionId(null);
       }

@@ -12,14 +12,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await login(email, password);
 
-    // Nếu login thành công (token đã lưu), chuyển hướng về dashboard
-    const token = localStorage.getItem('admin_token');
+    const token = sessionStorage.getItem('admin_token');
     if (token) {
       router.replace('/dashboard');
     }
@@ -161,49 +159,6 @@ export default function LoginPage() {
                     )}
                   </button>
                 </div>
-              </div>
-
-              {/* Remember me */}
-              <div className="flex items-center gap-2.5 pt-1">
-                <div className="relative flex items-center">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div
-                    onClick={() => setRememberMe(!rememberMe)}
-                    className="rounded-sm border-2 cursor-pointer flex items-center justify-center transition-all duration-200 border-outline-variant dark:border-gray-600 peer-checked:border-primary bg-surface-lowest dark:bg-gray-800 peer-checked:bg-primary"
-                    style={{ width: '18px', height: '18px' }}
-                  >
-                    {rememberMe && (
-                      <svg
-                        width="11"
-                        height="9"
-                        viewBox="0 0 11 9"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M1 4L4 7.5L10 1"
-                          stroke="white"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-                <label
-                  htmlFor="remember"
-                  onClick={() => setRememberMe(!rememberMe)}
-                  className="font-body text-sm text-neutral-T30 dark:text-gray-300 cursor-pointer select-none"
-                >
-                  Remember for 30 days
-                </label>
               </div>
 
               {/* Login Button */}

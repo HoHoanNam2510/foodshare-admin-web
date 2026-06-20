@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Eye, MessageSquare } from 'lucide-react';
-import ChatDetailModal from '@/components/features/chats/ChatDetailModal';
+import dynamic from 'next/dynamic';
+const ChatDetailModal = dynamic(
+  () => import('@/components/features/chats/ChatDetailModal'),
+  { loading: () => null }
+);
 import { formatDateTime } from '@/lib/formatters';
 import PageHeader from '@/components/ui/PageHeader';
 import Toolbar, { type ToolbarFilter } from '@/components/ui/Toolbar';
