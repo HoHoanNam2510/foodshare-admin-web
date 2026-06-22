@@ -12,12 +12,16 @@ import {
   MessageSquare,
   AlertTriangle,
   Loader2,
+  Package,
+  FileText,
 } from 'lucide-react';
 import {
   fetchAdminMessages,
   adminToggleLockConversation,
   type IConversation,
   type IMessage,
+  type IRelatedPost,
+  type IRelatedTransaction,
 } from '@/lib/chatApi';
 import UserAvatar from '@/components/ui/UserAvatar';
 
@@ -25,6 +29,25 @@ interface ChatDetailModalProps {
   chat: IConversation | null;
   onClose: () => void;
   onToggleLock: () => void;
+}
+
+function isSameDay(a: string, b: string): boolean {
+  const da = new Date(a);
+  const db = new Date(b);
+  return (
+    da.getFullYear() === db.getFullYear() &&
+    da.getMonth() === db.getMonth() &&
+    da.getDate() === db.getDate()
+  );
+}
+
+function formatSessionDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('vi-VN', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 }
 
 export default function ChatDetailModal({
@@ -77,8 +100,21 @@ export default function ChatDetailModal({
   };
 
   const renderMessageContent = (msg: IMessage) => {
+    // Tin đã thu hồi: ẩn nội dung gốc với cả admin — nhất quán với ngữ nghĩa thu
+    // hồi (ẩn 2 phía) và tránh lộ URL ảnh đã xóa khỏi Cloudinary.
+    if (msg.isRecalled) {
+      return (
+        <span className="text-sm italic text-gray-500 dark:text-gray-400 wrap-break-word">
+          Tin nhắn đã được thu hồi
+        </span>
+      );
+    }
+
     switch (msg.messageType) {
-      case 'IMAGE':
+      case 'IMAGE': {
+        // Backend đặt content = imageUrl khi ảnh không có caption → chỉ hiện
+        // content khi đó là caption thật, tránh in URL Cloudinary dài gây tràn.
+        const hasCaption = msg.content && msg.content !== msg.imageUrl;
         return (
           <div className="flex flex-col gap-1">
             {msg.imageUrl ? (
@@ -95,25 +131,148 @@ export default function ChatDetailModal({
                 <ImageIcon size={24} className="text-gray-400" />
               </div>
             )}
-            {msg.content && <span className="text-sm">{msg.content}</span>}
+            {hasCaption && (
+              <span className="text-sm wrap-break-word">{msg.content}</span>
+            )}
           </div>
         );
-      case 'LOCATION':
+      }
+      case 'LOCATION': {
+        const coords = msg.location
+          ? `${msg.location.latitude.toFixed(6)}, ${msg.location.longitude.toFixed(6)}`
+          : msg.content;
         return (
           <div className="flex items-center gap-2 p-2 bg-surface rounded border border-outline-variant/30 dark:border-gray-700">
-            <MapPin size={20} className="text-error" />
-            <div className="flex flex-col text-sm text-gray-800 dark:text-gray-200">
-              <span className="font-semibold">{msg.content}</span>
-              {msg.location && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {msg.location.latitude}, {msg.location.longitude}
-                </span>
-              )}
+            <MapPin size={20} className="text-error shrink-0" />
+            <div className="flex flex-col text-sm text-gray-800 dark:text-gray-200 min-w-0">
+              <span className="font-semibold text-green-700">
+                Vị trí được chia sẻ
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 wrap-break-word">
+                {coords}
+              </span>
             </div>
           </div>
         );
+      }
+      case 'POST': {
+        const p: IRelatedPost | undefined = msg.relatedPost;
+        const hasNote =
+          msg.content && msg.content !== 'Bài đăng' && msg.content !== 'Post';
+        return (
+          <div className="flex w-64 flex-col gap-1.5">
+            <div className="flex w-64 items-center gap-3 p-2.5 border border-outline-variant/30 dark:border-gray-700 rounded-xl bg-surface dark:bg-gray-800">
+              {p?.images?.[0] ? (
+                <Image
+                  src={p.images[0]}
+                  alt={p.title}
+                  width={52}
+                  height={52}
+                  className="h-13 w-13 rounded-lg object-cover shrink-0"
+                  unoptimized
+                />
+              ) : (
+                <div className="h-13 w-13 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center shrink-0">
+                  <Package
+                    size={22}
+                    className="text-green-600 dark:text-green-400"
+                  />
+                </div>
+              )}
+              <div className="flex flex-col min-w-0 gap-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                  Bài đăng
+                </span>
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 wrap-break-word line-clamp-2">
+                  {p?.title || msg.content}
+                </span>
+                {p && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {p.type === 'P2P_FREE'
+                      ? 'Miễn phí'
+                      : p.price
+                        ? `${p.price.toLocaleString('vi-VN')}đ`
+                        : ''}
+                  </span>
+                )}
+              </div>
+            </div>
+            {hasNote && (
+              <span className="text-sm wrap-break-word whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                {msg.content}
+              </span>
+            )}
+          </div>
+        );
+      }
+      case 'TRANSACTION': {
+        const txn: IRelatedTransaction | undefined = msg.relatedTransaction;
+        const txPost = txn?.postId;
+        const STATUS_LABELS: Record<string, string> = {
+          PENDING: 'Chờ xác nhận',
+          ACCEPTED: 'Đã chấp nhận',
+          COMPLETED: 'Hoàn thành',
+          CANCELLED: 'Đã hủy',
+          REJECTED: 'Từ chối',
+        };
+        const hasNote =
+          msg.content &&
+          msg.content !== 'Giao dịch' &&
+          msg.content !== 'Transaction';
+        return (
+          <div className="flex w-64 flex-col gap-1.5">
+            <div className="flex w-64 items-center gap-3 p-2.5 border border-outline-variant/30 dark:border-gray-700 rounded-xl bg-surface dark:bg-gray-800">
+              {txPost?.images?.[0] ? (
+                <Image
+                  src={txPost.images[0]}
+                  alt={txPost.title}
+                  width={52}
+                  height={52}
+                  className="h-13 w-13 rounded-lg object-cover shrink-0"
+                  unoptimized
+                />
+              ) : (
+                <div className="h-13 w-13 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center shrink-0">
+                  <FileText
+                    size={22}
+                    className="text-blue-600 dark:text-blue-400"
+                  />
+                </div>
+              )}
+              <div className="flex flex-col min-w-0 gap-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  Giao dịch
+                </span>
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 wrap-break-word">
+                  {txPost?.title ||
+                    (txn?._id
+                      ? `Giao dịch #${txn._id.slice(-8).toUpperCase()}`
+                      : msg.content)}
+                </span>
+                {txn && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {txn.status ? STATUS_LABELS[txn.status] || txn.status : ''}
+                    {txn.totalAmount
+                      ? ` · ${txn.totalAmount.toLocaleString('vi-VN')}đ`
+                      : ''}
+                  </span>
+                )}
+              </div>
+            </div>
+            {hasNote && (
+              <span className="text-sm wrap-break-word whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                {msg.content}
+              </span>
+            )}
+          </div>
+        );
+      }
       default:
-        return <span className="text-sm">{msg.content}</span>;
+        return (
+          <span className="text-sm wrap-break-word whitespace-pre-wrap">
+            {msg.content}
+          </span>
+        );
     }
   };
 
@@ -198,31 +357,54 @@ export default function ChatDetailModal({
               Chưa có tin nhắn nào.
             </div>
           ) : (
-            messages.map((msg) => {
+            messages.map((msg, index) => {
               const senderId = getSenderId(msg);
               const isLeft = senderId === chat.participants[0]?._id;
               const senderName = getSenderName(msg);
+              const prev = messages[index - 1];
+              const showSeparator =
+                !prev || !isSameDay(msg.createdAt, prev.createdAt);
 
               return (
-                <div
-                  key={msg._id}
-                  className={`flex flex-col ${isLeft ? 'items-start' : 'items-end'}`}
-                >
-                  <span className="text-[11px] text-gray-500 dark:text-gray-400 mb-1 px-1">
-                    {senderName} •{' '}
-                    {new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
+                <div key={msg._id}>
+                  {showSeparator && (
+                    <div className="my-4 flex items-center justify-center">
+                      <span className="px-3 py-1 rounded-full bg-surface-container dark:bg-gray-700 text-[11px] font-label text-gray-500 dark:text-gray-400">
+                        {formatSessionDate(msg.createdAt)}
+                      </span>
+                    </div>
+                  )}
                   <div
-                    className={`max-w-[70%] px-4 py-2.5 rounded-2xl ${
-                      isLeft
-                        ? 'bg-surface-lowest dark:bg-gray-900 border border-outline-variant/30 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-sm'
-                        : 'bg-primary/10 dark:bg-primary/20 text-gray-900 dark:text-gray-100 border border-primary/20 rounded-tr-sm'
-                    }`}
+                    className={`flex flex-col ${isLeft ? 'items-start' : 'items-end'}`}
                   >
-                    {renderMessageContent(msg)}
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400 mb-1 px-1 flex items-center gap-1.5">
+                      <span>
+                        {senderName} •{' '}
+                        {new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                      {msg.isEdited && !msg.isRecalled && (
+                        <span className="italic text-gray-400 dark:text-gray-500">
+                          · đã chỉnh sửa
+                        </span>
+                      )}
+                      {msg.isRecalled && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-error/10 text-error text-[9px] font-bold uppercase tracking-wider">
+                          Đã thu hồi
+                        </span>
+                      )}
+                    </span>
+                    <div
+                      className={`max-w-[70%] min-w-0 wrap-break-word px-4 py-2.5 rounded-2xl ${
+                        isLeft
+                          ? 'bg-surface-lowest dark:bg-gray-900 border border-outline-variant/30 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-sm'
+                          : 'bg-primary/10 dark:bg-primary/20 text-gray-900 dark:text-gray-100 border border-primary/20 rounded-tr-sm'
+                      }`}
+                    >
+                      {renderMessageContent(msg)}
+                    </div>
                   </div>
                 </div>
               );

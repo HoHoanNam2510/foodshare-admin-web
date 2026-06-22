@@ -13,7 +13,7 @@ export interface ILastMessage {
   _id: string;
   conversationId: string;
   senderId: string;
-  messageType: 'TEXT' | 'IMAGE' | 'LOCATION';
+  messageType: 'TEXT' | 'IMAGE' | 'LOCATION' | 'POST' | 'TRANSACTION';
   content: string;
   imageUrl?: string;
   location?: { latitude: number; longitude: number };
@@ -30,14 +30,37 @@ export interface IConversation {
   updatedAt: string;
 }
 
+export interface IRelatedPost {
+  _id: string;
+  title: string;
+  images?: string[];
+  price?: number;
+  type?: 'P2P_FREE' | 'B2C_MYSTERY_BAG';
+}
+
+export interface IRelatedTransaction {
+  _id: string;
+  type: 'REQUEST' | 'ORDER';
+  status: string;
+  totalAmount?: number;
+  quantity?: number;
+  postId?: { _id: string; title: string; images?: string[] };
+}
+
 export interface IMessage {
   _id: string;
   conversationId: string;
   senderId: { _id: string; fullName: string; avatar?: string } | string;
-  messageType: 'TEXT' | 'IMAGE' | 'LOCATION';
+  messageType: 'TEXT' | 'IMAGE' | 'LOCATION' | 'POST' | 'TRANSACTION';
   content: string;
   imageUrl?: string;
   location?: { latitude: number; longitude: number };
+  relatedPost?: IRelatedPost;
+  relatedTransaction?: IRelatedTransaction;
+  isRecalled?: boolean;
+  isEdited?: boolean;
+  recalledAt?: string;
+  editedAt?: string;
   createdAt: string;
 }
 

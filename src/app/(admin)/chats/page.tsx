@@ -134,7 +134,11 @@ export default function ChatsManagementPage() {
               ? '[Hình ảnh]'
               : chat.lastMessage.messageType === 'LOCATION'
                 ? '[Định vị]'
-                : chat.lastMessage.content}
+                : chat.lastMessage.messageType === 'POST'
+                  ? '[Bài đăng]'
+                  : chat.lastMessage.messageType === 'TRANSACTION'
+                    ? '[Giao dịch]'
+                    : chat.lastMessage.content}
             &quot;
           </span>
         ) : (
