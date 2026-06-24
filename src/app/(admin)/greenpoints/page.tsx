@@ -140,7 +140,7 @@ export default function GreenPointsManagementPage() {
 
       <Toolbar
         onSearch={handleSearch}
-        placeholder="Lọc theo User ID..."
+        placeholder="Lọc theo User ID (dán ID từ trang Người Dùng)..."
         delay={600}
       />
 

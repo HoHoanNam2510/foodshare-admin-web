@@ -146,7 +146,7 @@ export default function BroadcastHistoryPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
       <PageHeader
         title="Lịch Sử Broadcast Thông Báo"
         subtitle="Xem các lần gửi thông báo hàng loạt trong quá khứ"

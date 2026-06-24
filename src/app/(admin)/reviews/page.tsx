@@ -24,11 +24,11 @@ const PAGE_SIZE = 15;
 // ─── Rating helpers ───────────────────────────────────────────
 
 const RATING_STYLES: Record<number, string> = {
-  5: 'bg-green-50 text-primary border-primary/20',
-  4: 'bg-blue-50 text-blue-700 border-blue-200',
-  3: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  2: 'bg-orange-50 text-orange-700 border-orange-200',
-  1: 'bg-red-50 text-error border-error/20',
+  5: 'bg-green-50 dark:bg-green-900/20 text-primary dark:text-green-400 border-primary/20 dark:border-green-800/30',
+  4: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/30',
+  3: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/30',
+  2: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/30',
+  1: 'bg-red-50 dark:bg-red-900/20 text-error dark:text-red-400 border-error/20 dark:border-red-800/30',
 };
 
 const getRatingBadge = (rating: number) => (
@@ -59,6 +59,7 @@ const renderStarsInline = (rating: number) => (
 
 export default function ReviewsManagementPage() {
   const [ratingFilter, setRatingFilter] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [reviews, setReviews] = useState<IReview[]>([]);
@@ -77,7 +78,7 @@ export default function ReviewsManagementPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [ratingFilter]);
+  }, [ratingFilter, searchQuery]);
 
   const loadReviews = useCallback(async () => {
     setLoading(true);
@@ -119,6 +120,17 @@ export default function ReviewsManagementPage() {
       setDeletingId(null);
     }
   };
+
+  const filteredReviews = searchQuery
+    ? reviews.filter((r) => {
+        const q = searchQuery.toLowerCase();
+        return (
+          r.reviewerId.fullName.toLowerCase().includes(q) ||
+          r.revieweeId.fullName.toLowerCase().includes(q) ||
+          (r.feedback ?? '').toLowerCase().includes(q)
+        );
+      })
+    : reviews;
 
   const buildActions = (review: IReview): DropdownAction[] => [
     {
@@ -249,6 +261,12 @@ export default function ReviewsManagementPage() {
       />
 
       <Toolbar
+        searchQuery={searchQuery}
+        onSearchChange={(v) => {
+          setSearchQuery(v);
+          setCurrentPage(1);
+        }}
+        placeholder="Tìm theo tên người đánh giá, nhận xét..."
         filters={
           [
             {
@@ -270,11 +288,15 @@ export default function ReviewsManagementPage() {
 
       <DataTable
         columns={columns}
-        data={reviews}
+        data={filteredReviews}
         rowKey={(review) => review._id}
         loading={loading}
         error={error}
-        emptyMessage="Không có đánh giá nào phù hợp."
+        emptyMessage={
+          searchQuery
+            ? 'Không tìm thấy đánh giá phù hợp.'
+            : 'Không có đánh giá nào phù hợp.'
+        }
         pagination={pagination}
         currentPage={currentPage}
         onPageChange={setCurrentPage}

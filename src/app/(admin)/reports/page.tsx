@@ -26,6 +26,13 @@ import { adminSoftDeleteReport } from '@/lib/trashApi';
 
 const PAGE_LIMIT = 10;
 
+const TARGET_TYPE_LABELS: Record<string, string> = {
+  POST: 'Bài đăng',
+  USER: 'Người dùng',
+  TRANSACTION: 'Giao dịch',
+  REVIEW: 'Đánh giá',
+};
+
 const REASON_LABELS: Record<string, string> = {
   FOOD_SAFETY: 'An toàn thực phẩm',
   SCAM: 'Lừa đảo',
@@ -35,11 +42,15 @@ const REASON_LABELS: Record<string, string> = {
 };
 
 const REASON_STYLES: Record<string, string> = {
-  FOOD_SAFETY: 'bg-red-50 text-error border-error/20',
-  SCAM: 'bg-orange-50 text-orange-700 border-orange-200',
-  INAPPROPRIATE_CONTENT: 'bg-purple-50 text-purple-700 border-purple-200',
-  NO_SHOW: 'bg-blue-50 text-blue-700 border-blue-200',
-  OTHER: 'bg-gray-100 text-gray-600 border-gray-200',
+  FOOD_SAFETY:
+    'bg-red-50 dark:bg-red-900/20 text-error dark:text-red-400 border-error/20 dark:border-red-800/30',
+  SCAM: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/30',
+  INAPPROPRIATE_CONTENT:
+    'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800/30',
+  NO_SHOW:
+    'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/30',
+  OTHER:
+    'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -183,7 +194,7 @@ export default function ReportsManagementPage() {
           </span>
           <span className="text-xs text-gray-600 dark:text-gray-400">
             <strong className="text-gray-900 dark:text-gray-100">
-              {r.targetType}:
+              {TARGET_TYPE_LABELS[r.targetType] ?? r.targetType}:
             </strong>{' '}
             {r.targetId.slice(-8).toUpperCase()}
           </span>
@@ -225,9 +236,9 @@ export default function ReportsManagementPage() {
       onChange: setTargetFilter,
       options: [
         { value: 'ALL', label: 'Tất cả đối tượng' },
-        { value: 'POST', label: 'Bài đăng (POST)' },
-        { value: 'USER', label: 'Người dùng (USER)' },
-        { value: 'TRANSACTION', label: 'Giao dịch (TRANSACTION)' },
+        { value: 'POST', label: 'Bài đăng' },
+        { value: 'USER', label: 'Người dùng' },
+        { value: 'TRANSACTION', label: 'Giao dịch' },
       ],
     },
   ];

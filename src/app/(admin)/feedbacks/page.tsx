@@ -39,15 +39,25 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const TYPE_STYLES: Record<string, string> = {
-  BUG_REPORT: 'bg-red-50 text-red-700 border-red-200',
-  SUGGESTION: 'bg-amber-50 text-amber-700 border-amber-200',
+  BUG_REPORT:
+    'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/30',
+  SUGGESTION:
+    'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/30',
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
-  CRITICAL: 'bg-red-100 text-red-800 border-red-300',
-  HIGH: 'bg-orange-50 text-orange-700 border-orange-200',
-  MEDIUM: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  LOW: 'bg-gray-100 text-gray-600 border-gray-200',
+  CRITICAL:
+    'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700',
+  HIGH: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/30',
+  MEDIUM:
+    'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/30',
+  LOW: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700',
+};
+
+const ROLE_LABELS: Record<string, string> = {
+  USER: 'Người dùng',
+  STORE: 'Cửa hàng',
+  ADMIN: 'Quản trị viên',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -182,7 +192,10 @@ export default function FeedbacksManagementPage() {
       key: 'role',
       header: 'Vai trò',
       render: (fb) => (
-        <StatusBadge status={fb.userId.role} label={fb.userId.role} />
+        <StatusBadge
+          status={fb.userId.role}
+          label={ROLE_LABELS[fb.userId.role] ?? fb.userId.role}
+        />
       ),
     },
     {

@@ -219,7 +219,7 @@ export default function VouchersManagementPage() {
       render: (voucher) => (
         <>
           <span className="font-bold text-primary">{voucher.pointCost}</span>
-          <span className="text-xs text-gray-400 ml-1">đ</span>
+          <span className="text-xs text-gray-400 ml-1">pts</span>
         </>
       ),
     },

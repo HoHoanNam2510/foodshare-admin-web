@@ -37,7 +37,7 @@ const DEFAULT_SOFT_DELETE: ISoftDeleteConfig = {
 const DEFAULT_AI_MODERATION: IAIModerationConfig = {
   enabled: false,
   intervalHours: 6,
-  trustScoreThresholds: { reject: 50, approve: 70 },
+  trustScoreThresholds: { reject: 70, approve: 90 },
 };
 
 export default function SettingsPage() {
@@ -370,7 +370,7 @@ export default function SettingsPage() {
                 AI Kiểm Duyệt Bài Đăng
               </h2>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 uppercase tracking-wide">
-                Grok
+                GPT-4o-mini
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

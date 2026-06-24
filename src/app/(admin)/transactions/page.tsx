@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { Eye, HeartHandshake, ShoppingBag, Layers } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const TransactionDetailModal = dynamic(
@@ -41,6 +42,7 @@ export default function TransactionsManagementPage() {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<'ALL' | 'REQUEST' | 'ORDER'>(
     'ALL'
@@ -54,6 +56,7 @@ export default function TransactionsManagementPage() {
 
   const loadTransactions = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const res = await fetchAdminTransactions({
         type: activeTab !== 'ALL' ? activeTab : undefined,
@@ -64,7 +67,8 @@ export default function TransactionsManagementPage() {
       setTransactions(res.data);
       setPagination(res.pagination);
     } catch {
-      // error swallowed intentionally — table shows empty state
+      setError('Không thể tải danh sách giao dịch. Vui lòng thử lại.');
+      toast.error('Không thể tải danh sách giao dịch. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -283,6 +287,7 @@ export default function TransactionsManagementPage() {
         data={filteredTransactions}
         rowKey={(tx) => tx._id}
         loading={isLoading}
+        error={error}
         emptyMessage="Không có giao dịch nào phù hợp."
         pagination={pagination}
         currentPage={currentPage}
